@@ -95,7 +95,6 @@ void main()
 
             foreach (SimBody sB in BodyList)
                 sB.RenderSphericalBody(SharedSphereIndices.Length, BodyColorUniform, MVP_Uniform, ref simCamera.VP_Matrix, ref LocationMatrix4, ref SizeMatrix4);
-
         }
 
         /// <summary>

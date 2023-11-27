@@ -71,7 +71,6 @@ namespace OrbitalSimOpenGL
 
         public void InitScene(EphemerisBodyList ephemerismBodyList)
         {
-
             InitAxes();
             InitBodies(ephemerismBodyList);
 
@@ -142,7 +141,6 @@ namespace OrbitalSimOpenGL
         }
 
         #region Axes
-
         private Shader AxisShader;
         public static String AxisVertexShader = @"
 #version 330 core

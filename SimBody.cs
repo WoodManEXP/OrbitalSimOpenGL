@@ -56,13 +56,11 @@ namespace OrbitalSimOpenGL
         #endregion
         public SimBody(EphemerisBody ephemerisBody, String appDataFolder)
         {
-
             double dVal;
 
             AppDataFolder = appDataFolder;
 
             // Save ephemeris values into current settings (universe coords)
-
             X = double.TryParse(ephemerisBody.X_Str, out dVal) ? dVal : -1D;
             Y = double.TryParse(ephemerisBody.Y_Str, out dVal) ? dVal : -1D;
             Z = double.TryParse(ephemerisBody.Z_Str, out dVal) ? dVal : -1D;
