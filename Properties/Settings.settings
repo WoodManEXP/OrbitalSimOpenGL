@@ -1,0 +1,51 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OrbitalSimOpenGL.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="NoInitJPL_BodiesCSVFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Not finding initial JPL bodies CSV file</Value>
+    </Setting>
+    <Setting Name="NoSaveBodiesCSV" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Unable to save bodies CSV file</Value>
+    </Setting>
+    <Setting Name="GatheringEphemerides" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Gathering ephemerides from JPL Horizons</Value>
+    </Setting>
+    <Setting Name="HorizonsCheckURL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://ssd.jpl.nasa.gov/horizons.cgi</Value>
+    </Setting>
+    <Setting Name="HorizonsEphemerisURL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://ssd.jpl.nasa.gov/horizons_batch.cgi?batch=1&amp;COMMAND='{Command}'&amp;CENTER='@0'&amp;MAKE_EPHEM='YES'&amp;EPHEM_TYPE='VECTOR'&amp;VEC_TABLE='3'&amp;START_TIME='{StartTime}'&amp;STOP_TIME='{StopTime}'&amp;STEP_SIZE='1h'&amp;OUT_UNITS='KM-S'&amp;CSV_FORMAT='YES'</Value>
+    </Setting>
+    <Setting Name="NoHorizonsConnection" Type="System.String" Scope="User">
+      <Value Profile="(Default)">No connection to JPL Horizons</Value>
+    </Setting>
+    <Setting Name="AxisLength" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">24000000000</Value>
+    </Setting>
+    <Setting Name="Origin" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Origin</Value>
+    </Setting>
+    <Setting Name="SystemBarycenter" Type="System.String" Scope="User">
+      <Value Profile="(Default)">System barycenter</Value>
+    </Setting>
+    <Setting Name="ImagesDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Properties\Images</Value>
+    </Setting>
+    <Setting Name="ContinueStr" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Continue</Value>
+    </Setting>
+    <Setting Name="InitJPL_BodiesFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">InitJPL_Bodies.csv</Value>
+    </Setting>
+    <Setting Name="SavedJPLBodiesFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">SavedJPLBodies.csv</Value>
+    </Setting>
+    <Setting Name="SavedEphemerisBodiesFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">SavedEphemerisBodies.json</Value>
+    </Setting>
+    <Setting Name="MaxCamMoveScale" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">21</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

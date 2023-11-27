@@ -1,0 +1,38 @@
+﻿<Window x:Class="OrbitalSimOpenGL.BodiesListDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OrbitalSimOpenGL"
+        mc:Ignorable="d"
+        Title="Select bodies from JPL Ephemeris" Height="466" Width="656" Background="#FFCCCCCC"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="0,373,0,5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Button Content="OK" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Button_OK" Height="36" Width="65" FontFamily="Calibri" FontSize="14" ToolTip="Leave and save changes to selected bodies list"/>
+        <Button Content="Cancel" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Button_Cancel" Height="36" Width="65" FontFamily="Calibri" FontSize="14" Grid.Column="1" ToolTip="Leave, forgetting any changes to bodies list"/>
+        <Button Content="Reload" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Button_Reload" Height="36" Width="64" FontFamily="Calibri" FontSize="14" Grid.Column="2" ToolTip="Reload initial body list settings"/>
+        <Button Content="Clear" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Button_Clear" Height="36" Width="64" FontFamily="Calibri" FontSize="14" Grid.Column="3" ToolTip="Clear selected bodies"/>
+        <Button Content="Sel All" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Button_SelAll" Height="36" Width="64" FontFamily="Calibri" FontSize="14" Grid.Column="4" ToolTip="Select all bodies"/>
+        <ListBox x:Name="bodiesList" d:ItemsSource="{d:SampleData ItemCount=5}" Grid.ColumnSpan="5" Margin="14,-345,16,88">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox IsChecked="{Binding Selected}" />
+                        <TextBlock Text="{Binding Text}" Grid.Column="1" FontFamily="Calibri" FontSize="14"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>

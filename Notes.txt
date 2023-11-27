@@ -1,0 +1,31 @@
+﻿https://github.com/opentk/GLWpfControl - OpenGL WPF control used in project
+
+https://www.nuget.org/packages/OpenTK.GLWpfControl - Installed OpenGL PKG
+
+
+SimModel
+
+ Render
+ 
+	Perform animation calculations
+	Set camera characteristics
+	Draw axis
+	SimBodyList.Render()	// Send aspect ratio
+
+
+SimBodyList
+
+ Constructor 
+	make SharedSphere
+	
+ Render
+	Load SharedSphere
+	Loop over each body (aspect ratio)
+	
+	
+SimBody
+
+ Render (aspect ratio)
+	updating parameters to vertex shader
+		also counting for aspect ratio
+	Draw

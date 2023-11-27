@@ -1,0 +1,112 @@
+﻿<Window x:Class="OrbitalSimOpenGL.OrbitalSimControlWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OrbitalSimOpenGL"
+        mc:Ignorable="d"
+        Title="OrbitalSim Control - OpenGL" Height="384" Width="586"
+        ResizeMode="NoResize"
+        Topmost="True"
+        Loaded="Window_Loaded"
+        >
+    <Canvas RenderTransformOrigin="0.857,0.49" Height="356" VerticalAlignment="Top">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
+            <Menu Foreground="#FFFFF3F3" Background="Gray" Height="29" Width="144" BorderBrush="Black">
+                <MenuItem Header="_File" Height="31" FontFamily="Calibri" FontSize="14">
+                    <MenuItem Header="Exit" Foreground="#FFFFF3F3" Background="Gray" Click="FileExitMenu"/>
+                </MenuItem>
+            </Menu>
+        </StackPanel>
+        <Button x:Name="xtraBodsButton" RenderTransformOrigin="2.572,3.459" Canvas.Left="14" Canvas.Top="95"
+                Content="Xtra Bods"
+                HorizontalAlignment="Center" VerticalAlignment="Top" Width="73"
+                ToolTipService.ToolTip="Select JSON model file" Click="XtraBodsButton" ToolTip="Select extra bodies file" IsEnabled="False"/>
+        <Button x:Name="bodiesButton"  RenderTransformOrigin="2.572,3.459" Canvas.Left="14" Canvas.Top="40" 
+                Content="Bodies" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75"
+                ToolTipService.ToolTip="Load/select bodies" Click="BodiesButton" ToolTip="Load/select bodies to read from JPL"/>
+        <Button x:Name="startButton" Content="Start" Canvas.Left="138" Canvas.Top="41" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75"
+                ToolTipService.ToolTip="Start sim" Click="StartButton"/>
+        <Button x:Name="pauseButton" Content="Pause" Canvas.Left="243" Canvas.Top="41" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75"
+                ToolTipService.ToolTip="Pause sim" Click="PauseButton"/>
+        <GroupBox Height="203" Header="Camera" Width="464" Canvas.Left="111" Canvas.Top="71" HorizontalAlignment="Center" VerticalAlignment="Top">
+            <Canvas>
+                <Button x:Name="LookLeftButton" Content="LL" Canvas.Left="10" Canvas.Top="29" RenderTransformOrigin="-0.328,-0.399" HorizontalAlignment="Center" VerticalAlignment="Top"
+                Width="40" ToolTipService.ToolTip="Look left" Click="CameraLookLeft"/>
+                <Button x:Name="LookUpButton" Content="LU" Canvas.Left="44" Canvas.Top="5" RenderTransformOrigin="-0.328,-0.399" HorizontalAlignment="Left" VerticalAlignment="Top"
+                Width="40" ToolTipService.ToolTip="Look up" Click="CameraLookUp"/>
+                <Button x:Name="LookDownButton" Content="LD" Canvas.Left="44" Canvas.Top="53" RenderTransformOrigin="-0.328,-0.399" HorizontalAlignment="Center" VerticalAlignment="Top"
+                Width="40" ToolTipService.ToolTip="Look down" Click="CameraLookDown"/>
+                <Button x:Name="LookRightButton" Content="LR" Canvas.Left="71" Canvas.Top="29" RenderTransformOrigin="-0.328,-0.399" HorizontalAlignment="Center" VerticalAlignment="Top"
+                Width="40" ToolTipService.ToolTip="Look right" Click="CameraLookRight"/>
+                <Button x:Name="TiltC_Button" Content="TC" Canvas.Left="74" Canvas.Top="85" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5" Width="25" Click="CameraTiltC" Height="20">
+                    <Button.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform Angle="50.029"/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Button.RenderTransform>
+                </Button>
+                <Button x:Name="TiltCC_Button" Content="TCC" Canvas.Left="32" Canvas.Top="86" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" VerticalAlignment="Center" Width="25" Click="CameraTiltCC" Height="20">
+                    <Button.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform Angle="-53.525"/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Button.RenderTransform>
+                </Button>
+                <Slider x:Name="MoveScaleSlider" HorizontalAlignment="Left" Width="27" Orientation="Vertical" Height="75" Canvas.Left="276" Canvas.Top="1" VerticalAlignment="Center" Maximum="20" ValueChanged="CameraMoveSliderChanged" ToolTip="Camera KM move amount" Minimum="7"/>
+                <Label x:Name="OrbitDegreesLabel" Content="" Canvas.Left="411" Canvas.Top="83" HorizontalAlignment="Left" VerticalAlignment="Center" Width="40" ToolTip="Orbit amount (degrees)" HorizontalContentAlignment="Center"/>
+                <Button x:Name="CameraForwardButton" Content="For" Canvas.Left="164" Canvas.Top="23"
+                ToolTipService.ToolTip="Camera forwards" HorizontalAlignment="Left" VerticalAlignment="Center" Width="28" Click="CameraMoveForward"/>
+                <Button x:Name="CameraBackwardButton" Content="Rev" Canvas.Left="164" Canvas.Top="48"
+            ToolTipService.ToolTip="Camera backwards" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CameraMoveBackward" ToolTip="Camera reverse" Width="29" RenderTransformOrigin="-0.222,-1.349"/>
+                <Button x:Name="MoveUpButton" Content="MU" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Move camera Up" Click="CameraMoveUp" Canvas.Left="218" Canvas.Top="10" Width="30"/>
+                <Button x:Name="MoveLeftButton" Content="ML" Canvas.Left="198" Canvas.Top="35" Width="30" ToolTip="Move camera left" Click="CameraMoveLeft" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Button x:Name="MoveDownButton" Content="MD" Canvas.Left="218" Canvas.Top="61" Width="30" ToolTip="Move camera down" Click="CameraMoveDown" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Button x:Name="MoveRightButton" Content="MR" Canvas.Left="241" Canvas.Top="35" HorizontalAlignment="Left" VerticalAlignment="Center" Width="30" ToolTip="Move camera right" Click="CameraMoveRight"/>
+                <Slider x:Name="LookTiltDegreesSlider" HorizontalAlignment="Left" Width="27" Orientation="Vertical" Height="75" Canvas.Left="121" Canvas.Top="1" VerticalAlignment="Center" Maximum="180" ValueChanged="LookTiltDegreesSliderChanged" ToolTip="Look-Tile degrees" Minimum="1"/>
+                <Label x:Name="MoveScaleLabel" Content="" Canvas.Left="235" Canvas.Top="84" HorizontalAlignment="Left" VerticalAlignment="Center" Width="102" ToolTip="Move amount (km)" HorizontalContentAlignment="Center"/>
+                <Button x:Name="CameraOrbitUpButton" Content="OU" Canvas.Left="346" Canvas.Top="5" Width="40" ToolTipService.ToolTip="Orbit up about origin" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CameraOrbitUp"/>
+                <Button x:Name="CameraOrbitLeftButton" Content="OL" Canvas.Left="314" Canvas.Top="29" Width="40" ToolTipService.ToolTip="Orbit left about origin" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CameraOrbitLeft"/>
+                <Button x:Name="CameraOrbitDownButton" Content="OD" Canvas.Left="346" Canvas.Top="55" Width="40" ToolTipService.ToolTip="Orbit down about origin" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CameraOrbitDown"/>
+                <Button x:Name="CameraOrbitRightButton" Content="OR" Canvas.Left="378" Canvas.Top="29" Width="40" ToolTipService.ToolTip="Orbit right about origin" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CameraOrbitRight"/>
+
+                <GroupBox Height="63" Header="Orbit about" Width="158" Canvas.Left="295" Canvas.Top="114" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <ComboBox x:Name="OrbitAboutComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="135" RenderTransformOrigin="0.475,0" Canvas.Left="307" Canvas.Top="139" DropDownOpened="OrbitAboutDownOpened" SelectionChanged="OrbitAboutSelectionChanged"/>
+
+                <Slider x:Name="OrbitDegreesSlider" HorizontalAlignment="Left" Width="27" Orientation="Vertical" Height="75" Canvas.Left="421" Canvas.Top="1" VerticalAlignment="Center" Minimum="1" Maximum="180" ValueChanged="OrbitSiderChanged" ToolTip="Orbit response, 1 to 180" />
+                <Label x:Name="LookTiltDegreesLabel" Content="" Canvas.Left="112" Canvas.Top="83" HorizontalAlignment="Left" VerticalAlignment="Center" Width="40" ToolTip="Look-Tilt amount (degrees)" HorizontalContentAlignment="Center"/>
+            </Canvas>
+        </GroupBox>
+        <GroupBox Height="54" Header="Time Compression" Width="190" HorizontalAlignment="Center" Canvas.Top="281" VerticalAlignment="Top" Canvas.Left="213">
+            <Slider x:Name="TimeCompressionSlider" HorizontalAlignment="Left" Width="137" ToolTipService.ToolTip="(De)Compress time" Height="20" Margin="-1,0,0,0" ValueChanged="TimeCompressionSliderChanged" Minimum="1" Maximum="100" LostMouseCapture="TimeCompressionSliderLostMouseCapture"/>
+        </GroupBox>
+        <Label x:Name="TimeCompressionLabel" Content="" Canvas.Left="359" Canvas.Top="298" HorizontalAlignment="Center" VerticalAlignment="Top" Width="40"/>
+        <GroupBox Height="54" Header="Calc iterations" Width="195" HorizontalAlignment="Center" Canvas.Top="280" VerticalAlignment="Top" Canvas.Left="4">
+            <ComboBox x:Name="IterationScale" HorizontalAlignment="Left" Width="51" Height="22" IsEditable="True" ToolTip="This many per iteration" SelectionChanged="ItemScaleChanged">
+                <ComboBoxItem IsSelected="True">1</ComboBoxItem>
+                <ComboBoxItem>2</ComboBoxItem>
+                <ComboBoxItem>5</ComboBoxItem>
+                <ComboBoxItem>10</ComboBoxItem>
+                <ComboBoxItem>30</ComboBoxItem>
+            </ComboBox>
+        </GroupBox>
+        <StackPanel Orientation="Vertical" Canvas.Left="104" Canvas.Top="295" HorizontalAlignment="Center" VerticalAlignment="Top">
+            <RadioButton x:Name="IterateMinutes" GroupName="CalcIterations" IsChecked="True" Content="Minute(s)" ToolTip="Movements calculated in minutes" Checked="IterationUnitsChecked"/>
+            <RadioButton x:Name="IterateHours" GroupName="CalcIterations" Content="Hour(s)" ToolTip="Movements calculated in hours" Checked="IterationUnitsChecked"/>
+        </StackPanel>
+        <Button x:Name="ephemerisButton" Content="Ephemeris" Canvas.Left="14" Canvas.Top="68" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="EphemerisButton" ToolTip="Update ephemeris from JPL"/>
+        <Button x:Name="editBodies" Content="Edit Bodies" Canvas.Left="14" Canvas.Top="134" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="EditBodiesButton" IsEnabled="False"/>
+        <Button x:Name="saveBodiesButton" Content="Save Ephem" Canvas.Left="14" Canvas.Top="159" RenderTransformOrigin="0.379,0.403" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="SaveBodiesButton"/>
+        <Button x:Name="readBodiesButton" Content="Read Bodies" Canvas.Left="14" Canvas.Top="184" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="ReadBodiesButton" IsEnabled="False"/>
+        <GroupBox Height="61" Header="Look at" Width="136" Canvas.Left="111" Canvas.Top="202" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <ComboBox x:Name="LookAtComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.475,0" Canvas.Left="121" Canvas.Top="228" SelectionChanged="LookAtSelectionChanged" DropDownOpened="LookAtDropDownOpened"/>
+        <GroupBox Height="61" Header="Go near" Width="146" Canvas.Left="255" Canvas.Top="202" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <ComboBox x:Name="GoNearComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="126" RenderTransformOrigin="0.475,0" Canvas.Left="263" Canvas.Top="228" DropDownOpened="GoNearDropDownOpened" SelectionChanged="GoNearSelectionChanged"/>
+    </Canvas>
+</Window>
