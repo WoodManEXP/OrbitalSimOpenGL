@@ -116,21 +116,10 @@ namespace OrbitalSimOpenGL
             //NextPosition = new(SimBodyList);
         }
 
-        public void RenderScene(TimeSpan timeDelta)
+        public void Render(TimeSpan timeDelta)
         {
             if (!SceneReady)
                 return;
-
-            // Model * View * Projection
-
-            // Vector3 eye, target, up
-            //Vector3 eye = new(0f, 0f, 7f);
-            //Vector3 target = new(0f, 0f, 0f);
-            //Vector3 up = new(0f, 1f, 0f);
-            //Matrix4 view = Matrix4.LookAt(eye, target, up);
-
-            // use the deltaTime to adjust the rotation angle
-            //Double angle = MathHelper.DegreesToRadians(SecondsCounter = (SecondsCounter + timeDelta.TotalSeconds) % 360D);
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -138,29 +127,7 @@ namespace OrbitalSimOpenGL
 
             RenderAxis();
 
-            KeepVisible();
-
             SimBodyList?.Render(SimCamera);
-        }
-
-        /// <summary>
-        /// Keep bodies visible, by changing diameter, if they have become small in 3D to 2D projection
-        /// </summary>
-        private void KeepVisible()
-        {
-
-            // Get the world to viewport transform matrix
-            //Matrix3D m = MathUtils.TryWorldToViewportTransform(Viewport3DVisual, out bool bOK);
-            Vector3d halfNorm = SimCamera.UpVector3d * 5e-1f;
-
-            const int minSize = 12;
-            const int minSizeSqared = minSize * minSize;
-
-            Matrix4 vMatrix = SimCamera.ViewMatrix;
-            Matrix4 pMatrix = SimCamera.ProjectionMatrix;
-
-            foreach (SimBody sB in SimBodyList.BodyList)
-                sB.KeepVisible(ref SimCamera.VP_Matrix, SimCamera.ViewWidth, ref halfNorm, minSize, minSizeSqared);
         }
 
         #region Axes

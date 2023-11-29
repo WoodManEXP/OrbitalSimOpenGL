@@ -39,6 +39,7 @@ void main()
         int BodyColorUniform { get; set; }
         int MVP_Uniform { get; set; }
 
+        // Keep these here so they are allocated but once and reused
         Matrix4 SizeMatrix4 = Matrix4.Identity;
         Matrix4 LocationMatrix4 = Matrix4.Identity;
         public List<SimBody> BodyList { get; }
@@ -62,6 +63,10 @@ void main()
             MVP_Uniform = GL.GetUniformLocation(BodyShader.ShaderHandle, "MVP");
         }
 
+        /// <summary>
+        /// Render each body in the BodyList
+        /// </summary>
+        /// <param name="simCamera"></param>
         public void Render(SimCamera simCamera)
         {
             BodyShader.Use();
@@ -80,7 +85,6 @@ void main()
 
             //GL.UniformMatrix4(GL.GetUniformLocation(BodyShader.ShaderHandle, "MVP"), false, ref mvp);
 
-
             // Upload and render 2D cube
             //GL.BufferData(BufferTarget.ArrayBuffer, CubeVertices2D.Length * sizeof(float), CubeVertices2D, BufferUsageHint.StaticDraw);
             //GL.BufferData(BufferTarget.ElementArrayBuffer, CubeIndices2D.Length * sizeof(uint), CubeIndices2D, BufferUsageHint.StaticDraw);
@@ -91,10 +95,30 @@ void main()
             GL.BufferData(BufferTarget.ArrayBuffer, SharedSphereMesh.Length * sizeof(Single), SharedSphereMesh, BufferUsageHint.StaticDraw);
             GL.BufferData(BufferTarget.ElementArrayBuffer, SharedSphereIndices.Length * sizeof(UInt16), SharedSphereIndices, BufferUsageHint.StaticDraw);
 
-            //GL.DrawElements(PrimitiveType.Triangles, SharedSphereIndices.Length, DrawElementsType.UnsignedShort, 0);
+            Vector3d halfNorm = simCamera.UpVector3d * 5e-1f;
+
+            const int minSize = 12;
+            const int minSizeSqared = minSize * minSize;
+            Vector3d center;
+            FrustumCuller fC = simCamera.FrustumCuller;
 
             foreach (SimBody sB in BodyList)
-                sB.RenderSphericalBody(SharedSphereIndices.Length, BodyColorUniform, MVP_Uniform, ref simCamera.VP_Matrix, ref LocationMatrix4, ref SizeMatrix4);
+            {
+                // SimBody's center (U coords)
+                center.X = sB.X;
+                center.Y = sB.Y;
+                center.Z = sB.Z;
+
+                // If outsude frustun no need to render/process
+                if (false == fC.SphereCulls(ref center, sB.EphemerisDiameter))
+                {
+                    // Sphere is visible in current frustum
+                    // a. Keep its rendering to a minimum size (so something will be visible no matter how far from camera)
+                    // b. Render it
+                    sB.KeepVisible(ref simCamera.VP_Matrix, simCamera.ViewWidth, ref halfNorm, minSize, minSizeSqared);
+                    sB.Render(SharedSphereIndices.Length, BodyColorUniform, MVP_Uniform, ref simCamera.VP_Matrix, ref LocationMatrix4, ref SizeMatrix4);
+                }
+            }
         }
 
         /// <summary>

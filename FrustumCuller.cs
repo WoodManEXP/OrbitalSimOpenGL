@@ -119,45 +119,42 @@ namespace OrbitalSimOpenGL
         /// Returns true if the sphere is completely outside the frustrum
         /// </summary>
         /// <param name="center">Of shere is U coords</param>
-        /// <param name="radius">Of shere in U coords</param>
-        /// <returns></returns>
-        public Boolean SphereCulls(Vector3d center, Double radius)
+        /// <param name="diameter">Of shere in U coords</param>
+        /// <returns>True if sphere is culled, false otherwise</returns>
+        public Boolean SphereCulls(ref Vector3d center, Double diameter)
         {
             // https://community.khronos.org/t/clipping-test-for-quad-visibility/49368/4
             // https://learnopengl.com/Guest-Articles/2021/Scene/Frustum-Culling
             // https://mathinsight.org/distance_point_plane#:~:text=The%20length%20of%20the%20gray,dot%20product%20v%E2%8B%85n.
 
-            Double d;
-            Vector3d v;
-
             // Vec between sphere center and a point on the r, l, t, b frustum planes.
             // Each of those planes intersects the camera position.
-            v = center - SimCamera.CameraPosition;
+            Vector3d v = center - SimCamera.CameraPosition;
 
             // Right face
-            if (radius < (d = Vector3d.Dot(v, RightFaceNormal)))
+            if (diameter < Vector3d.Dot(v, RightFaceNormal))
                 return true;
 
             // Left face
-            if (radius < (d = Vector3d.Dot(v, LeftFaceNormal)))
+            if (diameter < Vector3d.Dot(v, LeftFaceNormal))
                 return true;
 
             // Top face
-            if (radius < (d = Vector3d.Dot(v, TopFaceNormal)))
+            if (diameter < Vector3d.Dot(v, TopFaceNormal))
                 return true;
 
             // Bottom face
-            if (radius < (d = Vector3d.Dot(v, BottomFaceNormal)))
+            if (diameter < Vector3d.Dot(v, BottomFaceNormal))
                 return true;
 
             // Near face
             v = center - CenterPointNear;
-            if (radius < (d = Vector3d.Dot(v, NearFaceNormal)))
+            if (diameter < Vector3d.Dot(v, NearFaceNormal))
                 return true;
 
             // Far face
             v = center - CenterPointFar;
-            if (radius < (d = Vector3d.Dot(v, FarFaceNormal)))
+            if (diameter < Vector3d.Dot(v, FarFaceNormal))
                 return true;
 
             return false;

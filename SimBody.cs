@@ -117,7 +117,7 @@ namespace OrbitalSimOpenGL
         /// <param name="vp"></param>
         /// <param name="locationMatrix4"></param>
         /// <param name="sizeMatrix4"></param>
-        internal void RenderSphericalBody(int indicesLength, int bodyColorUniform, int mvp_Uniform, ref Matrix4 vp, ref Matrix4 locationMatrix4, ref Matrix4 sizeMatrix4)
+        internal void Render(int indicesLength, int bodyColorUniform, int mvp_Uniform, ref Matrix4 vp, ref Matrix4 locationMatrix4, ref Matrix4 sizeMatrix4)
         {
             locationMatrix4.M41 = Scale.ScaleU_ToW(X); // X
             locationMatrix4.M42 = Scale.ScaleU_ToW(Y); // Y

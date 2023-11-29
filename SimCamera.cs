@@ -85,13 +85,14 @@ namespace OrbitalSimOpenGL
         public SimModel SimModel { get; set; }
         #endregion
 
-        public SimCamera(SimModel simModel)
+        public SimCamera(SimModel simModel, Vector3d positionPt, Vector3d lookAtPt, Double width, Double height)
         {
             SimModel = simModel;
             Scale = simModel.Scale;
-            FrustumCuller = new(this);
 
             Reticle = new();
+
+            SetAspectRatio(width, height); // Causes Perspective matrix to be generated
 
             // Calculate values for Camera move scale
             // Theyt are e**SliderValue (SliderValues are 0..20)
@@ -100,12 +101,27 @@ namespace OrbitalSimOpenGL
                 CamMoveKMs[i] = Math.Exp(i);
 
             // Initial conditions
-            SetCameraPosition(0D, 0D, 0D);
-            SetLookVector3(0f, 0f, -1f);
-            SetUpVector3(0f, 1f, 0f);
-            SetNormalVector3(1f, 0f, 0f);
+            // UpVector will be in +y direction
+            SetCameraPosition(positionPt);
 
-            ConstructViewMatrix();
+            Vector3d lookVec = lookAtPt - positionPt;
+            lookVec.Normalize();
+
+            Vector3d upVec = new(0d, 1d, 0d);
+            Vector3d nVec = Vector3d.Cross(lookVec, upVec);
+            nVec.Normalize();
+
+            upVec = -Vector3d.Cross(lookVec, nVec);
+            upVec.Normalize();
+
+            SetLookVector3(lookVec);
+            SetUpVector3(upVec);
+            SetNormalVector3(nVec);
+
+            FrustumCuller = new(this);
+            GenerateFrustum();
+
+            UpdateViewMatrix();
         }
 
         public void SetAspectRatio(Double width, Double Height)
@@ -125,10 +141,6 @@ namespace OrbitalSimOpenGL
         /// <param name="framerateMS">Moving average frame rate. A frame is happening on average every framerateMS</param>
         public void AnimateCamera(int ms, int framerateMS)
         {
-            GenerateFrustum(); // (re)set frustum
-
-            // Test Frustrum culling
-            //bool culled = SimCamera.FrustumCuller.SphereCulls(new Vector3d(0D, 0D, -3D), 2D);
             if (!AnimatingCamera)
                 return;
 
@@ -141,7 +153,11 @@ namespace OrbitalSimOpenGL
             AnimateLookAt();
             //AnimateGoNear();
 
-            ConstructViewMatrix();
+            UpdateViewMatrix();
+            GenerateFrustum(); // (re)set frustum
+
+            // Test Frustrum culling
+            //bool culled = SimCamera.FrustumCuller.SphereCulls(new Vector3d(0D, 0D, -3D), 2D);
         }
 
         /// <summary>
@@ -153,28 +169,28 @@ namespace OrbitalSimOpenGL
             Reticle.Render(timeSpan, this);
         }
 
-        public void SetCameraPosition(Double x, Double y, Double z)
+        public void SetCameraPosition(Vector3d position)
         {
-            CameraPosition.X = x; CameraPosition.Y = y; CameraPosition.Z = z;
+            CameraPosition = position;
         }
-        public void SetLookVector3(float x, float y, float z)
+        public void SetLookVector3(Vector3d lookVec)
         {
-            LookVector3d.X = x; LookVector3d.Y = y; LookVector3d.Z = z;
+            LookVector3d = lookVec;
         }
-        public void SetUpVector3(float x, float y, float z)
+        public void SetUpVector3(Vector3d uVec)
         {
-            UpVector3d.X = x; UpVector3d.Y = y; UpVector3d.Z = z;
+            UpVector3d = uVec;
         }
-        public void SetNormalVector3(float x, float y, float z)
+        public void SetNormalVector3(Vector3d nVec)
         {
-            NormalVector3d.X = x; NormalVector3d.Y = y; NormalVector3d.Z = z;
+            NormalVector3d = nVec;
         }
 
         /// <summary>
         /// Given current values of CameraPosition, UpDirection and LookDirection construct ViewMatrix.
         /// </summary>
         /// <remarks>To be called after any series of changes to camera (e.g. position or vectors)</remarks>
-        public void ConstructViewMatrix()
+        public void UpdateViewMatrix()
         {
             Vector3 eye = new();
             Scale.ScaleU_ToW(ref eye, CameraPosition);
@@ -183,13 +199,11 @@ namespace OrbitalSimOpenGL
             target.X += (float)LookVector3d.X;
             target.Y += (float)LookVector3d.Y;
             target.Z += (float)LookVector3d.Z;
-            //Scale.ScaleU_ToW(ref target, CameraPosition + LookVector3d);
 
             Vector3 up;
             up.X = (float)UpVector3d.X;
             up.Y = (float)UpVector3d.Y;
             up.Z = (float)UpVector3d.Z;
-            //Scale.ScaleU_ToW(ref up, UpVector3d);
 
             ViewMatrix = Matrix4.LookAt(eye, target, up);
 
@@ -208,7 +222,7 @@ namespace OrbitalSimOpenGL
 
         #region Animate camera LookAt
         private SimBody? LookAtSimBody { get; set; }
-        private Vector3d LookAtPoint3D;
+        private Vector3d LookAtPoint3d;
         private static float LookAtRadiansPerFrame = 2.0f * (MathHelper.Pi / 180); // 2.0 degrees
         //private Matrix3D LookAtRotationMatrix; // Getter/Setter do not seem to work here...
 
@@ -229,10 +243,10 @@ namespace OrbitalSimOpenGL
             if (-1 == bodyIndex)
             {
                 LookAtSimBody = null;
-                LookAtPoint3D.X = LookAtPoint3D.Y = LookAtPoint3D.Z = 0D;
+                LookAtPoint3d.X = LookAtPoint3d.Y = LookAtPoint3d.Z = 0D;
             }
-            //else
-            //    LookAtSimBody = SimModel.SimBodyList.BodyList[bodyIndex];
+            else
+                LookAtSimBody = SimModel.SimBodyList.BodyList[bodyIndex];
         }
 
         private void AnimateLookAt()
@@ -242,15 +256,14 @@ namespace OrbitalSimOpenGL
 
             // New look direction (vector)
             if (null != LookAtSimBody) // Otherwise moving to look at (0,0,0)
-                                       //Scale.ScaleU_ToW(ref LookAtPoint3D, LookAtSimBody.X, LookAtSimBody.Y, LookAtSimBody.Z);
             {
-                LookAtPoint3D.X = LookAtSimBody.X;
-                LookAtPoint3D.Y = LookAtSimBody.Y;
-                LookAtPoint3D.Z = LookAtSimBody.Z;
+                LookAtPoint3d.X = LookAtSimBody.X;
+                LookAtPoint3d.Y = LookAtSimBody.Y;
+                LookAtPoint3d.Z = LookAtSimBody.Z;
             }
 
             // Prior to normalization this vector could be really long
-            Vector3d newLookVector3d = LookAtPoint3D - CameraPosition;
+            Vector3d newLookVector3d = LookAtPoint3d - CameraPosition;
             newLookVector3d.Normalize();
 
             Vector3d rotateAboutVector3d = Vector3d.Cross(newLookVector3d, LookVector3d);
@@ -262,7 +275,7 @@ namespace OrbitalSimOpenGL
                 return;
             }
 
-            Double radiansThisFrame = angleBetweenLookVectors; // Math.Min(LookAtRadiansPerFrame, angleBetweenLookVectors);
+            Double radiansThisFrame = Math.Min(LookAtRadiansPerFrame, angleBetweenLookVectors);
 
             AnimatingLookAt = false; // Animation completed, close enough
 
@@ -272,7 +285,10 @@ namespace OrbitalSimOpenGL
             LookVector3d = rotationMatrix * LookVector3d;
             UpVector3d = rotationMatrix * UpVector3d;
             NormalVector3d = rotationMatrix * NormalVector3d;
-        }
+
+            if (angleBetweenLookVectors <= LookAtRadiansPerFrame)
+                AnimatingLookAt = false; // Animation completed, close enough
+            }
         #endregion
 
         #region Animate camera orbit

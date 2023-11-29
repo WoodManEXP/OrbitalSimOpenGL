@@ -1,6 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using OpenTK.Wpf;
 using System;
+using System.Configuration;
 using System.IO;
 using System.Windows;
 using System.Windows.Interop;
@@ -129,7 +130,7 @@ namespace OrbitalSimOpenGL
             int frameRate = FrameRateMovingAverage.AnotherValue(ms);
             SimCamera?.AnimateCamera(ms, frameRate);
 
-            SimModel.RenderScene(timeSpan);
+            SimModel.Render(timeSpan);
 
             SimCamera?.Render(timeSpan);
         }
@@ -270,16 +271,13 @@ namespace OrbitalSimOpenGL
                 // Instantiate model elements
                 SimModel.InitScene(EphemerisBodyList);
 
-                SimCamera = SimModel.SimCamera = new(SimModel);
-                AspectRatoChanged();
-
-                // Starting camera position
-                //Double cX = 0D, cY = 0D, cZ = 7D;
+                // Camera
                 Double cX = -1 * 6.0E06D, cY = 3 * 6.0E06D, cZ = 3 * 6.0E06D;
-                SimCamera.SetCameraPosition(cX, cY, cZ);
+                SimCamera = SimModel.SimCamera = new(SimModel,
+                                                    new Vector3d(cX, cY, cZ), new Vector3d(0d, 0d, 0d),
+                                                    OpenTkControl.ActualWidth, OpenTkControl.ActualHeight);
 
-                SimCamera.LookAt(-1); // Look at origin
-                SimCamera.OrbitAbout(-1); // Initially orbit about systems origin
+                SimCamera.OrbitAbout(-1); // Initially orbit about system's origin
             }
 
             SimRunning = true;
