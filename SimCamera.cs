@@ -56,9 +56,12 @@ namespace OrbitalSimOpenGL
             }
         }
 
-        public Matrix4 ProjectionMatrix = Matrix4.Identity;
+        public Single ViewWidth { get; set; }
+        public Single ViewHeight { get; set; }
+
+        public Matrix4 ProjectionMatrix { get; private set; } = Matrix4.Identity;
         public Matrix4 ViewMatrix { get; private set; } = Matrix4.Identity;
-        public Matrix4 VP_Matrix = Matrix4.Identity;
+        public Matrix4 VP_Matrix = Matrix4.Identity; // View * Projection
 
         public Vector3d CameraPosition;
         public Vector3d LookVector3d;
@@ -105,6 +108,13 @@ namespace OrbitalSimOpenGL
             ConstructViewMatrix();
         }
 
+        public void SetAspectRatio(Double width, Double Height)
+        {
+            ViewWidth = (Single)width;
+            ViewHeight = (Single)Height;
+            AspectRatio = ViewWidth / ViewHeight; // This will also set the Perspective matrix
+        }
+
         /// <summary>
         /// Animation for camera
         /// WPF animation support is not that great for the kind of animation effects needed/wanted.
@@ -115,6 +125,10 @@ namespace OrbitalSimOpenGL
         /// <param name="framerateMS">Moving average frame rate. A frame is happening on average every framerateMS</param>
         public void AnimateCamera(int ms, int framerateMS)
         {
+            GenerateFrustum(); // (re)set frustum
+
+            // Test Frustrum culling
+            //bool culled = SimCamera.FrustumCuller.SphereCulls(new Vector3d(0D, 0D, -3D), 2D);
             if (!AnimatingCamera)
                 return;
 

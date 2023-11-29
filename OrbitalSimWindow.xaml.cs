@@ -129,12 +129,6 @@ namespace OrbitalSimOpenGL
             int frameRate = FrameRateMovingAverage.AnotherValue(ms);
             SimCamera?.AnimateCamera(ms, frameRate);
 
-            // (re)set frustum
-            SimCamera?.GenerateFrustum();
-
-            // Test Frustrum culling
-            //bool culled = SimCamera.FrustumCuller.SphereCulls(new Vector3d(0D, 0D, -3D), 2D);
-
             SimModel.RenderScene(timeSpan);
 
             SimCamera?.Render(timeSpan);
@@ -393,11 +387,7 @@ namespace OrbitalSimOpenGL
         private void AspectRatoChanged()
         {
             if (SimHasBeenStarted)
-            {
-                Double aWidth = OpenTkControl.ActualWidth;
-                Double aHeight = OpenTkControl.ActualHeight;
-                SimCamera.AspectRatio = (float)(aWidth / aHeight);
-            }
+                SimCamera.SetAspectRatio(OpenTkControl.ActualWidth, OpenTkControl.ActualHeight);
         }
 
         //const int WM_SIZING = 0x214;

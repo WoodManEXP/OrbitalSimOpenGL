@@ -2,6 +2,7 @@
 using OpenTK.Mathematics;
 using System;
 using System.Windows.Input;
+using System.Windows.Media.Media3D;
 
 namespace OrbitalSimOpenGL
 {
@@ -39,8 +40,6 @@ namespace OrbitalSimOpenGL
         public int IterationSeconds { get; set; } = 60; // Each frame iteration represents this many seconds of model simulation
         public int TimeCompression { get; set; } = 1; // Number of times to iterate per frame
         public bool IncludeAxis { get; set; } = true; // Render the three axis elements (X, Y, Z)
-
-        Double SecondsCounter = 0D;
         public SimCamera SimCamera { get; set; }
 
         int VertexBufferObject, VertexArrayObject, ElementBufferObject;
@@ -135,9 +134,33 @@ namespace OrbitalSimOpenGL
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+            // Iterate();
+
             RenderAxis();
 
+            KeepVisible();
+
             SimBodyList?.Render(SimCamera);
+        }
+
+        /// <summary>
+        /// Keep bodies visible, by changing diameter, if they have become small in 3D to 2D projection
+        /// </summary>
+        private void KeepVisible()
+        {
+
+            // Get the world to viewport transform matrix
+            //Matrix3D m = MathUtils.TryWorldToViewportTransform(Viewport3DVisual, out bool bOK);
+            Vector3d halfNorm = SimCamera.UpVector3d * 5e-1f;
+
+            const int minSize = 12;
+            const int minSizeSqared = minSize * minSize;
+
+            Matrix4 vMatrix = SimCamera.ViewMatrix;
+            Matrix4 pMatrix = SimCamera.ProjectionMatrix;
+
+            foreach (SimBody sB in SimBodyList.BodyList)
+                sB.KeepVisible(ref SimCamera.VP_Matrix, SimCamera.ViewWidth, ref halfNorm, minSize, minSizeSqared);
         }
 
         #region Axes

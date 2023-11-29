@@ -123,7 +123,7 @@ namespace OrbitalSimOpenGL
             locationMatrix4.M42 = Scale.ScaleU_ToW(Y); // Y
             locationMatrix4.M43 = Scale.ScaleU_ToW(Z); // Z
 
-            sizeMatrix4.M11 =  sizeMatrix4.M22 =  sizeMatrix4.M33 = Scale.ScaleU_ToW(EphemerisDiameter);
+            sizeMatrix4.M11 =  sizeMatrix4.M22 =  sizeMatrix4.M33 = Scale.ScaleU_ToW(UseD);
 
             Matrix4 mvp = sizeMatrix4 * locationMatrix4 * vp;
 
@@ -147,38 +147,81 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// If body has become too small in 3D to 2D projection adjust its size so it remains visible
         /// </summary>
-        /// <param name="m">World to viewport transform matrix</param>
-        /// <param name="halfNorm">Half camera's UpDirection vector</param>
-        /// <param name="minSize">Minimum desired size</param>
-        /// <param name="minSizeSquared">Square of the minimum desired size</param>
-        public void KeepVisible(Matrix3D m, Vector3D halfNorm, Double minSize, Double minSizeSquared)
+        /// <param name="vp_Matrix"></param>
+        /// <param name="viewWidth">in pixels</param>
+        /// <param name="halfNorm"></param>
+        /// <param name="minSize"></param>
+        /// <param name="minSizeSquared"></param>
+        /// <remarks>This only works on spheres</remarks>
+        public void KeepVisible(ref Matrix4 vp_Matrix, Single viewWidth, ref Vector3d halfNorm, int minSize, int minSizeSquared)
         {
+            //TestProjetion();
+
             // Calc Point3D coordinates for both ends of a vector parallel to camera's UpDirection,
             // centered at sB.X, sB.Y, sB.Z with length = sB's diameter. These represents widest
             // points of sphere as seen by the camera.
-            Point3D oneSideUniv = new(X + HalfEphemerisD * halfNorm.X, Y + HalfEphemerisD * halfNorm.Y, Z + HalfEphemerisD * halfNorm.Z);
-            Point3D otherSideUniv = new(X - HalfEphemerisD * halfNorm.X, Y - HalfEphemerisD * halfNorm.Y, Z - HalfEphemerisD * halfNorm.Z);
+            Vector3d oneSideUniv = new(X + HalfEphemerisD * halfNorm.X, Y + HalfEphemerisD * halfNorm.Y, Z + HalfEphemerisD * halfNorm.Z);
+            Vector3d otherSideUniv = new(X - HalfEphemerisD * halfNorm.X, Y - HalfEphemerisD * halfNorm.Y, Z - HalfEphemerisD * halfNorm.Z);
 
-            Point3D oneSideView = m.Transform(Scale.ScaleU_ToW(oneSideUniv));        // Universe to WPF coords
-            Point3D otherSideView = m.Transform(Scale.ScaleU_ToW(otherSideUniv));
+            // U coords to W coords
+            Scale.ScaleVector3D(ref oneSideUniv);
+            Scale.ScaleVector3D(ref otherSideUniv);
 
-            Double dX = oneSideView.X - otherSideView.X;
-            Double dY = oneSideView.Y - otherSideView.Y;
-            Double distSquared = dX * dX + dY * dY;
+            // Make 3D to Homogenous 4D
+            Vector4 oneSideV4 = new((Vector3)oneSideUniv, 1f);
+            Vector4 otherSideV4 = new((Vector3)otherSideUniv, 1f);
 
+            // To clip space (through View abd projection matrices)
+            Vector4 oneSideClip = oneSideV4 * vp_Matrix;     
+            Vector4 otherSideClip = otherSideV4 * vp_Matrix;
+
+            // To pixels
+            oneSideClip /= oneSideClip.W;
+            otherSideClip /= otherSideClip.W;
+            oneSideClip *= viewWidth;
+            otherSideClip *= viewWidth;
+
+            // Distance between the two points in clip space
+            Single dX = oneSideClip.X - otherSideClip.X;
+            Single dY = oneSideClip.Y - otherSideClip.Y;
+            Single distSquared = dX * dX + dY * dY;
+            
             if (distSquared < minSizeSquared)
-            {
                 // Change the body's diameter such that distSquared will transform to minSizeSquared
-                UseD = minSize * EphemerisDiameter / Math.Sqrt(distSquared);
-            }
+                UseD = (minSize * EphemerisDiameter) / Math.Sqrt(distSquared);
             else
-            {
-                // Not too far away, ensure the diameter is the original value
+                // Not too small, keep the diameter as the original value
                 UseD = EphemerisDiameter;
-            }
-
-            // Update the DiameterTransform3D for UseD value
-            //DiameterTransform3D.ScaleX = DiameterTransform3D.ScaleY = DiameterTransform3D.ScaleZ = Scale.ScaleU_ToW(UseD);
         }
+
+#if false
+        void TestProjetion()
+        {
+            // View Matrix
+            Vector3 eye = new(0f, 0f, 0f);
+            Vector3 target = new(0f, 0f, -1f);
+            Vector3 up = new(0f, 1f, 0f);
+            Matrix4 viewMatrix = Matrix4.LookAt(eye, target, up);
+
+            // Projection/clip matrix
+            Single fov = 60.0f * (MathHelper.Pi / 180f);
+            Single ar = 1f;
+            Single depthNear = .01f, depthFar = 12f;
+            Matrix4 projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(fov, ar, depthNear, depthFar);
+
+            // Homogeneous point in 3D world space
+            Vector4 aPt = new Vector4(-2f, 2f, -10f, 1f);
+
+            aPt *= viewMatrix; // To view coordinate space (VCS)
+
+            aPt *= projectionMatrix; // To clipping coordinate space (CCS), NPC (normalized projection coordinates)
+
+            // To get the 2D coordinates on the screen
+            Single screenW = 100f;
+            Single screenH = 100f;
+            Single xScreen = (aPt.X / aPt.W) * screenW; // Perspective division
+            Single yScreen = (aPt.Y / aPt.W) * screenH;
+        }
+#endif
     }
 }

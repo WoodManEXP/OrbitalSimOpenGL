@@ -80,7 +80,7 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="vector3D"></param>
         /// <returns></returns>
-        public Vector3D ScaleVector3D(ref Vector3D vector3D)
+        public Vector3d ScaleVector3D(ref Vector3d vector3D)
         {
             vector3D.X *= ScaleVal;
             vector3D.Y *= ScaleVal;
@@ -95,9 +95,9 @@ namespace OrbitalSimOpenGL
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <returns></returns>
-        public Vector3D ScaleVector3D(Double x, Double y, Double z)
+        public Vector3d ScaleVector3D(Double x, Double y, Double z)
         {
-            Vector3D v = new(x, y, z);
+            Vector3d v = new(x, y, z);
             return ScaleVector3D(ref v);
         }
     }
