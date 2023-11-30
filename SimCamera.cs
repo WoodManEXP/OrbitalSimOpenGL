@@ -277,8 +277,6 @@ namespace OrbitalSimOpenGL
 
             Double radiansThisFrame = Math.Min(LookAtRadiansPerFrame, angleBetweenLookVectors);
 
-            AnimatingLookAt = false; // Animation completed, close enough
-
             OpenTK.Mathematics.Quaterniond q = Util.MakeQuaterniond(rotateAboutVector3d, radiansThisFrame);
             Matrix3d rotationMatrix = Matrix3d.CreateFromQuaternion(q);
 
