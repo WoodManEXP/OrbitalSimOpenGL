@@ -118,8 +118,8 @@ namespace OrbitalSimOpenGL
             SetUpVector3(upVec);
             SetNormalVector3(nVec);
 
+            // Instantiate here after camera characteristics set
             FrustumCuller = new(this);
-            GenerateFrustum();
 
             UpdateViewMatrix();
         }
@@ -151,10 +151,9 @@ namespace OrbitalSimOpenGL
             AnimateTilt();
             AnimateLook();
             AnimateLookAt();
-            //AnimateGoNear();
+            AnimateGoNear();
 
             UpdateViewMatrix();
-            GenerateFrustum(); // (re)set frustum
 
             // Test Frustrum culling
             //bool culled = SimCamera.FrustumCuller.SphereCulls(new Vector3d(0D, 0D, -3D), 2D);
@@ -209,15 +208,12 @@ namespace OrbitalSimOpenGL
 
             VP_Matrix = ViewMatrix * ProjectionMatrix;
 
+            FrustumCuller.GenerateFrustum();
+
             //eye = new(0f, 0f, 7f);
             //target = new(0f, 0f, 0f);
             //up = new(0f, 1f, 0f);
             //ViewMatrix = Matrix4.LookAt(eye, target, up);
-        }
-
-        public void GenerateFrustum()
-        {
-            FrustumCuller.GenerateFrustum();
         }
 
         #region Animate camera LookAt
@@ -440,9 +436,16 @@ namespace OrbitalSimOpenGL
 
             AnimatingGoNear = true;
         }
+
+        private void AnimateGoNear()
+        {
+            if (!AnimatingGoNear)
+                return;
+
+        }
         #endregion
 
-        #region Animate camera Look Direction
+            #region Animate camera Look Direction
         private Matrix3d LookRotationMatrix;
         private int LookFramesGoal { get; set; }
         private int LookFramesSoFar { get; set; }

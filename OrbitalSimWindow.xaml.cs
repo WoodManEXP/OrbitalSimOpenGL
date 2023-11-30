@@ -132,7 +132,7 @@ namespace OrbitalSimOpenGL
 
             SimModel.Render(timeSpan);
 
-            SimCamera?.Render(timeSpan);
+            SimCamera?.Render(timeSpan); // In case camera needs to render (e.g. recticle)
         }
         #endregion
 
