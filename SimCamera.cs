@@ -283,7 +283,7 @@ namespace OrbitalSimOpenGL
         #region Animate camera orbit
 
         private CameraOrbitDirections OrbitDirection { get; set; }
-        private Single OrbitRadiansGoal { get; set; } // radians
+        private Single OrbitRadiansGoal { get; set; }
         private Matrix3d OrbitRotationMatrix { get; set; }
         private int OrbitFramesGoal { get; set; }
         private int OrbitFramesSoFar { get; set; }
@@ -301,11 +301,10 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Orbit camera about OrbitAboutPoint3D, by degrees.
         /// Will be a circular orbit. 
-        /// For L/R, camera's NormalDirection is tangest to the orbital circle.
+        /// For L/R, camera's NormalDirection is tangent to the orbital circle.
         /// For U/D. camera's UpDirection is tangent to the orbital circle
         /// Camera remains looking at same point as before orbit.
         /// All three vectors change.
-        /// Animation position changes for Camera orbit are handled here rather than by the WPF animation stuff.
         /// </summary>
         /// <param name="orbitDirection"></param>
         /// <param name="degrees"></param>
@@ -368,23 +367,22 @@ namespace OrbitalSimOpenGL
             rotateVec.Normalize();
 
             rotateVec *= OrbitRotationMatrix;
-            rotateVec *= len;
 
-            CameraPosition = rotateVec;
+            CameraPosition = OrbitCenterPoint3d + len * rotateVec;
 
             switch (OrbitDirection)
             {
                 case CameraOrbitDirections.OrbitUp:
                 case CameraOrbitDirections.OrbitDown:
-                    LookVector3d = OrbitRotationMatrix * LookVector3d;
-                    UpVector3d = OrbitRotationMatrix * UpVector3d;
+                    LookVector3d *= OrbitRotationMatrix;
+                    UpVector3d *= OrbitRotationMatrix;
                     // NormalDirection is unchanged
                     break;
 
                 case CameraOrbitDirections.OrbitLeft:
                 case CameraOrbitDirections.OrbitRight:
-                    LookVector3d = OrbitRotationMatrix * LookVector3d;
-                    NormalVector3d = OrbitRotationMatrix * NormalVector3d;
+                    LookVector3d *= OrbitRotationMatrix;
+                    NormalVector3d *= OrbitRotationMatrix;
                     // UpDirection is unchanged
                     break;
             }
@@ -415,19 +413,18 @@ namespace OrbitalSimOpenGL
             {
                 orbitAboutVector3D = NormalVector3d;
 
-                if (CameraOrbitDirections.OrbitDown == OrbitDirection)
+                if (CameraOrbitDirections.OrbitUp == OrbitDirection)
                     radians = -radians;
             }
             else // OL, OR
             {
                 orbitAboutVector3D = UpVector3d;
 
-                if (CameraOrbitDirections.OrbitRight == OrbitDirection)
+                if (CameraOrbitDirections.OrbitLeft == OrbitDirection)
                     radians = -radians;
             }
 
             return Util.MakeQuaterniond(orbitAboutVector3D, radians);
-            //return new(orbitAboutVector3D, radians);
         }
 
         /// <summary>
