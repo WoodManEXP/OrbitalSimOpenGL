@@ -148,7 +148,7 @@ namespace OrbitalSimOpenGL
             _OrbitCameraDelegate = aDelegate;
         }
 
-        public void OrbitCamera(SimCamera.CameraOrbitDirections orbitDirection, Double orbitDegrees)
+        public void OrbitCamera(SimCamera.CameraOrbitDirections orbitDirection, Single orbitDegrees)
         {
 
             if (_OrbitCameraDelegate is not null)

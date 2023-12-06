@@ -29,7 +29,7 @@ namespace OrbitalSimOpenGL
         }
 
         /// <summary>
-        /// Make an OpenGL/OpenTK Quaternion but using WPD 3D's input parameter pattern
+        /// Make an OpenGL/OpenTK Quaternion but using WPF 3D's input parameter pattern
         /// </summary>
         /// <param name="axisOfRotation"></param>
         /// <param name="angleInRadians"></param>

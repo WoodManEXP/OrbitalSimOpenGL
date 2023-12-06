@@ -18,7 +18,7 @@ namespace OrbitalSimOpenGL
         public JPL_BodyList JPL_BodyList { get; set; }
         public EphemerisBodyList EphemerisBodyList { get; set; }
         public OrbitalSimWindow? OrbitalSimWindow { get; set; }
-        private Double OrbitCameraDegrees { get; set; } // Current value on OrbitDegreesSlider
+        private Single OrbitCameraDegrees { get; set; } // Current value on OrbitDegreesSlider
         private Single LookTiltCameraDegrees { get; set; } // Current value on LookTiltDegreesSlider
         private String AppDataFolder { get; set; }
         #endregion
@@ -82,7 +82,7 @@ namespace OrbitalSimOpenGL
             // Set orbit slider initial
             OrbitDegreesSlider.Minimum = 1D;
             OrbitDegreesSlider.Maximum = 180D;
-            OrbitDegreesSlider.Value = OrbitCameraDegrees = 90D;
+            OrbitDegreesSlider.Value = OrbitCameraDegrees = 90F;
             OrbitDegreesLabel.Content = "90";
 
             // Set Look-Tile slider initial
@@ -332,7 +332,7 @@ namespace OrbitalSimOpenGL
             if (slider is not null)
             {
                 double value = Math.Floor(slider.Value);
-                OrbitCameraDegrees = value; // Save and set 
+                OrbitCameraDegrees = (Single)value; // Save and set 
                 if (OrbitDegreesLabel is not null)
                     OrbitDegreesLabel.Content = value.ToString();
             }

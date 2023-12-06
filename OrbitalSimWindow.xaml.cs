@@ -155,7 +155,7 @@ namespace OrbitalSimOpenGL
         private void OrbitCamera(object[] args)
         {
             CameraOrbitDirections orbitDirection = (CameraOrbitDirections)args[0];
-            Double degrees = (Double)args[1];
+            Single degrees = (Single)args[1];
             //System.Diagnostics.Debug.WriteLine("TiltCamera " + tiltDirection.ToString());
             SimCamera?.OrbitCamera(orbitDirection, degrees);
         }

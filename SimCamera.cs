@@ -146,7 +146,7 @@ namespace OrbitalSimOpenGL
 
             FramerateMS = framerateMS; // Rather than a param to each method call
 
-            //AnimateOrbit();
+            AnimateOrbit();
             AnimateUDLRFB();
             AnimateTilt();
             AnimateLook();
@@ -154,9 +154,6 @@ namespace OrbitalSimOpenGL
             AnimateGoNear();
 
             UpdateViewMatrix();
-
-            // Test Frustrum culling
-            //bool culled = SimCamera.FrustumCuller.SphereCulls(new Vector3d(0D, 0D, -3D), 2D);
         }
 
         /// <summary>
@@ -167,7 +164,6 @@ namespace OrbitalSimOpenGL
         {
             Reticle.Render(timeSpan, this);
         }
-
         public void SetCameraPosition(Vector3d position)
         {
             CameraPosition = position;
@@ -210,10 +206,8 @@ namespace OrbitalSimOpenGL
 
             FrustumCuller.GenerateFrustum();
 
-            //eye = new(0f, 0f, 7f);
-            //target = new(0f, 0f, 0f);
-            //up = new(0f, 1f, 0f);
-            //ViewMatrix = Matrix4.LookAt(eye, target, up);
+            // Test Frustrum culling
+            //bool culled = SimCamera.FrustumCuller.SphereCulls(new Vector3d(0D, 0D, -3D), 2D);
         }
 
         #region Animate camera LookAt
@@ -288,6 +282,13 @@ namespace OrbitalSimOpenGL
 
         #region Animate camera orbit
 
+        private CameraOrbitDirections OrbitDirection { get; set; }
+        private Single OrbitRadiansGoal { get; set; } // radians
+        private Matrix3d OrbitRotationMatrix { get; set; }
+        private int OrbitFramesGoal { get; set; }
+        private int OrbitFramesSoFar { get; set; }
+        private Vector3d OrbitCenterPoint3d, OrbitCameraPosition;
+
         /// <summary>
         /// Body about which camera orbits
         /// </summary>
@@ -295,7 +296,7 @@ namespace OrbitalSimOpenGL
 
         // .03 degrees/ms. 90 degrees in 3 seconds
         // Adjust this value to change camera orbit rate. ( degrees / seconds / 1000 )
-        private static Single OrbitRate { get; } = .03f; // Degrees per ms
+        private static Single OrbitRate { get; } = .03f * (MathHelper.Pi / 180f); // Radians per ms
 
         /// <summary>
         /// Orbit camera about OrbitAboutPoint3D, by degrees.
@@ -308,16 +309,141 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="orbitDirection"></param>
         /// <param name="degrees"></param>
-        internal void OrbitCamera(CameraOrbitDirections orbitDirection, double degrees)
+        internal void OrbitCamera(CameraOrbitDirections orbitDirection, Single degrees)
         {
             if (AnimatingCamera)
                 return;
 
             AnimatingOrbit = true;
 
-            //            OrbitDirection = orbitDirection;
-            //            OrbitDegreesGoal = degrees;
-            //            OrbitFramesSoFar = 0;
+            OrbitDirection = orbitDirection;
+            OrbitRadiansGoal = MathHelper.DegreesToRadians(degrees);
+            OrbitFramesSoFar = 0;
+        }
+
+        /// <summary>
+        /// Implements camera orbit movements
+        /// </summary>
+        private void AnimateOrbit()
+        {
+            if (!AnimatingOrbit)
+                return;
+
+            // Orbit camera about body's location at beginning of animation. With bodies in motion camera is
+            // then offset to body's current location.
+
+            Vector3d aPoint;
+
+            if (0 == OrbitFramesSoFar)
+            {
+                // As a calculation optimization this assumes the FramerateMS will be nearly constant during 
+                // any given movement animation.
+                Single totalMS = OrbitRadiansGoal / OrbitRate;
+                OrbitFramesGoal = (int)Math.Ceiling(totalMS / FramerateMS);
+
+                Single radiansPerFrame = OrbitRadiansGoal / OrbitFramesGoal;
+                OrbitRotationMatrix = Matrix3d.CreateFromQuaternion(CalcOrbitQuaternion(radiansPerFrame));
+
+                // Init conditions for orbit
+                OrbitCenter(out aPoint);
+                OrbitCenterPoint3d = aPoint;            // Orbit about this and translate to new posn as body moves.
+                OrbitCameraPosition = CameraPosition;   // Camera handled similarly
+            }
+
+            // Perform rotations of camera vectors and position
+            // Orbit is circular about OrbitAboutPoint3D
+            // Position rotated about OrbitCenterPoint3d then Transformed to new location.
+            //
+            //          Orbit tangent to   Rotate about
+            // OU, OD         Up             Normal
+            // OL, OR       Normal             Up
+            //
+            // Translate to orbit center, rotate, translate back
+            //
+            Vector3d rotateVec = new(CameraPosition.X - OrbitCenterPoint3d.X,
+                                     CameraPosition.Y - OrbitCenterPoint3d.Y,
+                                     CameraPosition.Z - OrbitCenterPoint3d.Z);
+            Double len = rotateVec.Length;
+
+            rotateVec.Normalize();
+
+            rotateVec *= OrbitRotationMatrix;
+            rotateVec *= len;
+
+            CameraPosition = rotateVec;
+
+            switch (OrbitDirection)
+            {
+                case CameraOrbitDirections.OrbitUp:
+                case CameraOrbitDirections.OrbitDown:
+                    LookVector3d = OrbitRotationMatrix * LookVector3d;
+                    UpVector3d = OrbitRotationMatrix * UpVector3d;
+                    // NormalDirection is unchanged
+                    break;
+
+                case CameraOrbitDirections.OrbitLeft:
+                case CameraOrbitDirections.OrbitRight:
+                    LookVector3d = OrbitRotationMatrix * LookVector3d;
+                    NormalVector3d = OrbitRotationMatrix * NormalVector3d;
+                    // UpDirection is unchanged
+                    break;
+            }
+#if false
+            // Other than origin all bodies are in motion. So at each frame find location of body
+            // about which camera is orbiting.
+            OrbitCenter(out aPoint);
+
+            // Offset camera to new position relative to body's current position
+            CameraPosition = OrbitCameraPosition + (aPoint - OrbitCenterPoint3d);
+
+            System.Diagnostics.Debug.WriteLine("AnimateOrbit:"
+                                            + " body position:" + aPoint.ToString()
+                                            + " OrbitCenterPoint3D:" + OrbitCenterPoint3d.ToString()
+                                            + " OrbitCameraPosition:" + OrbitCameraPosition.ToString()
+                                            + " CameraPosition:" + CameraPosition.ToString()
+                                            );
+#endif
+            if (++OrbitFramesSoFar >= OrbitFramesGoal)
+                AnimatingOrbit = false; // Animation completed
+        }
+
+        private OpenTK.Mathematics.Quaterniond CalcOrbitQuaternion(Single radians)
+        {
+            Vector3d orbitAboutVector3D;
+
+            if (CameraOrbitDirections.OrbitUp == OrbitDirection || CameraOrbitDirections.OrbitDown == OrbitDirection)
+            {
+                orbitAboutVector3D = NormalVector3d;
+
+                if (CameraOrbitDirections.OrbitDown == OrbitDirection)
+                    radians = -radians;
+            }
+            else // OL, OR
+            {
+                orbitAboutVector3D = UpVector3d;
+
+                if (CameraOrbitDirections.OrbitRight == OrbitDirection)
+                    radians = -radians;
+            }
+
+            return Util.MakeQuaterniond(orbitAboutVector3D, radians);
+            //return new(orbitAboutVector3D, radians);
+        }
+
+        /// <summary>
+        /// Current posiion of body being rotated about
+        /// </summary>
+        /// <param name="position"></param>
+        public void OrbitCenter(out Vector3d position)
+        {
+            if (-1 == OrbitBodyIndex)
+                position.X = position.Y = position.Z = 0D;
+            else
+            {
+                position.X = SimModel.SimBodyList.BodyList[OrbitBodyIndex].X;
+                position.Y = SimModel.SimBodyList.BodyList[OrbitBodyIndex].Y;
+                position.Z = SimModel.SimBodyList.BodyList[OrbitBodyIndex].Z;
+            }
         }
 
         /// <summary>
@@ -328,7 +454,7 @@ namespace OrbitalSimOpenGL
         {
             OrbitBodyIndex = bodyIndex;
         }
-        #endregion
+#endregion
 
         #region Animate camera movement Up, Down, Left, Right, Forward, Backward, or Move
         private Vector3d UDLRFB_To { get; set; } // Universe coords
@@ -708,7 +834,7 @@ namespace OrbitalSimOpenGL
         private Matrix3d TiltRotationMatrix; // Getter/Setter do not seem to work here...
         private int TiltFramesGoal { get; set; }
         private int TiltFramesSoFar { get; set; }
-        private Single TiltDegrees { get; set; }
+        private Single TiltRadians { get; set; }
 
         /// <summary>
         /// Tilt camera cw or ccw
@@ -723,7 +849,7 @@ namespace OrbitalSimOpenGL
             if (AnimatingCamera)
                 return;
 
-            TiltDegrees = (tiltDirection == CameraTiltDirections.TileCounterClockwise) ? -degrees : degrees;
+            TiltRadians = MathHelper.DegreesToRadians((tiltDirection == CameraTiltDirections.TileCounterClockwise) ? -degrees : degrees);
             TiltFramesSoFar = 0;
 
             AnimatingTilt = true;
@@ -742,17 +868,17 @@ namespace OrbitalSimOpenGL
                 // As a calculation optimization this assumes the FramerateMS will be nearly constant during 
                 // any given movement animation.
                 //TiltFramesGoal = (int)Math.Ceiling((1E3 * LookUDLR_Duration.TimeSpan.TotalSeconds) / FramerateMS);
-                Single totalMS = Math.Abs(TiltDegrees / OrbitRate); // degrees can be < 0
+                Single totalMS = Math.Abs(TiltRadians / OrbitRate); // degrees can be < 0
                 TiltFramesGoal = (int)Math.Ceiling(totalMS / FramerateMS);
 
-                Single radiansPerFrame = MathHelper.DegreesToRadians(TiltDegrees / TiltFramesGoal);
+                Single radiansPerFrame = TiltRadians / TiltFramesGoal;
 
                 OpenTK.Mathematics.Quaterniond q = Util.MakeQuaterniond(LookVector3d, radiansPerFrame);
                 TiltRotationMatrix = Matrix3d.CreateFromQuaternion(q);
             }
 
-            UpVector3d = TiltRotationMatrix * UpVector3d;
-            NormalVector3d = TiltRotationMatrix * NormalVector3d;
+            UpVector3d *= TiltRotationMatrix;
+            NormalVector3d *= TiltRotationMatrix;
 
             // Recticle does not change
 
