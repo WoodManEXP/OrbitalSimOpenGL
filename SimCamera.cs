@@ -387,7 +387,7 @@ namespace OrbitalSimOpenGL
                     break;
             }
 #if false
-            // Other than origin all bodies are in motion. So at each frame find location of body
+            // All orbit-about targets, other than origin, are in motion. So at each frame find location of body
             // about which camera is orbiting.
             OrbitCenter(out aPoint);
 
@@ -750,8 +750,8 @@ namespace OrbitalSimOpenGL
         private Matrix3d LookRotationMatrix;
         private int LookFramesGoal { get; set; }
         private int LookFramesSoFar { get; set; }
-        private Single LookLR_Theta { get; set; }
-        private Single LookUD_Theta { get; set; }
+        private Single LookLR_Theta { get; set; } // radians
+        private Single LookUD_Theta { get; set; } // radians
         /// <summary>
         /// Alter look direction of Camera
         /// https://social.msdn.microsoft.com/Forums/en-US/080b45d1-f29b-415b-b1d6-39173185c0f1/rotate-vector-by-a-quaternion?forum=wpf
@@ -767,8 +767,8 @@ namespace OrbitalSimOpenGL
 
             AnimatingLook = true;
             LookFramesSoFar = 0;
-            LookLR_Theta = lR_Theta;
-            LookUD_Theta = uD_Theta;
+            LookLR_Theta = MathHelper.DegreesToRadians(lR_Theta);
+            LookUD_Theta = MathHelper.DegreesToRadians(uD_Theta);
         }
 
         /// <summary>
@@ -800,8 +800,8 @@ namespace OrbitalSimOpenGL
                 LookFramesGoal = (int)Math.Ceiling(totalMS / FramerateMS);
 
                 // This section already set to work against changes to either or both LookUD_Theta or LookLR_Theta
-                Single lrRadiansPerFrame = MathHelper.DegreesToRadians(LookLR_Theta / LookFramesGoal);
-                Single udRadiansPerFrame = MathHelper.DegreesToRadians(LookUD_Theta / LookFramesGoal);
+                Single lrRadiansPerFrame = LookLR_Theta / LookFramesGoal;
+                Single udRadiansPerFrame = LookUD_Theta / LookFramesGoal;
 
                 // L,R about Camera's UpDirection
                 OpenTK.Mathematics.Quaterniond q = Util.MakeQuaterniond(UpVector3d, lrRadiansPerFrame);

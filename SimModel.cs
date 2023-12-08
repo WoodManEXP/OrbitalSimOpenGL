@@ -35,12 +35,15 @@ namespace OrbitalSimOpenGL
         #region Properties
         public bool SceneReady { get; set; } = false;
         public SimBodyList? SimBodyList { get; set; }
+        private NextPosition? NextPosition { get; set; }
+        private PathTrace PathTrace;
         public Scale Scale { get; set; } = new();
         public String? AppDataFolder { get; set; }
         public int IterationSeconds { get; set; } = 60; // Each frame iteration represents this many seconds of model simulation
         public int TimeCompression { get; set; } = 1; // Number of times to iterate per frame
         public bool IncludeAxis { get; set; } = true; // Render the three axis elements (X, Y, Z)
         public SimCamera SimCamera { get; set; }
+        public bool SimRunning { get; set; } = false;
 
         int VertexBufferObject, VertexArrayObject, ElementBufferObject;
 
@@ -64,8 +67,10 @@ namespace OrbitalSimOpenGL
             GL.Enable(EnableCap.DepthTest);
 
             // Maximum number of vertex attributes supported
-            int nrAttributes = 0;
-            GL.GetInteger(GetPName.MaxVertexAttribs, out nrAttributes);
+            //int nrAttributes = 0;
+            //GL.GetInteger(GetPName.MaxVertexAttribs, out nrAttributes);
+
+            PathTrace = new(Scale);
         }
 
         public void InitScene(EphemerisBodyList ephemerismBodyList)
@@ -113,21 +118,74 @@ namespace OrbitalSimOpenGL
                 //BodiesModel3DGroup.Children.Add(g);     // Add to BodiesModel3DGroup
             }
 
-            //NextPosition = new(SimBodyList);
+            NextPosition = new(SimBodyList);
         }
 
-        public void Render(TimeSpan timeDelta)
+        /// <summary>
+        /// This is called repeatedly by the OpenTK system
+        /// </summary>
+        /// <param name="ms"></param>
+        /// <param name="frameRateMS"></param>
+        /// <remarks>Renders the current model state</remarks>
+        public void Render(int ms, int frameRateMS)
         {
             if (!SceneReady)
                 return;
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            // Iterate();
+            Iterate(SimRunning, ms, frameRateMS); // Perform model calculations
 
             RenderAxis();
 
             SimBodyList?.Render(SimCamera);
+        }
+
+#if false
+        private int IterateTotalCalls = 0;
+        int IterateLastMS = 0;
+        int IterateTotalMS = 0;
+#endif
+        /// <summary>
+        /// Frame iteration
+        /// </summary>
+        /// <param name="ms">ms time of this call as supplied</param>
+        /// <param name="movingAvgMS">Moving average frame rate. A frame is happening on average every movingAvgMS</param>
+        public void Iterate(bool simRunning, int ms, int movingAvgMS)
+        {
+
+#if false
+            IterateTotalCalls++;
+
+            if (0 == IterateLastMS)
+                IterateLastMS = ms;
+            else
+            {
+                IterateTotalMS += ms - IterateLastMS;
+                IterateLastMS = ms;
+            }
+
+            // Performance measurements
+            for (int i=0; i<500000; i++)
+                _ = (double)i / 1000D;
+
+            if (0==IterateTotalCalls%1000)
+            {
+                String idStr = MethodBase.GetCurrentMethod().Name + "." + this.GetType().Name;
+                Double callsPerMS = (Double)IterateTotalCalls / (Double)IterateTotalMS;
+                Double callsPerSec = 1000 * callsPerMS;
+                System.Diagnostics.Debug.WriteLine(idStr + " Calls, CallsPerSec, CallsPerMS " + IterateTotalCalls.ToString("N0") + ", " + callsPerSec.ToString("###.##")  + ", " + callsPerMS.ToString("#.######"));
+            }
+#endif
+
+            if (simRunning)
+            {
+                for (int i = 0; i < TimeCompression; i++)
+                    NextPosition?.IterateOnce(IterationSeconds);
+
+                // Process path traces (lines showing where bodies have been)
+                //PathTrace.UpdateTracePaths(SimBodyList, NextPosition.IterationNumber);
+            }
         }
 
         #region Axes
@@ -154,8 +212,8 @@ void main()
 }
 ";
         // Shared sphere
-        float[] SharedAxisMesh;
-        ushort[] SharedAxisIndices;
+        float[]? SharedAxisMesh;
+        ushort[]? SharedAxisIndices;
 
         Color4 X_AxisColor { get; } = Color4.Black;
         Color4 Y_AxisColor { get; } = Color4.Blue;

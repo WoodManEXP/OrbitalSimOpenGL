@@ -55,7 +55,7 @@ namespace OrbitalSimOpenGL
             var appName = assembly.GetName().Name;
 
             string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            AppDataFolder = Path.Combine(localAppData, appName); // appDataFolder = "C:\\Users\\Robert\\AppData\\Local\\OrbitalSimWPF2"
+            AppDataFolder = Path.Combine(localAppData, appName); // appDataFolder = "C:\\Users\\Robert\\AppData\\Local\\OrbitalSimOpenGL"
 
             InitializeComponent();
 
@@ -127,10 +127,10 @@ namespace OrbitalSimOpenGL
                 UpdateFrameLastMS = ms;
 
             // Perform any active camera animations
-            int frameRate = FrameRateMovingAverage.AnotherValue(ms);
-            SimCamera?.AnimateCamera(ms, frameRate);
+            int frameRateMS = FrameRateMovingAverage.AnotherValue(ms);
+            SimCamera?.AnimateCamera(ms, frameRateMS);
 
-            SimModel.Render(timeSpan);
+            SimModel.Render(ms, frameRateMS);
 
             SimCamera?.Render(timeSpan); // In case camera needs to render (e.g. recticle)
         }
@@ -280,16 +280,14 @@ namespace OrbitalSimOpenGL
                 SimCamera.OrbitAbout(-1); // Initially orbit about system's origin
             }
 
-            SimRunning = true;
+            SimModel.SimRunning = true;
             UpdateFrameLastMS = 0; // Reset on each start
             FrameRateMovingAverage.Reset();
         }
         // Pause sim
         public void PauseSim(object[] args)
         {
-            SimRunning = false;
-            //CompositionTarget.Rendering -= UpdateSimFrame; // Stop frame rendering
-            //System.Diagnostics.Debug.WriteLine("Pause sim");
+            SimModel.SimRunning = false;
         }
         #endregion
 

@@ -89,11 +89,7 @@
         <Label x:Name="TimeCompressionLabel" Content="" Canvas.Left="359" Canvas.Top="298" HorizontalAlignment="Center" VerticalAlignment="Top" Width="40"/>
         <GroupBox Height="54" Header="Calc iterations" Width="195" HorizontalAlignment="Center" Canvas.Top="280" VerticalAlignment="Top" Canvas.Left="4">
             <ComboBox x:Name="IterationScale" HorizontalAlignment="Left" Width="51" Height="22" IsEditable="True" ToolTip="This many per iteration" SelectionChanged="ItemScaleChanged">
-                <ComboBoxItem IsSelected="True">1</ComboBoxItem>
-                <ComboBoxItem>2</ComboBoxItem>
-                <ComboBoxItem>5</ComboBoxItem>
-                <ComboBoxItem>10</ComboBoxItem>
-                <ComboBoxItem>30</ComboBoxItem>
+
             </ComboBox>
         </GroupBox>
         <StackPanel Orientation="Vertical" Canvas.Left="104" Canvas.Top="295" HorizontalAlignment="Center" VerticalAlignment="Top">

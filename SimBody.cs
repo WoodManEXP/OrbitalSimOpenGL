@@ -96,15 +96,15 @@ namespace OrbitalSimOpenGL
                 "Venus" => Color4.White,
                 "Moon" => Color4.SlateGray,
                 "Earth" => Color4.Blue,
-                //"Phobos" => Color4.Green,
-                //"Deimos" => Color4.Green,
+                "Phobos" => Color4.Green,
+                "Deimos" => Color4.Green,
                 "Mars" => Color4.DarkRed,
                 "Jupiter" => Color4.Beige,
                 "Saturn" => Color4.Beige,
                 "Uranus" => Color4.LightGreen,
                 "Neptune" => Color4.SlateBlue,
                 "Pluto" => Color4.Tan,
-                _ => Color4.Green
+                _ => Color4.DarkOrange
             };
         }
 

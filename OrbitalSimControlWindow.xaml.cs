@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
@@ -197,7 +198,7 @@ namespace OrbitalSimOpenGL
                 EphemerisBodyList = ephemerisBodyList;
             }
 
-            PopulateLookAtComboBox();
+            PopulateComboBoxes();
 
             startButton.IsEnabled = false;
             pauseButton.IsEnabled = true;
@@ -281,7 +282,7 @@ namespace OrbitalSimOpenGL
             if (OrbitAboutComboBox.SelectedItem != null)
                 OrbitalSimCmds?.OrbitAbout((String)OrbitAboutComboBox.SelectedItem);
         }
-        private void PopulateLookAtComboBox()
+        private void PopulateComboBoxes()
         {
 
             if (!SimHasBeenStarted)
@@ -309,6 +310,12 @@ namespace OrbitalSimOpenGL
 
                 LookAtComboBox.SelectedIndex = 0;       // Origin
                 OrbitAboutComboBox.SelectedIndex = 0;   // Origin
+
+                // IterationScale combobox
+                var lStr = new List<String>() { "1", "2", "5", "10", "30" };
+                foreach (String aStr in lStr)
+                    IterationScale.Items.Add(aStr);
+                IterationScale.SelectedItem = IterationScale.Items.GetItemAt(0);
             }
         }
         private void CameraMoveSliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -383,7 +390,7 @@ namespace OrbitalSimOpenGL
                     baseSeconds = 60 * 60;  // an hour
 
                 // Num seconds to iterate per frame.
-                int scale = int.Parse((String)LookAtComboBox.SelectedItem);
+                int scale = int.Parse((String)IterationScale.SelectedValue);
 
                 // Num seconds will be a number of minutes or number of hours
                 OrbitalSimCmds?.SimIterationRate(scale * baseSeconds);
