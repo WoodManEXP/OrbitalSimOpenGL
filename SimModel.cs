@@ -45,6 +45,16 @@ namespace OrbitalSimOpenGL
         public SimCamera SimCamera { get; set; }
         public bool SimRunning { get; set; } = false;
 
+        private bool _Wireframe;
+        public bool Wireframe 
+        { get => _Wireframe;
+            set
+            {
+                GL.PolygonMode(MaterialFace.FrontAndBack, value ? PolygonMode.Line : PolygonMode.Fill); // PolygonMode.Fill
+                _Wireframe = value;
+            }
+        }
+
         int VertexBufferObject, VertexArrayObject, ElementBufferObject;
 
         float[] CubeVertices2D = {
@@ -61,7 +71,7 @@ namespace OrbitalSimOpenGL
 
         public SimModel()
         {
-            GL.ClearColor(Color4.LightGray); 
+            GL.ClearColor(Color4.LightGray);
 
             // enable depth testing to ensure correct z-ordering of fragments
             GL.Enable(EnableCap.DepthTest);
@@ -94,9 +104,7 @@ namespace OrbitalSimOpenGL
             GL.CullFace(CullFaceMode.Back);
             GL.FrontFace(FrontFaceDirection.Cw);  // Tringles are wound CW
 
-            // Fill the triangles or wireframe
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line); // PolygonMode.Fill
-
+            Wireframe = true;
             SceneReady = true;
         }
 

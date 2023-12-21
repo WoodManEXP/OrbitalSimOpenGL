@@ -428,5 +428,27 @@ namespace OrbitalSimOpenGL
                 OrbitalSimCmds.SimTimeCompression(value);
             }
         }
+
+        /// <summary>
+        /// Axix checkbox clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AxisCheckbox(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            OrbitalSimCmds.Axis(checkBox.IsChecked.Value);
+        }
+
+        /// <summary>
+        /// Wireframe checkbox clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void WireframeCheckbox(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            OrbitalSimCmds.Wireframe(checkBox.IsChecked.Value);
+        }
     }
 }

@@ -25,6 +25,44 @@ namespace OrbitalSimOpenGL
             Dispatcher = dispatcher;
         }
 
+        #region Axis
+        public delegate void AxisDelegate(object[] args);
+        private AxisDelegate? _AxisDelegate = null;
+        public void AxisRegister(AxisDelegate aDelegate)
+        {
+            _AxisDelegate = aDelegate;
+        }
+
+        public void Axis(bool show)
+        {
+
+            if (_AxisDelegate is not null)
+            {
+                object[] args = { show };
+                Dispatcher?.BeginInvoke(DispatcherPriority.Normal, _AxisDelegate, args);
+            }
+        }
+        #endregion
+
+        #region Wireframe
+        public delegate void WireframeDelegate(object[] args);
+        private WireframeDelegate? _WireframeDelegate = null;
+        public void WireframeRegister(WireframeDelegate aDelegate)
+        {
+            _WireframeDelegate = aDelegate;
+        }
+
+        public void Wireframe(bool show)
+        {
+
+            if (_WireframeDelegate is not null)
+            {
+                object[] args = { show };
+                Dispatcher?.BeginInvoke(DispatcherPriority.Normal, _WireframeDelegate, args);
+            }
+        }
+        #endregion
+
         #region Camera Scale 
 
         public delegate void ScaleCameraDelegate(object[] args);
@@ -43,7 +81,6 @@ namespace OrbitalSimOpenGL
                 Dispatcher?.BeginInvoke(DispatcherPriority.Normal, _ScaleCameraDelegate, args);
             }
         }
-
         #endregion
 
         #region Camera Move operations

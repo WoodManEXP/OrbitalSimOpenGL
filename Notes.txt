@@ -36,4 +36,6 @@ SimBody
 - Add point at and ID (hit testing)
 - Keep looking at
 - Stay near
-- Does hours iteration work?
+- Does hours iteration work? (done)
+- Axis on/off (done)
+- Wireframe on/off (done)

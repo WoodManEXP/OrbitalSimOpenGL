@@ -77,6 +77,9 @@ namespace OrbitalSimOpenGL
             OrbitalSimCmds.SimIterationRateRegister(IterationRate);
             OrbitalSimCmds.SimTimeCompressionRegister(TimeCompression);
 
+            OrbitalSimCmds.AxisRegister(ShowAxis);
+            OrbitalSimCmds.WireframeRegister(UseWireframe);
+
             SimModel = new();
         }
 
@@ -164,7 +167,7 @@ namespace OrbitalSimOpenGL
         /// Set which system body,or system origin, about which to orbit camera
         /// </summary>
         /// <param name="args"></param>
-        public void OrbitAbout(object[] args)
+        private void OrbitAbout(object[] args)
         {
             String bodyName = (String)args[0];
             int index;
@@ -192,14 +195,14 @@ namespace OrbitalSimOpenGL
         {
         }
         // Move camera
-        public void MoveCamera(object[] args)
+        private void MoveCamera(object[] args)
         {
             CameraMoveDirections moveDirection = (CameraMoveDirections)args[0];
             //System.Diagnostics.Debug.WriteLine("MoveCamera " + moveDirection.ToString());
             SimCamera?.Move(moveDirection);
         }
         // Go Near
-        public void GoNear(object[] args)
+        private void GoNear(object[] args)
         {
             String bodyName = (String)args[0];
             int index;
@@ -212,7 +215,7 @@ namespace OrbitalSimOpenGL
             SimCamera?.GoNear(index);
         }
         // Look camera
-        public void LookCamera(object[] args)
+        private void LookCamera(object[] args)
         {
             CameraLookDirections lookDirection = (CameraLookDirections)args[0];
             Single degrees = (Single)args[1];
@@ -243,7 +246,7 @@ namespace OrbitalSimOpenGL
             SimCamera?.Tilt(tiltDirection, degrees);
         }
         // LookAt camera
-        public void LookAtCamera(object[] args)
+        private void LookAtCamera(object[] args)
         {
             String lookAtStr = (String)args[0];
 
@@ -256,7 +259,7 @@ namespace OrbitalSimOpenGL
                 SimCamera?.LookAt(SimModel.SimBodyList.GetIndex(lookAtStr));
         }
         // Start sim (and continue paused sim)
-        public void StartSim(object[] args)
+        private void StartSim(object[] args)
         {
             if (!SimHasBeenStarted)
             {
@@ -285,9 +288,23 @@ namespace OrbitalSimOpenGL
             FrameRateMovingAverage.Reset();
         }
         // Pause sim
-        public void PauseSim(object[] args)
+        private void PauseSim(object[] args)
         {
             SimModel.SimRunning = false;
+        }
+
+        private void ShowAxis(object[] args)
+        {
+            bool b = (bool)args[0];
+            if (SimModel is not null)
+                SimModel.IncludeAxis = b;
+        }
+
+        private void UseWireframe(object[] args)
+        {
+            bool b = (bool)args[0];
+            if (SimModel is not null)
+                SimModel.Wireframe = b;
         }
         #endregion
 

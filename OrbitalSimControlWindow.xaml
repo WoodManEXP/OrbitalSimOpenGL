@@ -104,5 +104,7 @@
         <ComboBox x:Name="LookAtComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.475,0" Canvas.Left="121" Canvas.Top="228" SelectionChanged="LookAtSelectionChanged" DropDownOpened="LookAtDropDownOpened"/>
         <GroupBox Height="61" Header="Go near" Width="146" Canvas.Left="255" Canvas.Top="202" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <ComboBox x:Name="GoNearComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="126" RenderTransformOrigin="0.475,0" Canvas.Left="263" Canvas.Top="228" DropDownOpened="GoNearDropDownOpened" SelectionChanged="GoNearSelectionChanged"/>
+        <CheckBox x:Name="ShowAxis" Content="Axis" Canvas.Left="438" Canvas.Top="283" HorizontalAlignment="Left" VerticalAlignment="Center" Width="137" Click="AxisCheckbox" IsChecked="True"/>
+        <CheckBox x:Name="ShowWireframe" Content="Wireframe" Canvas.Left="438" Canvas.Top="301" HorizontalAlignment="Center" VerticalAlignment="Top" Width="126" Click="WireframeCheckbox" IsChecked="True"/>
     </Canvas>
 </Window>
