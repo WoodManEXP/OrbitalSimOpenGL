@@ -288,6 +288,10 @@ void main()
             if (!IncludeAxis)
                 return;
 
+            // Axes look best drawn as wireframes
+            bool wireframe = Wireframe;
+            Wireframe = true;
+
             AxisShader.Use();
 
             Matrix4 vp = SimCamera.ViewMatrix * SimCamera.ProjectionMatrix;
@@ -314,6 +318,8 @@ void main()
             mvp = Z_AxisRotationMatrix * vp;
             GL.UniformMatrix4(MVP_Uniform, false, ref mvp);
             GL.DrawElements(PrimitiveType.Triangles, SharedAxisIndices.Length, DrawElementsType.UnsignedShort, 0);
+
+            Wireframe = wireframe; //Restore
         }
         #endregion
 
