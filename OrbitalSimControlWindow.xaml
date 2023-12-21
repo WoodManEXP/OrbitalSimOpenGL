@@ -88,7 +88,7 @@
         </GroupBox>
         <Label x:Name="TimeCompressionLabel" Content="" Canvas.Left="359" Canvas.Top="298" HorizontalAlignment="Center" VerticalAlignment="Top" Width="40"/>
         <GroupBox Height="54" Header="Calc iterations" Width="195" HorizontalAlignment="Center" Canvas.Top="280" VerticalAlignment="Top" Canvas.Left="4">
-            <ComboBox x:Name="IterationScale" HorizontalAlignment="Left" Width="51" Height="22" IsEditable="True" ToolTip="This many per iteration" SelectionChanged="ItemScaleChanged">
+            <ComboBox x:Name="IterationScale" HorizontalAlignment="Left" Width="51" Height="22" IsEditable="True" ToolTip="This many per iteration" SelectionChanged="IterationScaleChanged">
 
             </ComboBox>
         </GroupBox>

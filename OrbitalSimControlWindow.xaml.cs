@@ -362,16 +362,9 @@ namespace OrbitalSimOpenGL
         }
         private void IterationUnitsChecked(object sender, RoutedEventArgs e)
         {
-            var radioButton = (RadioButton)sender; // checked RadioButton
-            if (radioButton == IterateMinutes)
-            {
+            //var radioButton = (RadioButton)sender; // checked RadioButton
 
-            }
-            else if (radioButton == IterateHours)
-            {
-
-            }
-            else;
+            IterationScaleChanged(sender, e as SelectionChangedEventArgs);
         }
 
         /// <summary>
@@ -379,7 +372,7 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ItemScaleChanged(object sender, SelectionChangedEventArgs e)
+        private void IterationScaleChanged(object sender, SelectionChangedEventArgs e)
         {
             int baseSeconds;
             if (IterateMinutes is not null)
@@ -389,11 +382,14 @@ namespace OrbitalSimOpenGL
                 else
                     baseSeconds = 60 * 60;  // an hour
 
-                // Num seconds to iterate per frame.
-                int scale = int.Parse((String)IterationScale.SelectedValue);
+                if (IterationScale.SelectedValue is not null) // Happens during app start-up before all controls initialized
+                {      
+                    // Num seconds to iterate per frame.
+                    int scale = int.Parse((String)IterationScale.SelectedValue);
 
-                // Num seconds will be a number of minutes or number of hours
-                OrbitalSimCmds?.SimIterationRate(scale * baseSeconds);
+                    // Num seconds will be a number of minutes or number of hours
+                    OrbitalSimCmds?.SimIterationRate(scale * baseSeconds);
+                }
             }
         }
 

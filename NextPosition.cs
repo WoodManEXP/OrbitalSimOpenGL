@@ -24,7 +24,7 @@ namespace OrbitalSimOpenGL
         private int NumBodies { get; set; }
         private SimBodyList SimBodyList { get; set; }
         private MassMass MassMass { get; set; }
-        private Double Reg_G { get; } = 1E-3 * 6.6743E-11;   // Gravitational constant = N * m^2 / kg^-2 (m s^-2)
+        private Double Reg_G { get; } = 1E-3 * 6.6743E-11;   // Gravitational constant is kg m / sec-squared
                                                              // The 1E-3 converts from kg*m/s-squared to kg*km/s-squared
                                                              // (sim distancs are in km rather than m)
         public int IterationNumber { get; set; } = -1;
@@ -184,7 +184,9 @@ namespace OrbitalSimOpenGL
         /// </summary>
         private void CalcForceVectors()
         {
+#if false
             bool printedSunLoc = false;
+#endif
 
             for (int bL = 0; bL < NumBodies; bL++)       // bL - body low number
             {
