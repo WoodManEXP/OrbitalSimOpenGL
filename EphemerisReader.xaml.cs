@@ -37,7 +37,7 @@ namespace OrbitalSimOpenGL
             var appName = assembly.GetName().Name;
 
             string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            AppDataFolder = Path.Combine(localAppData, appName); // appDataFolder = "C:\\Users\\Robert\\AppData\\Local\\OrbitalSimWPF2"
+            AppDataFolder = Path.Combine(localAppData, appName); // appDataFolder = "C:\\Users\\Robert\\AppData\\Local\\OrbitalSimWOpenGL"
 
             JPL_BodyList = jplBodyList;
 

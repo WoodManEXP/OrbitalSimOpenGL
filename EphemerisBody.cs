@@ -31,7 +31,7 @@ namespace OrbitalSimOpenGL
                     , String designation   /* 3 */
                     , String iAU_Alias     /* 4 */
                     , String diameteStr    /* 5 */
-                    , String massStr       /* 6 */
+                    , String massStr       /* 6 kg */
                     , String gM_Str)       /* 7 */
         {
             ID = id;

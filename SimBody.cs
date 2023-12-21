@@ -25,14 +25,6 @@ namespace OrbitalSimOpenGL
         public Double VY { get; set; } // km/s
         public Double VZ { get; set; } // km/s
 
-        // Next settings, U Coords
-        public Double N_X { get; set; }
-        public Double N_Y { get; set; }
-        public Double N_Z { get; set; }
-        public Double N_VX { get; set; }
-        public Double N_VY { get; set; }
-        public Double N_VZ { get; set; }
-
         // Other settings from Ephemeris reading
         public Double LT { get; set; }
         public Double RG { get; set; }
@@ -66,7 +58,7 @@ namespace OrbitalSimOpenGL
             Z = double.TryParse(ephemerisBody.Z_Str, out dVal) ? dVal : -1D;
             VX = double.TryParse(ephemerisBody.VX_Str, out dVal) ? dVal : -1D;
             VY = double.TryParse(ephemerisBody.VY_Str, out dVal) ? dVal : -1D;
-            VY = double.TryParse(ephemerisBody.VY_Str, out dVal) ? dVal : -1D;
+            VZ = double.TryParse(ephemerisBody.VZ_Str, out dVal) ? dVal : -1D;
             LT = double.TryParse(ephemerisBody.LT_Str, out dVal) ? dVal : -1D;
             //LT = double.TryParse(ephemerisBody.LT_Str, out dVal) ? dVal : -1D;
             RG = double.TryParse(ephemerisBody.RG_Str, out dVal) ? dVal : -1D;
@@ -115,8 +107,12 @@ namespace OrbitalSimOpenGL
         /// <param name="bodyColorUniform"></param>
         /// <param name="mvp_Uniform"></param>
         /// <param name="vp"></param>
-        /// <param name="locationMatrix4"></param>
-        /// <param name="sizeMatrix4"></param>
+        /// <param name="locationMatrix4">Will be used/modified to set loc for this body</param>
+        /// <param name="sizeMatrix4">Will be used/modified to set size for this body</param>
+        /// <remarks>
+        /// Assumes the shared unit sphere is what's currently loaded in OpenGL ArrayBuffer. So this
+        /// is applying a set of transformations to that sphere to render this body.
+        /// </remarks>
         internal void Render(int indicesLength, int bodyColorUniform, int mvp_Uniform, ref Matrix4 vp, ref Matrix4 locationMatrix4, ref Matrix4 sizeMatrix4)
         {
             locationMatrix4.M41 = Scale.ScaleU_ToW(X); // X

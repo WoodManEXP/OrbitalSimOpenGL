@@ -24,9 +24,10 @@ namespace OrbitalSimOpenGL
         private int NumBodies { get; set; }
         private SimBodyList SimBodyList { get; set; }
         private MassMass MassMass { get; set; }
-        //private Double JPL_G { get; } = 6.6743015E-20;    // Gravitational constant km^3 kg^-1 s^-2
-        private Double Reg_G { get; } = 6.6743000E-11;    // Gravitational constant N m^2 kg^-2 (m s^-2)
-        public ulong IterationNumber { get; set; } = 0;
+        private Double Reg_G { get; } = 1E-3 * 6.6743E-11;   // Gravitational constant = N * m^2 / kg^-2 (m s^-2)
+                                                             // The 1E-3 converts from kg*m/s-squared to kg*km/s-squared
+                                                             // (sim distancs are in km rather than m)
+        public int IterationNumber { get; set; } = -1;
         #endregion
 
         /// <summary>
@@ -56,45 +57,6 @@ namespace OrbitalSimOpenGL
         }
 
         /// <summary>
-        /// Generate force vectors at the current state of the SimBodyList
-        /// </summary>
-        private void CalcForceVectors()
-        {
-            for (int bL = 0; bL < NumBodies; bL++)       // bL - body low number
-            {
-                SimBody lBody = SimBodyList.BodyList[bL];
-
-                for (int bH = 0; bH < NumBodies; bH++)    // bH - body high number
-                {
-                    // Nothing for diagonal or entries below the diagonal
-                    if (bH <= bL)
-                        continue;
-
-                    SimBody hBody = SimBodyList.BodyList[bH];
-
-                    // Index of this bL, bH combo into the Vectors table/array.
-                    // Same algorithm as used in MassMass.
-                    int i = ValuesIndex(bL, bH);
-
-                    // Calc distance between the two bodies and a normalized force
-                    // vector from the low body num to the high body num.
-                    ForceVectors[i].X = hBody.X - lBody.X;
-                    ForceVectors[i].Y = hBody.Y - lBody.Y;
-                    ForceVectors[i].Z = hBody.Z - lBody.Z;
-                    Double d = 1E3 * ForceVectors[i].Length; // From km to m
-                    ForceVectors[i].Normalize();
-
-                    // Newton's gravational attraction calculation
-                    Double newtons = Reg_G * MassMass.GetMassMass(bL, bH) / (d * d);
-
-                    // Each force vector's length is proportional to the Newtons of force the pair
-                    // of bodies exert on one another.
-                    ForceVectors[i] *= newtons;
-                }
-            }
-        }
-
-        /// <summary>
         /// Reposition bodies for a single iteration
         /// </summary>
         /// <param name="seconds">Number of seconds elapsed for the iteration</param>
@@ -117,35 +79,65 @@ namespace OrbitalSimOpenGL
                 // dX, dY, and dZ calculated as average velocity over interval * interval length (seconds)
                 // New X, Y, Z placed in SimBody elements after calculation are complete.
                 simBody = SimBodyList.BodyList[bodyNum];
-                Double simBodyMass = 1E3 * simBody.Mass; // Also cvt from m to km
+                //Double simBodyMass = 1E3 * simBody.Mass;
                 //Double dV = (forceVector.X * seconds) / simBodyMass;
-                Double newVX = simBody.VX + (forceVector.X * seconds) / simBodyMass;
-                simBody.VX = newVX;
-                Double newVY = simBody.VY + (forceVector.Y * seconds) / simBodyMass;
-                simBody.VY = newVY;
-                Double newVZ = simBody.VZ + (forceVector.Z * seconds) / simBodyMass;
-                simBody.VZ = newVZ;
+#if false
+                if ("Sun".Equals(simBody.Name))
+                {
+                    Vector3d speed = new(simBody.VX, simBody.VY, simBody.VZ);
+                    System.Diagnostics.Debug.WriteLine("IterateOnce Sun b4:"
+                                    + " VX:" + simBody.VX.ToString("0.000000000000E0")
+                                    + " VY:" + simBody.VY.ToString("0.000000000000E0")
+                                    + " VZ:" + simBody.VZ.ToString("0.000000000000E0")
+                                    + " forceVector:" + forceVector.Length.ToString("0.000000000000E0")
+                                    + " forceVector X:" + forceVector.X.ToString("0.000000000000E0")
+                                    + " forceVector Y:" + forceVector.Y.ToString("0.000000000000E0")
+                                    + " forceVector Z:" + forceVector.Z.ToString("0.000000000000E0")
+                                    + " speed:" + speed.Length.ToString("0.000000000000E0")
+                                    );
+                }
+#endif
+                // New velocity vectors
+                simBody.VX += (forceVector.X * seconds) / simBody.Mass;
+                simBody.VY += (forceVector.Y * seconds) / simBody.Mass;
+                simBody.VZ += (forceVector.Z * seconds) / simBody.Mass;
 
-                simBody.N_X = simBody.X + seconds * ((simBody.VX + newVX) / 2D);
-                simBody.N_Y = simBody.Y + seconds * ((simBody.VY + newVY) / 2D);
-                simBody.N_Z = simBody.Z + seconds * ((simBody.VZ + newVZ) / 2D);
-            }
-
-            // New positions calculated. Update each body with its new position
-            for (int bodyNum = 0; bodyNum < NumBodies; bodyNum++)
-            {
-                simBody = SimBodyList.BodyList[bodyNum];
+                Double newX = simBody.X + seconds * ((simBody.VX + simBody.VX) / 2D);
+                Double newY = simBody.Y + seconds * ((simBody.VY + simBody.VY) / 2D);
+                Double newZ = simBody.Z + seconds * ((simBody.VZ + simBody.VZ) / 2D);
 
                 if (simBody.LastTraceVector3D.X == 0) // Set first RecentVector into the SimBody
                 {
-                    simBody.LastTraceVector3D.X = simBody.N_X - simBody.X;
-                    simBody.LastTraceVector3D.Y = simBody.N_Y - simBody.Y;
-                    simBody.LastTraceVector3D.Z = simBody.N_Z - simBody.Z;
+                    simBody.LastTraceVector3D.X = newX - simBody.X;
+                    simBody.LastTraceVector3D.Y = newY - simBody.Y;
+                    simBody.LastTraceVector3D.Z = newZ - simBody.Z;
                 }
 
-                simBody.X = simBody.N_X;
-                simBody.Y = simBody.N_Y;
-                simBody.Z = simBody.N_Z;
+                // Update body with its new position
+                simBody.X = newX;
+                simBody.Y = newY;
+                simBody.Z = newZ;
+
+#if false
+                if ("Jupiter".Equals(simBody.Name) && 0 == IterationNumber % 100)
+                {
+                    Vector3d speed = new(simBody.VX, simBody.VY, simBody.VZ);
+                    System.Diagnostics.Debug.WriteLine("IterateOnce Sun after:"
+                                    + "IterationNumber " + IterationNumber.ToString()
+                                    + " forceVector X,Y,Z " + forceVector.X.ToString("0.000000000000E0")
+                                    + ", " + forceVector.Y.ToString("0.000000000000E0")
+                                    + ", " + forceVector.Z.ToString("0.000000000000E0")
+                                    + " Len " + forceVector.Length.ToString("0.000000000000E0")
+                                    + " VX,VY,VZ " + simBody.VX.ToString("0.000000000000E0")
+                                    + ", " + simBody.VY.ToString("0.000000000000E0")
+                                    + ", " + simBody.VZ.ToString("0.000000000000E0")
+                                    + " Vel " + speed.Length.ToString("0.000000000000E0")
+                                    + " X,Y,Z " + simBody.X.ToString("0.000000000000E0")
+                                    + ", " + simBody.Y.ToString("0.000000000000E0")
+                                    + ", " + simBody.Z.ToString("0.000000000000E0")
+                                    );
+                }
+#endif
             }
         }
 
@@ -162,8 +154,9 @@ namespace OrbitalSimOpenGL
             {
                 if (bodyNum != otherBodyNum)
                 {
-                    // Force vectors between any two bodies originate at body with lower index value.
-                    // If bodyNum < otherBodyNum use forceVector as it stands. Otherwise reverse it.
+                    // ValuesIndex indices are generated by bodyNum pairs.
+                    // Force vectors between any two bodies represent attraction from body with lower index to
+                    // body with higher index, attraction of lower to higher (bL ---> bH)
                     int index = ValuesIndex(bodyNum, otherBodyNum);
                     if (bodyNum < otherBodyNum)
                         forceVector += ForceVectors[index];
@@ -171,17 +164,99 @@ namespace OrbitalSimOpenGL
                         forceVector -= ForceVectors[index];
                 }
             }
+
+#if false
+            if (0 == bodyNum)
+            {
+                System.Diagnostics.Debug.WriteLine("SumForceVectors on Sun "
+                                                   + " newtons, vec X,Y,Z: "
+                                                   + forceVector.Length.ToString("0.000000000000E0")
+                                                   + "," + forceVector.X.ToString("0.000000000000E0")
+                                                   + "," + forceVector.Y.ToString("0.000000000000E0")
+                                                   + "," + forceVector.Z.ToString("0.000000000000E0")
+                                                   );
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Generate force vectors among bodies givem current state of the SimBodyList
+        /// </summary>
+        private void CalcForceVectors()
+        {
+            bool printedSunLoc = false;
+
+            for (int bL = 0; bL < NumBodies; bL++)       // bL - body low number
+            {
+                SimBody lBody = SimBodyList.BodyList[bL];
+
+                for (int bH = 0; bH < NumBodies; bH++)    // bH - body high number
+                {
+                    // Nothing for diagonal or below the diagonal entries 
+                    if (bH <= bL)
+                        continue;
+
+                    SimBody hBody = SimBodyList.BodyList[bH];
+
+                    // Index of this bL, bH combo into the Vectors table/array.
+                    // Same algorithm as used in MassMass.
+                    int i = ValuesIndex(bL, bH);
+
+                    // Calc normalized vector between two bodies.
+                    // Force vectors between any two bodies represent attraction from body with lower index to
+                    // body with higher index, attraction of lower to higher (bL ---> bH)
+                    ForceVectors[i].X = hBody.X - lBody.X;
+                    ForceVectors[i].Y = hBody.Y - lBody.Y;
+                    ForceVectors[i].Z = hBody.Z - lBody.Z;
+                    Double d = 1E3 * ForceVectors[i].Length; // From km to m
+                    ForceVectors[i].Normalize();
+
+                    // Newton's gravational attraction/force calculation
+                    Double newtons = Reg_G * MassMass.GetMassMass(bL, bH) / (d * d);
+
+                    // Each force vector's length is the Newtons of force the pair of bodies exert on one another.
+                    ForceVectors[i] *= newtons;
+#if false
+                    if (0 == bL) // Sun
+                    {
+                        if (printedSunLoc is false)
+                            System.Diagnostics.Debug.WriteLine("CalcForceVectors Sun loc (X,Y,Z) "
+                                + lBody.X.ToString("0.000000000000E0")
+                                + ", " + lBody.Y.ToString("0.000000000000E0")
+                                + ", " + lBody.Z.ToString("0.000000000000E0")
+                                );
+                        printedSunLoc = true;
+
+                        System.Diagnostics.Debug.WriteLine("CalcForceVectors Sun to " + hBody.Name
+                                                                                   + " d (km): " + (d / 1000D).ToString("0.000000000000E0")
+                                                                                   + " newtons, vec X,Y,Z: "
+                                                                                   + newtons.ToString("0.000000000000E0")
+                                                                                   + "," + ForceVectors[i].X.ToString("0.000000000000E0")
+                                                                                   + "," + ForceVectors[i].Y.ToString("0.000000000000E0")
+                                                                                   + "," + ForceVectors[i].Z.ToString("0.000000000000E0")
+                                                                                   );
+                        System.Diagnostics.Debug.WriteLine("CalcForceVectors " + hBody.Name + " loc (X, Y, Z) "
+                                + hBody.X.ToString("0.000000000000E0")
+                                + ", " + hBody.Y.ToString("0.000000000000E0")
+                                + ", " + hBody.Z.ToString("0.000000000000E0"));
+                    }
+#endif
+                }
+            }
         }
 
         /// <summary>
         /// Generate index into Vectors array
         /// </summary>
-        /// <param name="bL">Lower body number - position in SimBodyList/param>
-        /// <param name="bH">Higher body number - position in SimBodyList</param>
+        /// <param name="body0">One body number - position in SimBodyList/param>
+        /// <param name="body1">Other body number - position in SimBodyList</param>
         /// <returns></returns>
-        private int ValuesIndex(int bL, int bH)
+        private int ValuesIndex(int body0, int body1)
         {
-            return (bL * NumBodies) - SumOfIntegers[bL] + bH - bL - 1;
+            var lBL = Math.Min(body0, body1);
+            var lBh = Math.Max(body0, body1);
+
+            return (lBL * NumBodies) - SumOfIntegers[lBL] + lBh - lBL - 1;
         }
     }
 }

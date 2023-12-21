@@ -58,17 +58,21 @@ namespace OrbitalSimOpenGL
         /// <returns></returns>
         public Double GetMassMass(int body1, int body2)
         {
-            return MassMassValues[ValuesIndex(Math.Min(body1, body2), Math.Max(body1, body2))];
+            return MassMassValues[ValuesIndex(body1, body2)];
         }
+
         /// <summary>
-        /// Generate index into MassMassValues array
+        /// Generate index into Vectors array
         /// </summary>
-        /// <param name="bL">Lower body number - position in SimBodyList/param>
-        /// <param name="bH">Higher body number - position in SimBodyList</param>
+        /// <param name="body0">One body number - position in SimBodyList/param>
+        /// <param name="body1">Other body number - position in SimBodyList</param>
         /// <returns></returns>
-        private int ValuesIndex(int bL, int bH)
+        private int ValuesIndex(int body0, int body1)
         {
-            return (bL * NumBodies) - SumOfIntegers[bL] + bH - bL - 1;
+            var lBL = Math.Min(body0, body1);
+            var lBh = Math.Max(body0, body1);
+
+            return (lBL * NumBodies) - SumOfIntegers[lBL] + lBh - lBL - 1;
         }
     }
 }

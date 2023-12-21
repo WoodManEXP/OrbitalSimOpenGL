@@ -4,14 +4,13 @@ namespace OrbitalSimOpenGL
 {
     public class JPL_Body
     {
-
         public JPL_Body(Boolean selected       /* 1 */
             , String id            /* 2 */
             , String name          /* 3 */
             , String designation   /* 4 */
             , String iAU_Alias     /* 5 */
             , String diameteStr    /* 6 */
-            , String massStr       /* 7 */
+            , String massStr       /* 7 kg */
             , String gM_Str)       /* 8 */
         {
 
