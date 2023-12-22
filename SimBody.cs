@@ -104,9 +104,9 @@ namespace OrbitalSimOpenGL
         /// Render body using the shared sphere
         /// </summary>
         /// <param name="indicesLength"></param>
-        /// <param name="bodyColorUniform"></param>
-        /// <param name="mvp_Uniform"></param>
-        /// <param name="vp"></param>
+        /// <param name="bodyColorUniform">OpenGL shader uniforn number for color</param>
+        /// <param name="mvp_Uniform">OpenGL shader uniforn number for mvp matrix4</param>
+        /// <param name="vp">View Projection matrix</param>
         /// <param name="locationMatrix4">Will be used/modified to set loc for this body</param>
         /// <param name="sizeMatrix4">Will be used/modified to set size for this body</param>
         /// <remarks>
@@ -119,7 +119,7 @@ namespace OrbitalSimOpenGL
             locationMatrix4.M42 = Scale.ScaleU_ToW(Y); // Y
             locationMatrix4.M43 = Scale.ScaleU_ToW(Z); // Z
 
-            sizeMatrix4.M11 =  sizeMatrix4.M22 =  sizeMatrix4.M33 = Scale.ScaleU_ToW(UseD);
+            sizeMatrix4.M11 = sizeMatrix4.M22 = sizeMatrix4.M33 = Scale.ScaleU_ToW(UseD);
 
             Matrix4 mvp = sizeMatrix4 * locationMatrix4 * vp;
 
@@ -167,27 +167,62 @@ namespace OrbitalSimOpenGL
             Vector4 oneSideV4 = new((Vector3)oneSideUniv, 1f);
             Vector4 otherSideV4 = new((Vector3)otherSideUniv, 1f);
 
-            // To clip space (through View abd projection matrices)
-            Vector4 oneSideClip = oneSideV4 * vp_Matrix;     
+            // To clip space (through View and projection matrices)
+            Vector4 oneSideClip = oneSideV4 * vp_Matrix;
             Vector4 otherSideClip = otherSideV4 * vp_Matrix;
 
-            // To pixels
+            // To clip space
             oneSideClip /= oneSideClip.W;
             otherSideClip /= otherSideClip.W;
             oneSideClip *= viewWidth;
             otherSideClip *= viewWidth;
 
-            // Distance between the two points in clip space
+            // Distance between the two points in clip space (-1 .. 1)
             Single dX = oneSideClip.X - otherSideClip.X;
             Single dY = oneSideClip.Y - otherSideClip.Y;
             Single distSquared = dX * dX + dY * dY;
-            
-            if (distSquared < minSizeSquared)
+
+            if (1E-3 >= distSquared)
+            {
+                // Body so small it is lost in single precision. Jump to double precision.
+
+                // Make 3D to Homogenous 4D
+                Vector4d oneSideV4D = new(oneSideUniv, 1d);
+                Vector4d otherSideV4D = new(otherSideUniv, 1d);
+
+                Vector4d row0 = new(vp_Matrix.M11, vp_Matrix.M12, vp_Matrix.M13, vp_Matrix.M14);
+                Vector4d row1 = new(vp_Matrix.M21, vp_Matrix.M22, vp_Matrix.M23, vp_Matrix.M24);
+                Vector4d row2 = new(vp_Matrix.M31, vp_Matrix.M32, vp_Matrix.M33, vp_Matrix.M34);
+                Vector4d row3 = new(vp_Matrix.M41, vp_Matrix.M42, vp_Matrix.M43, vp_Matrix.M44);
+                Matrix4d vp_Matrix4d = new(row0, row1, row2, row3);
+
+                // To clip space (through View and projection matrices)
+                Vector4d oneSideClipD = oneSideV4D * vp_Matrix4d;
+                Vector4d otherSideClipD = otherSideV4D * vp_Matrix4d;
+
+                // To pixels
+                oneSideClipD /= oneSideClipD.W;
+                otherSideClipD /= otherSideClipD.W;
+                oneSideClipD *= viewWidth;
+                otherSideClipD *= viewWidth;
+
+                // Distance between the two points in clip space (-1 .. 1)
+                Double dXD = oneSideClipD.X - otherSideClipD.X;
+                Double dYD = oneSideClipD.Y - otherSideClipD.Y;
+                Double distSquaredD = dXD * dXD + dYD * dYD;
+
                 // Change the body's diameter such that distSquared will transform to minSizeSquared
-                UseD = (minSize * EphemerisDiameter) / Math.Sqrt(distSquared);
+                UseD = (minSize * EphemerisDiameter) / Math.Sqrt(distSquaredD);
+            }
             else
-                // Not too small, keep the diameter as the original value
-                UseD = EphemerisDiameter;
+            {
+                if (distSquared < minSizeSquared)
+                    // Change the body's diameter such that distSquared will transform to minSizeSquared
+                    UseD = (minSize * EphemerisDiameter) / Math.Sqrt(distSquared);
+                else
+                    // Not too small, keep the diameter as the original value
+                    UseD = EphemerisDiameter;
+            }
         }
 
 #if false

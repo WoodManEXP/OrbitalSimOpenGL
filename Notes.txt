@@ -33,7 +33,7 @@ SimBody
 
 - Mars moons draw strangely
 - GoNear draws strangely when sim running
-- Add point at and ID (hit testing)
+- Add point-at and ID (hit testing)
 - Keep looking at
 - Stay near
 - Does hours iteration work? (done)
