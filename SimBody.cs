@@ -14,7 +14,6 @@ namespace OrbitalSimOpenGL
     public class SimBody
     {
         #region Properties
-
         Scale Scale { get; set; }
 
         // Current settings, U coords
