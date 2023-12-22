@@ -32,7 +32,7 @@ namespace OrbitalSimOpenGL
         #region Properties
         //readonly static float ToRadians = Math.PI / 180D;
         //readonly static Double ToDegrees = 180D / Math.PI;
-        readonly static Double OneAU = 1.49668992D + 8; // KM (93M miles);
+        readonly static Double OneAU = 1.49668992E8D; // KM (93M miles);
 
         // Amount camera moves increses exponentially as the scale increases (0 .. N)
         public Double[] CamMoveKMs { get; }
@@ -658,14 +658,14 @@ namespace OrbitalSimOpenGL
                     // As a calculation optimization this assumes the FramerateMS will be nearly constant during 
                     // any given movement animation.
 
-                    // First timne thru, calculate target length of animation (ms) and deceleration (ms)
+                    // First time thru, calculate target length of animation (ms) and deceleration (ms)
                     // 1 .. GN_MaxAnimationTime MS up to distance of 1 AU
                     // Up to OneAU is a proportion of GN_MaxAnimationTime. All over OneAU are set to max.
                     Double animationTime = (currDistToTarget <= OneAU) ? Math.Max(1.5E3, currDistToTarget / OneAU * GN_MaxAnimationTimeMS) : GN_MaxAnimationTimeMS;
                     Double decelerationTime = (currDistToTarget <= OneAU) ? currDistToTarget / OneAU * GN_MaxDecelTimeMS : GN_MaxDecelTimeMS;
 
                     GN_FramesGoal = (int)Math.Ceiling(animationTime / FramerateMS);
-                    GN_DecelFramesGoal = (int)Math.Ceiling(decelerationTime / FramerateMS);
+                    GN_DecelFramesGoal =  (int)Math.Ceiling(decelerationTime / FramerateMS);
                     GN_CruiseFramesGoal = GN_FramesGoal - GN_DecelFramesGoal;
                 }
 

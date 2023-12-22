@@ -31,7 +31,7 @@ SimBody
 	Draw
 
 
-- Mars moons draw strangely
+- Mars moons draw strangely (done)
 - GoNear draws strangely when sim running
 - Add point-at and ID (hit testing)
 - Keep looking at
@@ -39,3 +39,5 @@ SimBody
 - Does hours iteration work? (done)
 - Axis on/off (done)
 - Wireframe on/off (done)
+- Implement Trace
+- Barrycenter not adjusting. Either cause it to adjust or remove it as target in bodies selections

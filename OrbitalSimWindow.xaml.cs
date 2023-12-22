@@ -129,13 +129,16 @@ namespace OrbitalSimOpenGL
             else
                 UpdateFrameLastMS = ms;
 
-            // Perform any active camera animations
+            // FrameRate
             int frameRateMS = FrameRateMovingAverage.AnotherValue(ms);
-            SimCamera?.AnimateCamera(ms, frameRateMS);
 
             SimModel.Render(ms, frameRateMS);
 
-            SimCamera?.Render(timeSpan); // In case camera needs to render (e.g. recticle)
+            // Camera animation occurs after SimModel.Render as it moves things in the model space
+            // Perform any active camera animations
+            SimCamera?.AnimateCamera(ms, frameRateMS);
+
+            SimCamera?.Render(); // In case camera needs to render (e.g. recticle)
         }
         #endregion
 

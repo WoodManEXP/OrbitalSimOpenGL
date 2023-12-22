@@ -92,7 +92,7 @@ void main()
             MVP = SizeMatrix * LocationMatrix * ViewMatrix * ProjectionMatrix;
         }
 
-        internal void Render(TimeSpan timeSpan, SimCamera simCamera)
+        internal void Render(SimCamera simCamera)
         {
             if (DrawReticle)
             {
