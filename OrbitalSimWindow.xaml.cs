@@ -34,6 +34,13 @@ namespace OrbitalSimOpenGL
         /// </summary>
         private static OrbitalSimWindow? ThisOrbitalSimWindow { get; set; }
 
+        // Commands
+        public enum GenericCommands
+        {
+             Axis
+           , Wireframe 
+        };
+
         #endregion
 
         public OrbitalSimWindow()
@@ -77,8 +84,7 @@ namespace OrbitalSimOpenGL
             OrbitalSimCmds.SimIterationRateRegister(IterationRate);
             OrbitalSimCmds.SimTimeCompressionRegister(TimeCompression);
 
-            OrbitalSimCmds.AxisRegister(ShowAxis);
-            OrbitalSimCmds.WireframeRegister(UseWireframe);
+            OrbitalSimCmds.GenericRegister(GenericCommand);
 
             SimModel = new();
         }
@@ -131,12 +137,7 @@ namespace OrbitalSimOpenGL
 
             // FrameRate, a frame is happening on average every framerateMS
             int frameRateMS = FrameRateMovingAverage.AnotherValue(ms);
-#if false
-            System.Diagnostics.Debug.WriteLine("OrbitalSimWindow.OnRender " 
-                + " ms " + ms.ToString()
-                + " frameRateMS " + frameRateMS.ToString()
-                );
-#endif
+
             SimModel.Render(ms, frameRateMS);
 
             // Camera animation occurs after SimModel.Render as it moves things in the model space
@@ -301,11 +302,25 @@ namespace OrbitalSimOpenGL
             SimModel.SimRunning = false;
         }
 
-        private void ShowAxis(object[] args)
+        private void GenericCommand(object[] args)
         {
-            bool b = (bool)args[0];
-            if (SimModel is not null)
-                SimModel.IncludeAxis = b;
+            GenericCommands cmd;
+
+            switch(cmd = (GenericCommands)args[0])
+            {
+                case GenericCommands.Axis:
+                    if (SimModel is not null)
+                        SimModel.IncludeAxis = (bool)args[1];
+                    break;
+
+                case GenericCommands.Wireframe:
+                    if (SimModel is not null)
+                        SimModel.Wireframe = (bool)args[1];
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private void UseWireframe(object[] args)

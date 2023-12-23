@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Threading;
+using static OrbitalSimOpenGL.OrbitalSimWindow;
 
 namespace OrbitalSimOpenGL
 {
@@ -25,41 +26,37 @@ namespace OrbitalSimOpenGL
             Dispatcher = dispatcher;
         }
 
-        #region Axis
-        public delegate void AxisDelegate(object[] args);
-        private AxisDelegate? _AxisDelegate = null;
-        public void AxisRegister(AxisDelegate aDelegate)
-        {
-            _AxisDelegate = aDelegate;
-        }
+        #region Generic Command
 
+        // Seems easier to use a generic command entry setting parameters for specific commands.
+        // Rather than pulling together a delegate for each command.
+        public delegate void GenericDelegate(object[] args);
+        private GenericDelegate? _GenericDelegate = null;
+        public void GenericRegister(GenericDelegate aDelegate)
+        {
+            _GenericDelegate = aDelegate;
+        }
+        public void GenericCommand(object[] args)
+        {
+
+            if (_GenericDelegate is not null)
+                Dispatcher?.BeginInvoke(DispatcherPriority.Normal, _GenericDelegate, args);
+        }
+        #endregion
+
+        #region Axis
         public void Axis(bool show)
         {
-
-            if (_AxisDelegate is not null)
-            {
-                object[] args = { show };
-                Dispatcher?.BeginInvoke(DispatcherPriority.Normal, _AxisDelegate, args);
-            }
+            object[] args = { OrbitalSimWindow.GenericCommands.Axis, show };
+            GenericCommand(args);
         }
         #endregion
 
         #region Wireframe
-        public delegate void WireframeDelegate(object[] args);
-        private WireframeDelegate? _WireframeDelegate = null;
-        public void WireframeRegister(WireframeDelegate aDelegate)
-        {
-            _WireframeDelegate = aDelegate;
-        }
-
         public void Wireframe(bool show)
         {
-
-            if (_WireframeDelegate is not null)
-            {
-                object[] args = { show };
-                Dispatcher?.BeginInvoke(DispatcherPriority.Normal, _WireframeDelegate, args);
-            }
+            object[] args = { OrbitalSimWindow.GenericCommands.Wireframe, show };
+            GenericCommand(args);
         }
         #endregion
 
