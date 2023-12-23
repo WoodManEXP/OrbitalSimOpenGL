@@ -119,7 +119,7 @@ namespace OrbitalSimOpenGL
             //int seconds = timeSpan.Seconds;
             //int milliseconds = timeSpan.Milliseconds;
 
-            int ms = timeSpan.Milliseconds; // + 1000 * seconds + 60000 * minutes;
+            int ms = timeSpan.Milliseconds;
 
             if (0 == UpdateFrameLastMS)
             {
@@ -129,9 +129,14 @@ namespace OrbitalSimOpenGL
             else
                 UpdateFrameLastMS = ms;
 
-            // FrameRate
+            // FrameRate, a frame is happening on average every framerateMS
             int frameRateMS = FrameRateMovingAverage.AnotherValue(ms);
-
+#if false
+            System.Diagnostics.Debug.WriteLine("OrbitalSimWindow.OnRender " 
+                + " ms " + ms.ToString()
+                + " frameRateMS " + frameRateMS.ToString()
+                );
+#endif
             SimModel.Render(ms, frameRateMS);
 
             // Camera animation occurs after SimModel.Render as it moves things in the model space
@@ -140,7 +145,7 @@ namespace OrbitalSimOpenGL
 
             SimCamera?.Render(); // In case camera needs to render (e.g. recticle)
         }
-        #endregion
+#endregion
 
         #region Commands
         private void TimeCompression(object[] args)

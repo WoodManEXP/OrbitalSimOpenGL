@@ -159,10 +159,9 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Render anything visible associated with camera.
         /// </summary>
-        /// <param name="timeSpan"></param>
-        internal void Render(TimeSpan timeSpan)
+        internal void Render()
         {
-            Reticle.Render(timeSpan, this);
+            Reticle.Render(this);
         }
         public void SetCameraPosition(Vector3d position)
         {
@@ -548,16 +547,11 @@ namespace OrbitalSimOpenGL
         #endregion
 
         #region Animate GoNear
-        private static Double GN_MaxAnimationTimeMS { get; } = 3000E0;  // Max animation will be this many ms
-        private static Double GN_MaxDecelTimeMS { get; } = 2000E0;      // Max deceleration time will be this many ms
+        private static Double GN_MaxAnimationTimeSecs { get; } = 3E0;  // Max animation will be this many seconds
         private Double GN_NearDistance { get; set; } // What distance from the GoNear body to stop
-        private Double GN_CruiseStopDistance { get; set; }
         private bool StartedGN_LookAtAnimation { get; set; }
         private int GN_FramesGoal { get; set; }
-        private int GN_CruiseFramesGoal { get; set; }
-        private int GN_DecelFramesGoal { get; set; }
         private int GN_FramesSoFar { get; set; }
-        private Double GN_Velocity { get; set; } // km/frame
 
         private Vector3d GN_TargetPoint; //
         private SimBody GN_SimBody { get; set; }
@@ -582,16 +576,11 @@ namespace OrbitalSimOpenGL
             {
                 GN_TargetPoint.X = GN_TargetPoint.Y = GN_TargetPoint.Z = 0D;
                 GN_NearDistance = 3E6; // 3M km from origin
-                GN_CruiseStopDistance = 0D;
             }
             else
             {
                 GN_SimBody = SimModel.SimBodyList.BodyList[GN_BodyIndex];
-                GN_TargetPoint.X = GN_SimBody.X;
-                GN_TargetPoint.Y = GN_SimBody.Y;
-                GN_TargetPoint.Z = GN_SimBody.Z;
-                GN_NearDistance = 15E-1 * GN_SimBody.EphemerisDiameter; // Stop N diameters from the body
-                GN_CruiseStopDistance = 6E1 * GN_SimBody.EphemerisDiameter; // Cruise phase stops N diameters from the body
+                GN_NearDistance = 3E0 * GN_SimBody.EphemerisDiameter; // Stop N diameters from the body
             }
         }
 
@@ -644,74 +633,33 @@ namespace OrbitalSimOpenGL
                 distVector3d.Z = targetPosition3D.Z - CameraPosition.Z;
                 Double currDistToTarget = distVector3d.Length - GN_NearDistance;
 
-                Double distThisFrame = 0D;
+                if (currDistToTarget <= GN_NearDistance)
+                {
+                    AnimatingGoNear = false; // Stop 
+                    return;
+                }
 
                 if (0 == GN_FramesSoFar)
                 {
-                    // If camera is already within GN_NearDistance, nothing to do
-                    if (currDistToTarget <= GN_NearDistance)
-                    {
-                        AnimatingGoNear = false; // Stop 
-                        return;
-                    }
 
-                    // As a calculation optimization this assumes the FramerateMS will be nearly constant during 
-                    // any given movement animation.
-
-                    // First time thru, calculate target length of animation (ms) and deceleration (ms)
-                    // 1 .. GN_MaxAnimationTime MS up to distance of 1 AU
-                    // Up to OneAU is a proportion of GN_MaxAnimationTime. All over OneAU are set to max.
-                    Double animationTime = (currDistToTarget <= OneAU) ? Math.Max(1.5E3, currDistToTarget / OneAU * GN_MaxAnimationTimeMS) : GN_MaxAnimationTimeMS;
-                    Double decelerationTime = (currDistToTarget <= OneAU) ? currDistToTarget / OneAU * GN_MaxDecelTimeMS : GN_MaxDecelTimeMS;
-
-                    GN_FramesGoal = (int)Math.Ceiling(animationTime / FramerateMS);
-                    GN_DecelFramesGoal =  (int)Math.Ceiling(decelerationTime / FramerateMS);
-                    GN_CruiseFramesGoal = GN_FramesGoal - GN_DecelFramesGoal;
+                    int maxFrames = (int)(GN_MaxAnimationTimeSecs * (1000 / FramerateMS));
+                    GN_FramesGoal = (currDistToTarget > OneAU) ? maxFrames : (int)(currDistToTarget / OneAU * maxFrames);
+                    if (0 == GN_FramesGoal) // In case really close;
+                        GN_FramesGoal = 2;
                 }
 
-                if (GN_FramesSoFar < GN_CruiseFramesGoal) // Cruise phase
-                {
-                    // Because target body is moving, continually adjust distPerFrame during cruise phase to arrive at
-                    // deceleration point at scheduled time.
-                    // Cruise persists at this, or nearly this. Deceleration begins at last cruise velocity.
-                    int cruiseFramesRemaining = GN_CruiseFramesGoal - GN_FramesSoFar;
-                    Double remainingCruiseDist = currDistToTarget - GN_CruiseStopDistance;
+                Double distThisFrame = currDistToTarget / (GN_FramesGoal - GN_FramesSoFar);
 
-                    GN_Velocity = remainingCruiseDist / cruiseFramesRemaining;
-
-                    distThisFrame = GN_Velocity;
-
-                    //                    System.Diagnostics.Debug.WriteLine("AnimateGoNear: cruise"
-                    //                        + " FramerateMS:" + FramerateMS.ToString("N0")
-                    //                        + " cruiseV:" + GN_Velocity.ToString("N0")
-                    //                        + " remainingCruiseDist:" + remainingCruiseDist.ToString("N0")
-                    //                        + " currDistToTarget:" + currDistToTarget.ToString("N0")
-                    //                        + " distThisFrame:" + distThisFrame.ToString("N0")
-                    //                        + " cruiseFrameRemaining:" + cruiseFramesRemaining.ToString("N0")
-                    //                    );
-                }
-                else
-                {
-                    // Deceleration phase
-                    // Because target body is moving, continually adjust deceleration rate across frames to arrive at
-                    // target point by the last frame.
-                    int dcelFramesRemaining = GN_FramesGoal - GN_FramesSoFar;
-
-                    Double decelV = (2D * currDistToTarget) / dcelFramesRemaining;
-                    Double acceleration = -currDistToTarget / dcelFramesRemaining;
-
-                    distThisFrame = decelV + acceleration / 2d;
-
-                    //                    System.Diagnostics.Debug.WriteLine("AnimateGoNear: decel"
-                    //                        + " decelV:" + decelV.ToString("N0")
-                    //                        + " acceleration:" + acceleration.ToString("N0")
-                    //                        + " currDistToTarget: " + currDistToTarget.ToString("N0")
-                    //                        + " distThisFrame:" + distThisFrame.ToString("N0")
-                    //                        + " dcelFramesRemaining:" + dcelFramesRemaining.ToString("N0")
-                    //                        + " GN_FramesGoal:" + GN_FramesGoal.ToString("N0")
-                    //                        + " GN_FramesSoFar:" + GN_FramesSoFar.ToString("N0")
-                    //                    );
-                }
+#if false
+                System.Diagnostics.Debug.WriteLine("SimCamera..AnimateGoNear "
+                    + " currDistToTarget " + currDistToTarget.ToString("0.000000000000E0")
+                    + " distThisFrame " + distThisFrame.ToString("0.000000000000E0")
+                    + " GN_FramesSoFar " + GN_FramesSoFar.ToString()
+                    + " GN_FramesGoal " + GN_FramesGoal.ToString()
+                    );
+                if (0 == GN_FramesGoal)
+                    System.Diagnostics.Debugger.Break();
+#endif
 
                 distVector3d.Normalize();
                 CameraPosition += (distVector3d * distThisFrame);
@@ -729,14 +677,22 @@ namespace OrbitalSimOpenGL
                 // Smooth out rounding issues looking for vector direction change here
                 if (1.74533e-5D < angleBetweenLookVectors) // .001 degrees in radians
                 {
+#if false
+                    System.Diagnostics.Debug.WriteLine("SimCamera..AnimateGoNear "
+                        + " angleBetweenLookVectors " + angleBetweenLookVectors.ToString("0.000000000000E0")
+                        + " GN_FramesSoFar " + GN_FramesSoFar.ToString()
+                        );
+#endif
+                    
+                    
                     Vector3d rotateAboutVector3d = Vector3d.Cross(LookVector3d, newLookVector3d);
 
                     OpenTK.Mathematics.Quaterniond q = Util.MakeQuaterniond(rotateAboutVector3d, angleBetweenLookVectors);
                     Matrix3d rotationMatrix = Matrix3d.CreateFromQuaternion(q);
 
-                    LookVector3d = rotationMatrix * LookVector3d;
-                    UpVector3d = rotationMatrix * UpVector3d;
-                    NormalVector3d = rotationMatrix * NormalVector3d;
+                    LookVector3d *= rotationMatrix;
+                    UpVector3d *= rotationMatrix;
+                    NormalVector3d *= rotationMatrix;
                 }
 
                 // Stop animation is complete
