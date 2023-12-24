@@ -60,6 +60,22 @@ namespace OrbitalSimOpenGL
         }
         #endregion
 
+        #region Keep
+        public void Keep(bool show)
+        {
+            object[] args = { OrbitalSimWindow.GenericCommands.Keep, show };
+            GenericCommand(args);
+        }
+        #endregion
+
+        #region Reticle
+        public void Reticle(bool show)
+        {
+            object[] args = { OrbitalSimWindow.GenericCommands.Reticle, show };
+            GenericCommand(args);
+        }
+        #endregion
+
         #region Camera Scale 
 
         public delegate void ScaleCameraDelegate(object[] args);
@@ -171,7 +187,7 @@ namespace OrbitalSimOpenGL
         }
         #endregion
 
-        #region Camera orbit operations
+        #region Camera Orbit operations
 
         public delegate void OrbitCameraDelegate(object[] args);
         private OrbitCameraDelegate? _OrbitCameraDelegate = null;

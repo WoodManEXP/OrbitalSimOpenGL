@@ -450,5 +450,21 @@ namespace OrbitalSimOpenGL
             CheckBox checkBox = (CheckBox)sender;
             OrbitalSimCmds.Wireframe(checkBox.IsChecked.Value);
         }
+        /// <summary>
+        /// Keep checkbox clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void KeepClicked(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            OrbitalSimCmds.Keep(checkBox.IsChecked.Value);
+        }
+
+        private void ReticleCheckbox(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            OrbitalSimCmds.Reticle(checkBox.IsChecked.Value);
+        }
     }
 }

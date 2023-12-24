@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OrbitalSimOpenGL"
         mc:Ignorable="d"
-        Title="OrbitalSim Control - OpenGL" Height="384" Width="586"
+        Title="OrbitalSim Control - OpenGL" Height="420" Width="586"
         ResizeMode="NoResize"
         Topmost="True"
         Loaded="Window_Loaded"
         >
-    <Canvas RenderTransformOrigin="0.857,0.49" Height="356" VerticalAlignment="Top">
+    <Canvas RenderTransformOrigin="0.857,0.49" Height="420" VerticalAlignment="Top">
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
             <Menu Foreground="#FFFFF3F3" Background="Gray" Height="29" Width="144" BorderBrush="Black">
                 <MenuItem Header="_File" Height="31" FontFamily="Calibri" FontSize="14">
@@ -29,7 +29,7 @@
                 ToolTipService.ToolTip="Start sim" Click="StartButton"/>
         <Button x:Name="pauseButton" Content="Pause" Canvas.Left="243" Canvas.Top="41" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75"
                 ToolTipService.ToolTip="Pause sim" Click="PauseButton"/>
-        <GroupBox Height="203" Header="Camera" Width="464" Canvas.Left="111" Canvas.Top="71" HorizontalAlignment="Center" VerticalAlignment="Top">
+        <GroupBox Height="220" Header="Camera" Width="464" Canvas.Left="111" Canvas.Top="71" HorizontalAlignment="Center" VerticalAlignment="Top">
             <Canvas>
                 <Button x:Name="LookLeftButton" Content="LL" Canvas.Left="10" Canvas.Top="29" RenderTransformOrigin="-0.328,-0.399" HorizontalAlignment="Center" VerticalAlignment="Top"
                 Width="40" ToolTipService.ToolTip="Look left" Click="CameraLookLeft"/>
@@ -83,16 +83,16 @@
                 <Label x:Name="LookTiltDegreesLabel" Content="" Canvas.Left="112" Canvas.Top="83" HorizontalAlignment="Left" VerticalAlignment="Center" Width="40" ToolTip="Look-Tilt amount (degrees)" HorizontalContentAlignment="Center"/>
             </Canvas>
         </GroupBox>
-        <GroupBox Height="54" Header="Time Compression" Width="190" HorizontalAlignment="Center" Canvas.Top="281" VerticalAlignment="Top" Canvas.Left="213">
+        <GroupBox Height="54" Header="Time Compression" Width="190" HorizontalAlignment="Center" Canvas.Top="309" VerticalAlignment="Top" Canvas.Left="213">
             <Slider x:Name="TimeCompressionSlider" HorizontalAlignment="Left" Width="137" ToolTipService.ToolTip="(De)Compress time" Height="20" Margin="-1,0,0,0" ValueChanged="TimeCompressionSliderChanged" Minimum="1" Maximum="100" LostMouseCapture="TimeCompressionSliderLostMouseCapture"/>
         </GroupBox>
-        <Label x:Name="TimeCompressionLabel" Content="" Canvas.Left="359" Canvas.Top="298" HorizontalAlignment="Center" VerticalAlignment="Top" Width="40"/>
-        <GroupBox Height="54" Header="Calc iterations" Width="195" HorizontalAlignment="Center" Canvas.Top="280" VerticalAlignment="Top" Canvas.Left="4">
+        <Label x:Name="TimeCompressionLabel" Content="" Canvas.Left="359" Canvas.Top="326" HorizontalAlignment="Center" VerticalAlignment="Top" Width="40"/>
+        <GroupBox Height="54" Header="Calc iterations" Width="195" HorizontalAlignment="Center" Canvas.Top="308" VerticalAlignment="Top" Canvas.Left="4">
             <ComboBox x:Name="IterationScale" HorizontalAlignment="Left" Width="51" Height="22" IsEditable="True" ToolTip="This many per iteration" SelectionChanged="IterationScaleChanged">
 
             </ComboBox>
         </GroupBox>
-        <StackPanel Orientation="Vertical" Canvas.Left="104" Canvas.Top="295" HorizontalAlignment="Center" VerticalAlignment="Top">
+        <StackPanel Orientation="Vertical" Canvas.Left="104" Canvas.Top="323" HorizontalAlignment="Center" VerticalAlignment="Top">
             <RadioButton x:Name="IterateMinutes" GroupName="CalcIterations" IsChecked="True" Content="Minute(s)" ToolTip="Movements calculated in minutes" Checked="IterationUnitsChecked"/>
             <RadioButton x:Name="IterateHours" GroupName="CalcIterations" Content="Hour(s)" ToolTip="Movements calculated in hours" Checked="IterationUnitsChecked"/>
         </StackPanel>
@@ -104,7 +104,9 @@
         <ComboBox x:Name="LookAtComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.475,0" Canvas.Left="121" Canvas.Top="228" SelectionChanged="LookAtSelectionChanged" DropDownOpened="LookAtDropDownOpened"/>
         <GroupBox Height="61" Header="Go near" Width="146" Canvas.Left="255" Canvas.Top="202" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <ComboBox x:Name="GoNearComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="126" RenderTransformOrigin="0.475,0" Canvas.Left="263" Canvas.Top="228" DropDownOpened="GoNearDropDownOpened" SelectionChanged="GoNearSelectionChanged"/>
-        <CheckBox x:Name="ShowAxis" Content="Axis" Canvas.Left="438" Canvas.Top="283" HorizontalAlignment="Left" VerticalAlignment="Center" Width="137" Click="AxisCheckbox" IsChecked="True"/>
-        <CheckBox x:Name="ShowWireframe" Content="Wireframe" Canvas.Left="438" Canvas.Top="301" HorizontalAlignment="Center" VerticalAlignment="Top" Width="126" Click="WireframeCheckbox" IsChecked="True"/>
+        <CheckBox x:Name="ShowAxis" Content="Axis" Canvas.Left="438" Canvas.Top="311" HorizontalAlignment="Center" VerticalAlignment="Top" Width="137" Click="AxisCheckbox" IsChecked="True"/>
+        <CheckBox x:Name="ShowReticle" Content="Reticle" Canvas.Left="438" Canvas.Top="346" HorizontalAlignment="Center" VerticalAlignment="Top" Width="137" IsChecked="True" Click="ReticleCheckbox"/>
+        <CheckBox x:Name="ShowWireframe" Content="Wireframe" Canvas.Left="438" Canvas.Top="329" HorizontalAlignment="Center" VerticalAlignment="Top" Width="126" Click="WireframeCheckbox" IsChecked="True"/>
+        <CheckBox x:Name="KeepCheckbox" Content="Keep" Canvas.Left="226" Canvas.Top="268" HorizontalAlignment="Center" VerticalAlignment="Top" Width="59" Click="KeepClicked"/>
     </Canvas>
 </Window>

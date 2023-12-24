@@ -19,7 +19,6 @@ namespace OrbitalSimOpenGL
         public OrbitalSimCmds? OrbitalSimCmds { get; set; }
         private EphemerisBodyList? EphemerisBodyList { get; set; }
         public SimBodyList? SimBodyList { get; set; }
-
         public SimCamera? SimCamera { get; set; }
         private SimModel SimModel { get; set; }
         private ToolTipHelper ToolTipHelper { get; set; } = new();
@@ -37,10 +36,11 @@ namespace OrbitalSimOpenGL
         // Commands
         public enum GenericCommands
         {
-             Axis
-           , Wireframe 
+            Axis
+          , Wireframe
+          , Reticle
+          , Keep
         };
-
         #endregion
 
         public OrbitalSimWindow()
@@ -146,7 +146,7 @@ namespace OrbitalSimOpenGL
 
             SimCamera?.Render(); // In case camera needs to render (e.g. recticle)
         }
-#endregion
+        #endregion
 
         #region Commands
         private void TimeCompression(object[] args)
@@ -222,6 +222,9 @@ namespace OrbitalSimOpenGL
                 index = SimModel.SimBodyList.GetIndex(bodyName);
 
             SimCamera?.GoNear(index);
+
+            // Make Keep settings
+
         }
         // Look camera
         private void LookCamera(object[] args)
@@ -254,6 +257,7 @@ namespace OrbitalSimOpenGL
             //System.Diagnostics.Debug.WriteLine("TiltCamera " + tiltDirection.ToString());
             SimCamera?.Tilt(tiltDirection, degrees);
         }
+
         // LookAt camera
         private void LookAtCamera(object[] args)
         {
@@ -266,6 +270,9 @@ namespace OrbitalSimOpenGL
                 SimCamera?.LookAt(-1);
             else
                 SimCamera?.LookAt(SimModel.SimBodyList.GetIndex(lookAtStr));
+
+            // Make Keep settings
+
         }
         // Start sim (and continue paused sim)
         private void StartSim(object[] args)
@@ -306,21 +313,28 @@ namespace OrbitalSimOpenGL
         {
             GenericCommands cmd;
 
-            switch(cmd = (GenericCommands)args[0])
-            {
-                case GenericCommands.Axis:
-                    if (SimModel is not null)
+            if (SimModel is not null)
+                switch (cmd = (GenericCommands)args[0])
+                {
+                    case GenericCommands.Axis:
                         SimModel.IncludeAxis = (bool)args[1];
-                    break;
+                        break;
 
-                case GenericCommands.Wireframe:
-                    if (SimModel is not null)
+                    case GenericCommands.Wireframe:
                         SimModel.Wireframe = (bool)args[1];
-                    break;
+                        break;
 
-                default:
-                    break;
-            }
+                    case GenericCommands.Keep:
+                        SimModel.SimCamera.Keep = (bool)args[1];
+                        break;
+
+                    case GenericCommands.Reticle:
+                        SimModel.SimCamera.ShowReticle = (bool)args[1];
+                        break;
+
+                    default:
+                        break;
+                }
         }
 
         private void UseWireframe(object[] args)

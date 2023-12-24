@@ -31,8 +31,8 @@ SimBody
 	Draw
 
 
-- Mars moons draw strangely (done)
-- Control windows no so "on-top"
+- Mars moons draw strangely (done, sort of)
+- Control windows not so "on-top"
 - GoNear draws strangely when sim running (Done)
 	- Reimplement GoNear deceleration phase
 - Add point-at and ID (hit testing)
@@ -41,6 +41,8 @@ SimBody
 - Does hours iteration work? (done)
 - Axis on/off (done)
 - Wireframe on/off (done)
+- Reticle on/off (done)
 - Implement Trace
 - Barrycenter not adjusting. Either cause it to adjust or remove it as target in bodies selections
 - Implement generic command entry point in OrbitalSimCmds (done)
+- Reticle as X or + or somesuch

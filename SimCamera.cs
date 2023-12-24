@@ -56,6 +56,16 @@ namespace OrbitalSimOpenGL
             }
         }
 
+        // Keep properties
+        public enum Keeps
+        {
+            LookAt
+          , GoNear
+        };
+        private int KeepBody { get; set; }
+        public bool Keep { get; set; }
+        private bool RetainedKeep { get; set; }
+
         public Single ViewWidth { get; set; }
         public Single ViewHeight { get; set; }
 
@@ -82,6 +92,7 @@ namespace OrbitalSimOpenGL
             get { return AnimatingLook | AnimatingTilt | AnimatingLookAt | AnimatingUDLRFB | AnimatingOrbit | AnimatingGoNear; }
         }
         private Reticle Reticle { get; set; }
+        public bool ShowReticle { get; set; } = true;
         public SimModel SimModel { get; set; }
         #endregion
 
@@ -161,7 +172,8 @@ namespace OrbitalSimOpenGL
         /// </summary>
         internal void Render()
         {
-            Reticle.Render(this);
+            if (ShowReticle)
+                Reticle.Render(this);
         }
         public void SetCameraPosition(Vector3d position)
         {
@@ -229,6 +241,10 @@ namespace OrbitalSimOpenGL
 
             AnimatingLookAt = true;
 
+            // Disable Keep during this animation
+            RetainedKeep = Keep;
+            Keep = false;
+
             // Where to?
             if (-1 == bodyIndex)
             {
@@ -262,6 +278,7 @@ namespace OrbitalSimOpenGL
             if (0D == angleBetweenLookVectors) // Already looking that way?
             {
                 AnimatingLookAt = false;
+                Keep = RetainedKeep; // Resore
                 return;
             }
 
@@ -275,7 +292,11 @@ namespace OrbitalSimOpenGL
             NormalVector3d = rotationMatrix * NormalVector3d;
 
             if (angleBetweenLookVectors <= LookAtRadiansPerFrame)
+            {
                 AnimatingLookAt = false; // Animation completed, close enough
+                Keep = RetainedKeep; // Resore
+
+            }
         }
         #endregion
 
@@ -450,7 +471,7 @@ namespace OrbitalSimOpenGL
         {
             OrbitBodyIndex = bodyIndex;
         }
-#endregion
+        #endregion
 
         #region Animate camera movement Up, Down, Left, Right, Forward, Backward, or Move
         private Vector3d UDLRFB_To { get; set; } // Universe coords
@@ -582,6 +603,10 @@ namespace OrbitalSimOpenGL
                 GN_SimBody = SimModel.SimBodyList.BodyList[GN_BodyIndex];
                 GN_NearDistance = 3E0 * GN_SimBody.EphemerisDiameter; // Stop N diameters from the body
             }
+
+            // Disable Keep during this animation
+            RetainedKeep = Keep;
+            Keep = false;
         }
 
         /// <summary>
@@ -636,6 +661,7 @@ namespace OrbitalSimOpenGL
                 if (currDistToTarget <= GN_NearDistance)
                 {
                     AnimatingGoNear = false; // Stop 
+                    Keep = RetainedKeep; // Resore
                     return;
                 }
 
@@ -683,8 +709,7 @@ namespace OrbitalSimOpenGL
                         + " GN_FramesSoFar " + GN_FramesSoFar.ToString()
                         );
 #endif
-                    
-                    
+
                     Vector3d rotateAboutVector3d = Vector3d.Cross(LookVector3d, newLookVector3d);
 
                     OpenTK.Mathematics.Quaterniond q = Util.MakeQuaterniond(rotateAboutVector3d, angleBetweenLookVectors);
@@ -697,7 +722,10 @@ namespace OrbitalSimOpenGL
 
                 // Stop animation is complete
                 if (++GN_FramesSoFar >= GN_FramesGoal)
+                {
                     AnimatingGoNear = false;
+                    Keep = RetainedKeep; // Resore
+                }
             }
         }
         #endregion
@@ -780,7 +808,6 @@ namespace OrbitalSimOpenGL
             if (++LookFramesSoFar >= LookFramesGoal)
                 AnimatingLook = false; // Animation completed
         }
-
         #endregion
 
         #region Animate camera Tilt/UpVector
