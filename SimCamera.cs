@@ -57,13 +57,15 @@ namespace OrbitalSimOpenGL
         }
 
         // Keep properties
-        public enum Keeps
+        public enum KindOfKeep
         {
-            LookAt
+            Nothing
+          , LookAt
           , GoNear
         };
-        private int KeepBody { get; set; }
-        public bool Keep { get; set; }
+        private int KeepBody { get; set; } = -2; // -2 is nothing set
+        private KindOfKeep KeepKind { get; set; } = KindOfKeep.Nothing;
+        public bool Keep { get; set; } = false;
         private bool RetainedKeep { get; set; }
 
         public Single ViewWidth { get; set; }
@@ -152,6 +154,28 @@ namespace OrbitalSimOpenGL
         /// <param name="framerateMS">Moving average frame rate. A frame is happening on average every framerateMS</param>
         public void AnimateCamera(int ms, int framerateMS)
         {
+
+            // If Keep is true (on) initialt the kind of keep specified.
+            // Keep is never true while camera animation is active.
+            if (Keep)
+            {
+                if (-2 != KeepBody) // A body has been selected
+                                    // Start the keep operation
+                    switch (KeepKind)
+                    {
+                        case KindOfKeep.LookAt:
+                            LookAt(KeepBody);
+                            break;
+
+                        case KindOfKeep.GoNear:
+                            GoNear(KeepBody);
+                            break;
+
+                        default:
+                            break;
+                    }
+            }
+
             if (!AnimatingCamera)
                 return;
 
@@ -244,6 +268,8 @@ namespace OrbitalSimOpenGL
             // Disable Keep during this animation
             RetainedKeep = Keep;
             Keep = false;
+            KeepBody = bodyIndex;
+            KeepKind = KindOfKeep.LookAt;
 
             // Where to?
             if (-1 == bodyIndex)
@@ -607,6 +633,8 @@ namespace OrbitalSimOpenGL
             // Disable Keep during this animation
             RetainedKeep = Keep;
             Keep = false;
+            KeepBody = GN_BodyIndex;
+            KeepKind = KindOfKeep.GoNear;
         }
 
         /// <summary>

@@ -38,7 +38,6 @@ namespace OrbitalSimOpenGL
         }
         public void GenericCommand(object[] args)
         {
-
             if (_GenericDelegate is not null)
                 Dispatcher?.BeginInvoke(DispatcherPriority.Normal, _GenericDelegate, args);
         }
