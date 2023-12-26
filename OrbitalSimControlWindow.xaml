@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OrbitalSimOpenGL"
         mc:Ignorable="d"
-        Title="OrbitalSim Control - OpenGL" Height="420" Width="586"
+        Title="OrbitalSim Control - OpenGL" Height="438" Width="612"
         ResizeMode="NoResize"
         Topmost="True"
         Loaded="Window_Loaded"
         >
-    <Canvas RenderTransformOrigin="0.857,0.49" Height="420" VerticalAlignment="Top">
+    <Canvas RenderTransformOrigin="0.857,0.49" Height="431" VerticalAlignment="Top" Margin="0,0,-29,0">
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
             <Menu Foreground="#FFFFF3F3" Background="Gray" Height="29" Width="144" BorderBrush="Black">
                 <MenuItem Header="_File" Height="31" FontFamily="Calibri" FontSize="14">
@@ -29,7 +29,7 @@
                 ToolTipService.ToolTip="Start sim" Click="StartButton"/>
         <Button x:Name="pauseButton" Content="Pause" Canvas.Left="243" Canvas.Top="41" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75"
                 ToolTipService.ToolTip="Pause sim" Click="PauseButton"/>
-        <GroupBox Height="220" Header="Camera" Width="464" Canvas.Left="111" Canvas.Top="71" HorizontalAlignment="Center" VerticalAlignment="Top">
+        <GroupBox Height="222" Header="Camera" Width="464" Canvas.Left="111" Canvas.Top="71" HorizontalAlignment="Center" VerticalAlignment="Top">
             <Canvas>
                 <Button x:Name="LookLeftButton" Content="LL" Canvas.Left="10" Canvas.Top="29" RenderTransformOrigin="-0.328,-0.399" HorizontalAlignment="Center" VerticalAlignment="Top"
                 Width="40" ToolTipService.ToolTip="Look left" Click="CameraLookLeft"/>
@@ -81,6 +81,12 @@
 
                 <Slider x:Name="OrbitDegreesSlider" HorizontalAlignment="Left" Width="27" Orientation="Vertical" Height="75" Canvas.Left="421" Canvas.Top="1" VerticalAlignment="Center" Minimum="1" Maximum="180" ValueChanged="OrbitSiderChanged" ToolTip="Orbit response, 1 to 180" />
                 <Label x:Name="LookTiltDegreesLabel" Content="" Canvas.Left="112" Canvas.Top="83" HorizontalAlignment="Left" VerticalAlignment="Center" Width="40" ToolTip="Look-Tilt amount (degrees)" HorizontalContentAlignment="Center"/>
+                <ComboBox x:Name="ReticleBox" Canvas.Left="353" Canvas.Top="277" Width="92" RenderTransformOrigin="0.833,4.829" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <ComboBoxItem Content = "None" IsSelected="True" />
+                    <ComboBoxItem Content = "Sphere" />
+                    <ComboBoxItem Content = "X" />
+                </ComboBox>
+                <Label Content="Reticle" Canvas.Left="309" Canvas.Top="275" HorizontalAlignment="Center" VerticalAlignment="Top"/>
             </Canvas>
         </GroupBox>
         <GroupBox Height="54" Header="Time Compression" Width="190" HorizontalAlignment="Center" Canvas.Top="309" VerticalAlignment="Top" Canvas.Left="213">
@@ -105,8 +111,8 @@
         <GroupBox Height="61" Header="Go near" Width="146" Canvas.Left="255" Canvas.Top="202" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <ComboBox x:Name="GoNearComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="126" RenderTransformOrigin="0.475,0" Canvas.Left="263" Canvas.Top="228" DropDownOpened="GoNearDropDownOpened" SelectionChanged="GoNearSelectionChanged"/>
         <CheckBox x:Name="ShowAxis" Content="Axis" Canvas.Left="438" Canvas.Top="311" HorizontalAlignment="Center" VerticalAlignment="Top" Width="137" Click="AxisCheckbox" IsChecked="True"/>
-        <CheckBox x:Name="ShowReticle" Content="Reticle" Canvas.Left="438" Canvas.Top="346" HorizontalAlignment="Center" VerticalAlignment="Top" Width="137" IsChecked="True" Click="ReticleCheckbox"/>
+        <CheckBox x:Name="ShowReticle" Content="Reticle" Canvas.Left="438" Canvas.Top="347" HorizontalAlignment="Center" VerticalAlignment="Top" Width="57" IsChecked="True" Click="ReticleCheckbox"/>
         <CheckBox x:Name="ShowWireframe" Content="Wireframe" Canvas.Left="438" Canvas.Top="329" HorizontalAlignment="Center" VerticalAlignment="Top" Width="126" Click="WireframeCheckbox" IsChecked="True"/>
-        <CheckBox x:Name="KeepCheckbox" Content="Keep" Canvas.Left="226" Canvas.Top="268" HorizontalAlignment="Center" VerticalAlignment="Top" Width="59" Click="KeepClicked"/>
+        <CheckBox x:Name="KeepCheckbox" Content="Keep loooking at" Canvas.Left="124" Canvas.Top="267" HorizontalAlignment="Center" VerticalAlignment="Top" Width="123" Click="KeepClicked"/>
     </Canvas>
 </Window>

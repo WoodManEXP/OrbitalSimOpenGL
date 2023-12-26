@@ -167,9 +167,9 @@ namespace OrbitalSimOpenGL
                             LookAt(KeepBody);
                             break;
 
-                        case KindOfKeep.GoNear:
-                            GoNear(KeepBody);
-                            break;
+//                        case KindOfKeep.GoNear:
+//                            GoNear(KeepBody);
+//                            break;
 
                         default:
                             break;
@@ -249,7 +249,6 @@ namespace OrbitalSimOpenGL
         private SimBody? LookAtSimBody { get; set; }
         private Vector3d LookAtPoint3d;
         private static float LookAtRadiansPerFrame = 2.0f * (MathHelper.Pi / 180); // 2.0 degrees
-        //private Matrix3D LookAtRotationMatrix; // Getter/Setter do not seem to work here...
 
         /// <summary>
         /// Rotate camera to look at a body in the sim
@@ -321,7 +320,6 @@ namespace OrbitalSimOpenGL
             {
                 AnimatingLookAt = false; // Animation completed, close enough
                 Keep = RetainedKeep; // Resore
-
             }
         }
         #endregion
@@ -599,6 +597,7 @@ namespace OrbitalSimOpenGL
         private bool StartedGN_LookAtAnimation { get; set; }
         private int GN_FramesGoal { get; set; }
         private int GN_FramesSoFar { get; set; }
+//        private bool GN_RetainedKeep { get; set; }
 
         private Vector3d GN_TargetPoint; //
         private SimBody GN_SimBody { get; set; }
@@ -631,10 +630,9 @@ namespace OrbitalSimOpenGL
             }
 
             // Disable Keep during this animation
-            RetainedKeep = Keep;
-            Keep = false;
-            KeepBody = GN_BodyIndex;
-            KeepKind = KindOfKeep.GoNear;
+//            GN_RetainedKeep = Keep;
+//            Keep = false;
+//            KeepBody = GN_BodyIndex;
         }
 
         /// <summary>
@@ -673,6 +671,8 @@ namespace OrbitalSimOpenGL
             }
             else
             {
+//                KeepKind = KindOfKeep.GoNear;
+
                 // Animating LookAt phase complete, perform cruise/decelerate phases
                 // Bodies are constantlly in motion (except for origin), hence the continual recalculation.
                 // Route will be as an arc continually adjusting to the target's position rather than direct line
@@ -689,7 +689,7 @@ namespace OrbitalSimOpenGL
                 if (currDistToTarget <= GN_NearDistance)
                 {
                     AnimatingGoNear = false; // Stop 
-                    Keep = RetainedKeep; // Resore
+//                    Keep = GN_RetainedKeep; // Resore
                     return;
                 }
 
@@ -752,7 +752,7 @@ namespace OrbitalSimOpenGL
                 if (++GN_FramesSoFar >= GN_FramesGoal)
                 {
                     AnimatingGoNear = false;
-                    Keep = RetainedKeep; // Resore
+//                    Keep = GN_RetainedKeep; // Resore
                 }
             }
         }
