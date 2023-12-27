@@ -31,13 +31,13 @@ SimBody
 	Draw
 
 
-- Mars moons draw strangely (done, sort of)
+- Mars moons draw strangely (done, sort of, still rounding effects in some cases)
 - Control windows not so "on-top"
 - GoNear draws strangely when sim running (Done)
-	- Reimplement GoNear deceleration phase
+	- Reimplement GoNear deceleration phase (maybe later, no so great with bodies in motion)
 - Add point-at and ID (hit testing)
-- Keep looking at
-- Stay near
+- Keep looking at (done)
+- Stay near (not doing this)
 - Does hours iteration work? (done)
 - Axis on/off (done)
 - Wireframe on/off (done)

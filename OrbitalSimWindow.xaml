@@ -6,10 +6,22 @@
         xmlns:local="clr-namespace:OrbitalSimOpenGL"
         xmlns:glWpfControl="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
-        Title="Orbital Sim" Height="450" Width="800">
+        Title="Orbital Sim" Height="500" Width="800">
     <Grid>
-        <glWpfControl:GLWpfControl 
-            x:Name="OpenTkControl" 
-            Render="OnRender" Loaded="OnLoaded"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="100" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <glWpfControl:GLWpfControl Grid.Row="0" x:Name="OpenTkControl" Render="OnRender" Loaded="OnLoaded" MouseMove="MouseMove"/>
+        <Rectangle Grid.Row="1" Fill="White" />
+        <GroupBox Header="Info" Grid.Row="1">
+            <Canvas>
+                <Label Content="FPS" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="43"/>
+                <Label x:Name="FPSValue" Content="0" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="38" Canvas.Left="28"/>
+            </Canvas>
+        </GroupBox>
     </Grid>
 </Window>

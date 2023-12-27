@@ -154,12 +154,11 @@ namespace OrbitalSimOpenGL
         /// <param name="framerateMS">Moving average frame rate. A frame is happening on average every framerateMS</param>
         public void AnimateCamera(int ms, int framerateMS)
         {
-
-            // If Keep is true (on) initialt the kind of keep specified.
+            // If Keep is true (on) perform the kind of keep specified.
             // Keep is never true while camera animation is active.
             if (Keep)
             {
-                if (-2 != KeepBody) // A body has been selected
+                if (0 <= KeepBody)  // A body has been selected (and not Origin (-1))
                                     // Start the keep operation
                     switch (KeepKind)
                     {
@@ -285,13 +284,34 @@ namespace OrbitalSimOpenGL
             if (!AnimatingLookAt)
                 return;
 
-            // New look direction (vector)
-            if (null != LookAtSimBody) // Otherwise moving to look at (0,0,0)
+            Double angleBetweenLookVectors = LookAt(LookAtSimBody, LookAtRadiansPerFrame);
+
+            if (angleBetweenLookVectors <= LookAtRadiansPerFrame)
             {
-                LookAtPoint3d.X = LookAtSimBody.X;
-                LookAtPoint3d.Y = LookAtSimBody.Y;
-                LookAtPoint3d.Z = LookAtSimBody.Z;
+                AnimatingLookAt = false; // Animation completed, close enough
+                Keep = RetainedKeep; // Resore
             }
+        }
+
+        /// <summary>
+        /// Update camera vectors to look at LookAtSimBody, rotating a max of maxRadians.
+        /// </summary>
+        /// <param name="minRotateRadians">MAx amount to rotate the vectors</param>
+        /// <returns>
+        /// Radians between current and target LookVectors -> which may not be the same
+        /// angle the vectors are rotated.
+        /// </returns>
+        private Double LookAt(SimBody? sB, Double minRotateRadians)
+        {
+            // New look direction (vector)
+            if (null != sB) // Otherwise moving to look at (0,0,0)
+            {
+                LookAtPoint3d.X = sB.X;
+                LookAtPoint3d.Y = sB.Y;
+                LookAtPoint3d.Z = sB.Z;
+            }
+            else
+                LookAtPoint3d.X = LookAtPoint3d.Y = LookAtPoint3d.Z = 0D;
 
             // Prior to normalization this vector could be really long
             Vector3d newLookVector3d = LookAtPoint3d - CameraPosition;
@@ -300,27 +320,18 @@ namespace OrbitalSimOpenGL
             Vector3d rotateAboutVector3d = Vector3d.Cross(newLookVector3d, LookVector3d);
             Double angleBetweenLookVectors = Vector3d.CalculateAngle(LookVector3d, newLookVector3d); // Radians
 
-            if (0D == angleBetweenLookVectors) // Already looking that way?
+            if (0D != angleBetweenLookVectors) // Not already looking that way?
             {
-                AnimatingLookAt = false;
-                Keep = RetainedKeep; // Resore
-                return;
+                Double radiansThisFrame = Math.Min(minRotateRadians, angleBetweenLookVectors);
+
+                OpenTK.Mathematics.Quaterniond q = Util.MakeQuaterniond(rotateAboutVector3d, radiansThisFrame);
+                Matrix3d rotationMatrix = Matrix3d.CreateFromQuaternion(q);
+
+                LookVector3d = rotationMatrix * LookVector3d;
+                UpVector3d = rotationMatrix * UpVector3d;
+                NormalVector3d = rotationMatrix * NormalVector3d;
             }
-
-            Double radiansThisFrame = Math.Min(LookAtRadiansPerFrame, angleBetweenLookVectors);
-
-            OpenTK.Mathematics.Quaterniond q = Util.MakeQuaterniond(rotateAboutVector3d, radiansThisFrame);
-            Matrix3d rotationMatrix = Matrix3d.CreateFromQuaternion(q);
-
-            LookVector3d = rotationMatrix * LookVector3d;
-            UpVector3d = rotationMatrix * UpVector3d;
-            NormalVector3d = rotationMatrix * NormalVector3d;
-
-            if (angleBetweenLookVectors <= LookAtRadiansPerFrame)
-            {
-                AnimatingLookAt = false; // Animation completed, close enough
-                Keep = RetainedKeep; // Resore
-            }
+            return angleBetweenLookVectors;
         }
         #endregion
 

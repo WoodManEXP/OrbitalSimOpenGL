@@ -166,24 +166,24 @@ namespace OrbitalSimOpenGL
             Vector4 oneSideV4 = new((Vector3)oneSideUniv, 1f);
             Vector4 otherSideV4 = new((Vector3)otherSideUniv, 1f);
 
-            // To clip space (through View and projection matrices)
+            // To clip space, -1 .. 1 (through View and projection matrices)
             Vector4 oneSideClip = oneSideV4 * vp_Matrix;
             Vector4 otherSideClip = otherSideV4 * vp_Matrix;
 
-            // To clip space
+            // To 2D pixel space
             oneSideClip /= oneSideClip.W;
             otherSideClip /= otherSideClip.W;
             oneSideClip *= viewWidth;
             otherSideClip *= viewWidth;
 
-            // Distance between the two points in clip space (-1 .. 1)
+            // Distance between the two points in pixel space 
             Single dX = oneSideClip.X - otherSideClip.X;
             Single dY = oneSideClip.Y - otherSideClip.Y;
             Single distSquared = dX * dX + dY * dY;
 
             if (1E-3 >= distSquared)
             {
-                // Body so small it is lost in single precision. Jump to double precision.
+                // Body so small it is lost in single precision projection. Jump to double precision.
 
                 // Make 3D to Homogenous 4D
                 Vector4d oneSideV4D = new(oneSideUniv, 1d);
@@ -195,17 +195,17 @@ namespace OrbitalSimOpenGL
                 Vector4d row3 = new(vp_Matrix.M41, vp_Matrix.M42, vp_Matrix.M43, vp_Matrix.M44);
                 Matrix4d vp_Matrix4d = new(row0, row1, row2, row3);
 
-                // To clip space (through View and projection matrices)
+                // To clip space, -1 .. 1 (through View and projection matrices)
                 Vector4d oneSideClipD = oneSideV4D * vp_Matrix4d;
                 Vector4d otherSideClipD = otherSideV4D * vp_Matrix4d;
 
-                // To pixels
+                // To 2D pixel space
                 oneSideClipD /= oneSideClipD.W;
                 otherSideClipD /= otherSideClipD.W;
                 oneSideClipD *= viewWidth;
                 otherSideClipD *= viewWidth;
 
-                // Distance between the two points in clip space (-1 .. 1)
+                // Distance between the two points in pixel space
                 Double dXD = oneSideClipD.X - otherSideClipD.X;
                 Double dYD = oneSideClipD.Y - otherSideClipD.Y;
                 Double distSquaredD = dXD * dXD + dYD * dYD;

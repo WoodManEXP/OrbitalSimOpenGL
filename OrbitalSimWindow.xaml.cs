@@ -41,6 +41,8 @@ namespace OrbitalSimOpenGL
           , Reticle
           , Keep
         };
+
+        private Stats Stats { get; set; }
         #endregion
 
         public OrbitalSimWindow()
@@ -87,6 +89,8 @@ namespace OrbitalSimOpenGL
             OrbitalSimCmds.GenericRegister(GenericCommand);
 
             SimModel = new();
+
+            Stats = new(this, SimModel);
         }
 
         /// <summary>
@@ -140,11 +144,13 @@ namespace OrbitalSimOpenGL
 
             SimModel.Render(ms, frameRateMS);
 
+            // Perform any active camera animations.
             // Camera animation occurs after SimModel.Render as it moves things in the model space
-            // Perform any active camera animations
             SimCamera?.AnimateCamera(ms, frameRateMS);
 
             SimCamera?.Render(); // In case camera needs to render (e.g. recticle)
+
+            Stats.Render(timeSpan, frameRateMS);
         }
         #endregion
 
@@ -274,6 +280,7 @@ namespace OrbitalSimOpenGL
             // Make Keep settings
 
         }
+
         // Start sim (and continue paused sim)
         private void StartSim(object[] args)
         {
@@ -292,9 +299,10 @@ namespace OrbitalSimOpenGL
 
                 // Camera
                 Double cX = -1 * 6.0E06D, cY = 3 * 6.0E06D, cZ = 3 * 6.0E06D;
-                SimCamera = SimModel.SimCamera = new(SimModel,
-                                                    new Vector3d(cX, cY, cZ), new Vector3d(0d, 0d, 0d),
-                                                    OpenTkControl.ActualWidth, OpenTkControl.ActualHeight);
+                SimCamera = SimModel.SimCamera = Stats.SimCamera =
+                        new(SimModel,
+                            new Vector3d(cX, cY, cZ), new Vector3d(0d, 0d, 0d),
+                            OpenTkControl.ActualWidth, OpenTkControl.ActualHeight);
 
                 SimCamera.OrbitAbout(-1); // Initially orbit about system's origin
             }
@@ -355,12 +363,12 @@ namespace OrbitalSimOpenGL
         /// <param name="e"></param>
         private void MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-#if false
+
             // Retrieve the coordinate of the mouse position.
             Point pt = e.GetPosition((UIElement)sender);
 
             //System.Diagnostics.Debug.WriteLine("MouseMove " + pt.ToString());
-
+#if false
             // Set up a callback to receive the hit test result enumeration.
             HitSomething = false;
             VisualTreeHelper.HitTest(SimViewport,
