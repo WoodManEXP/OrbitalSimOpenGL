@@ -22,9 +22,9 @@
             <Canvas>
                 <Label Content="FPS" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="43"/>
                 <Label x:Name="FPSValue" Content="0" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="38" Canvas.Left="28"/>
-                <Label x:Name="MouseOverBody" Content="" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="133" Canvas.Left="72"/>
-                <Label x:Name="MouseXCoord" Content="0" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="38" Canvas.Left="1" Canvas.Top="55"/>
-                <Label x:Name="MouseYCoord" Content="0" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="38" Canvas.Top="55" Canvas.Left="44"/>
+                <Label x:Name="MouseOverBody" Content="" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="94" Canvas.Left="72"/>
+                <Label x:Name="MouseOverBodyDist" Content="" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="133" Canvas.Left="171"/>
+                <Label x:Name="MouseCoords" Content="0" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="76" Canvas.Left="1" Canvas.Top="55"/>
             </Canvas>
         </GroupBox>
     </Grid>
