@@ -142,7 +142,7 @@ namespace OrbitalSimOpenGL
             // FrameRate, a frame is happening on average every framerateMS
             int frameRateMS = FrameRateMovingAverage.AnotherValue(ms);
 
-            SimModel.Render(ms, frameRateMS);
+            SimModel.Render(ms, frameRateMS, MousePosition);
 
             // Perform any active camera animations.
             // Camera animation occurs after SimModel.Render as it moves things in the model space
@@ -354,90 +354,20 @@ namespace OrbitalSimOpenGL
         #endregion
 
         #region Hit testing
-        private bool HitSomething { get; set; }
+        public System.Windows.Point MousePosition; // Integer coords
+
         /// <summary>
-        /// Handle MouseMoves in the SimWindow
+        /// Handle MouseMoves in the OpenTK control in SimWindow
         /// See https://stackoverflow.com/questions/21750692/viewport3d-mouse-event-doesnt-fire-when-hitting-background
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-
             // Retrieve the coordinate of the mouse position.
-            Point pt = e.GetPosition((UIElement)sender);
+            MousePosition = e.GetPosition((UIElement)sender);
 
-            //System.Diagnostics.Debug.WriteLine("MouseMove " + pt.ToString());
-#if false
-            // Set up a callback to receive the hit test result enumeration.
-            HitSomething = false;
-            VisualTreeHelper.HitTest(SimViewport,
-                              new HitTestFilterCallback(HitTestFilterCallback),
-                              new HitTestResultCallback(HitTestResultCallback),
-                              new PointHitTestParameters(pt));
-            if (!HitSomething)
-                ToolTipHelper.NoToolTip(); // In case a ToolTip was being displayed
-#endif
-        }
-
-        /// <summary>
-        /// The SimModel provides the HitTestFilterBehavior
-        /// </summary>
-        /// <param name="o"></param>
-        /// <returns></returns>
-        private HitTestFilterBehavior HitTestFilterCallback(DependencyObject o)
-        {
-            //return (SimModel is not null) ? SimModel.HitTestBehavior(o) : HitTestFilterBehavior.Stop;
-            return HitTestFilterBehavior.Stop;
-        }
-
-        /// <summary>
-        /// Process hits on SimBodies
-        /// See https://learn.microsoft.com/en-us/dotnet/desktop/wpf/graphics-multimedia/how-to-hit-test-in-a-viewport3d?view=netframeworkdesktop-4.8
-        /// </summary>
-        /// <param name="rawresult"></param>
-        /// <returns></returns>
-        private HitTestResultBehavior HitTestResultCallback(HitTestResult rawresult)
-        {
-#if false
-            RayHitTestResult rayResult = rawresult as RayHitTestResult;
-
-            if (rayResult is not null)
-            {
-                RayMeshGeometry3DHitTestResult rayMeshResult = rayResult as RayMeshGeometry3DHitTestResult;
-
-                if (rayMeshResult is not null)
-                {
-                    GeometryModel3D? hitGeo = rayMeshResult.ModelHit as GeometryModel3D;
-
-                    if (hitGeo is not null)
-                    {
-                        SimBody sB;
-
-                        if (SimModel.GeometryToBodyDict.TryGetValue(hitGeo, out sB))
-                        {
-                            // Tooltip
-                            Double distToBody = SimCamera.DistToBody(sB);
-
-                            // Projected coords in 2D viewport
-                            Matrix3D m = MathUtils.TryWorldToViewportTransform(Viewport3DVisual, out bool bOK);
-                            Point3D projectedPoint = m.Transform(SimModel.Scale.ScaleU_ToW(new Point3D(sB.X, sB.Y, sB.Z)));
-
-                            ToolTipHelper.ToolTipContent = sB.Name
-                                        + " "
-                                        + String.Format("{0:#,##0}", distToBody)
-                                        + " km"
-                                        + " Viewport "
-                                        + projectedPoint.ToString()
-                                        ;
-                            ToolTipHelper.Show();
-                            HitSomething = true;
-                        }
-                    }
-                }
-            }
-#endif
-            return HitTestResultBehavior.Continue;
+            //System.Diagnostics.Debug.WriteLine("MouseMove " + MousePosition.ToString());
         }
         #endregion
 
@@ -476,5 +406,9 @@ namespace OrbitalSimOpenGL
         }
         #endregion
 
+        private void MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            MousePosition.X =  MousePosition.Y = -1;
+        }
     }
 }

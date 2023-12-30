@@ -1,6 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Media3D;
 
@@ -44,10 +45,12 @@ namespace OrbitalSimOpenGL
         public bool IncludeAxis { get; set; } = true; // Render the three axis elements (X, Y, Z)
         public SimCamera SimCamera { get; set; }
         public bool SimRunning { get; set; } = false;
+        public SimBody? LastMouseOverSB { get; set; } = null;
 
         private bool _Wireframe;
-        public bool Wireframe 
-        { get => _Wireframe;
+        public bool Wireframe
+        {
+            get => _Wireframe;
             set
             {
                 GL.PolygonMode(MaterialFace.FrontAndBack, value ? PolygonMode.Line : PolygonMode.Fill); // PolygonMode.Fill
@@ -134,8 +137,9 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="ms"></param>
         /// <param name="frameRateMS"></param>
+        /// <param name="mousePosition">Current mouse cursor position, for hit-testing</param>
         /// <remarks>Renders the current model state</remarks>
-        public void Render(int ms, int frameRateMS)
+        public void Render(int ms, int frameRateMS, System.Windows.Point mousePosition)
         {
             if (!SceneReady)
                 return;
@@ -146,7 +150,11 @@ namespace OrbitalSimOpenGL
 
             RenderAxis();
 
-            SimBodyList?.Render(SimCamera);
+            // Render bodies
+            // If render returns non-null sB then the mouse was over that body.
+            SimBody sB;
+            if (null != (sB = SimBodyList?.Render(SimCamera, mousePosition)))
+                LastMouseOverSB = sB;
         }
 
 #if false
@@ -161,31 +169,6 @@ namespace OrbitalSimOpenGL
         /// <param name="movingAvgMS">Moving average frame rate. A frame is happening on average every movingAvgMS</param>
         public void Iterate(bool simRunning, int ms, int movingAvgMS)
         {
-
-#if false
-            IterateTotalCalls++;
-
-            if (0 == IterateLastMS)
-                IterateLastMS = ms;
-            else
-            {
-                IterateTotalMS += ms - IterateLastMS;
-                IterateLastMS = ms;
-            }
-
-            // Performance measurements
-            for (int i=0; i<500000; i++)
-                _ = (double)i / 1000D;
-
-            if (0==IterateTotalCalls%1000)
-            {
-                String idStr = MethodBase.GetCurrentMethod().Name + "." + this.GetType().Name;
-                Double callsPerMS = (Double)IterateTotalCalls / (Double)IterateTotalMS;
-                Double callsPerSec = 1000 * callsPerMS;
-                System.Diagnostics.Debug.WriteLine(idStr + " Calls, CallsPerSec, CallsPerMS " + IterateTotalCalls.ToString("N0") + ", " + callsPerSec.ToString("###.##")  + ", " + callsPerMS.ToString("#.######"));
-            }
-#endif
-
             if (simRunning)
             {
                 for (int i = 0; i < TimeCompression; i++)

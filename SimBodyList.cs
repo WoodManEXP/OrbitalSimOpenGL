@@ -2,6 +2,7 @@
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Media.Media3D;
 
 namespace OrbitalSimOpenGL
@@ -55,6 +56,7 @@ void main()
             BodyList = new List<SimBody>();
 
             foreach (EphemerisBody eB in ephemerismBodyList.Bodies)
+                //                if (eB.Name.Equals("Sun"))
                 BodyList.Add(new SimBody(eB, AppDataFolder));
 
             BodyShader = new(VertexShader, FragmentShader);
@@ -67,8 +69,15 @@ void main()
         /// Render each body in the BodyList
         /// </summary>
         /// <param name="simCamera"></param>
-        public void Render(SimCamera simCamera)
+        /// <param name="mousePosition">Current mouse cursor position, for hit-testing</param>
+        /// <returns>
+        /// simBody which mouse is over or null if no hit
+        /// </returns>
+        public SimBody Render(SimCamera simCamera, System.Windows.Point mousePosition)
         {
+            SimBody? hitSB = null;
+            Double lastHitDist = Double.MaxValue;
+
             BodyShader.Use();
 
             // Model (Scale * Trans) * View * Projection
@@ -80,8 +89,8 @@ void main()
 
             Vector3d halfNorm = simCamera.UpVector3d * 5e-1f;
 
-            const int minSize = 12;
-            const int minSizeSqared = minSize * minSize;
+            const Single minSize = 5;
+            const Single minSizeSqared = 5 * 5;
             Vector3d center;
             FrustumCuller fC = simCamera.FrustumCuller;
 
@@ -98,10 +107,17 @@ void main()
                     // Sphere is visible in current frustum
                     // a. Keep its rendering to a minimum size (so something will be visible no matter how far from camera)
                     // b. Render it
-                    sB.KeepVisible(ref simCamera.VP_Matrix, simCamera.ViewWidth, ref halfNorm, minSize, minSizeSqared);
+                    Double dist = sB.KeepVisible(simCamera, ref halfNorm, minSize, minSizeSqared, ref mousePosition);
                     sB.Render(SharedSphereIndices.Length, BodyColorUniform, MVP_Uniform, ref simCamera.VP_Matrix, ref LocationMatrix4, ref SizeMatrix4);
+                    if (-1D != dist)
+                        if (dist < lastHitDist) // Keep only hit closest to camera
+                        {
+                            hitSB = sB;
+                            lastHitDist = dist;
+                        }
                 }
             }
+            return hitSB;
         }
 
         /// <summary>

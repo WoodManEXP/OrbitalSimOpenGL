@@ -1,8 +1,11 @@
-﻿using System;
+﻿using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Documents;
 
 namespace OrbitalSimOpenGL
 {
@@ -14,15 +17,18 @@ namespace OrbitalSimOpenGL
         #region Properties
         OrbitalSimWindow OrbitalSimWindow { get; set; }
         public SimModel SimModel { get; set; }
-        public SimCamera? SimCamera { get; set; }
+        public SimCamera SimCamera { get; set; }
         private int ElapsedMS { get; set; } = 0;
+        private System.Windows.Point LastMousePosition { get; set; }
         private static int StatIntervalA { get; } = 2000;
+        private SimBody? LastMouseOverSB { get; set; } = null;
         #endregion
 
-        public Stats(OrbitalSimWindow orbitalSimWindow, SimModel simModel)
+        public Stats(OrbitalSimWindow orbitalSimWindow, SimModel simModel, SimCamera simCamera)
         {
             OrbitalSimWindow = orbitalSimWindow;
             SimModel = simModel;
+            SimCamera = simCamera;
         }
 
         /// <summary>
@@ -35,19 +41,46 @@ namespace OrbitalSimOpenGL
 
             int milliseconds = timeSpan.Milliseconds;
 
-            ElapsedMS += milliseconds;
-
             if ((ElapsedMS += milliseconds) > StatIntervalA)
             {
 
                 OrbitalSimWindow.FPSValue.Content = (1000 / frameRateMS).ToString();
 
-//                System.Diagnostics.Debug.WriteLine("Stats.Render - interval, frameRateMS " 
-//                    + ElapsedMS.ToString()
-//                    + ", " + frameRateMS.ToString());
+                //                System.Diagnostics.Debug.WriteLine("Stats.Render - interval, frameRateMS " 
+                //                    + ElapsedMS.ToString()
+                //                    + ", " + frameRateMS.ToString());
                 ElapsedMS = 0;
+
+                // Distance to LastMouseOverSB
+                if (LastMouseOverSB is not null)
+                {
+                    Vector3d distVector3D;
+                    distVector3D.X = LastMouseOverSB.X - SimCamera.CameraPosition.X;
+                    distVector3D.Y = LastMouseOverSB.Y - SimCamera.CameraPosition.Y;
+                    distVector3D.Z = LastMouseOverSB.Z - SimCamera.CameraPosition.Z;
+
+                    // Dist from camera position to point on sphere where ray cast would intersect
+                    Double dist = distVector3D.Length - (LastMouseOverSB.EphemerisDiameter / 2);
+
+                }
+
             }
 
+            // If mouse over a different body?
+            if (LastMouseOverSB != SimModel.LastMouseOverSB)
+            {
+                LastMouseOverSB = SimModel.LastMouseOverSB;
+                if (LastMouseOverSB is not null)
+                    OrbitalSimWindow.MouseOverBody.Content = LastMouseOverSB.Name;
+            }
+
+            // Mouse position over sim area
+            if (LastMousePosition != OrbitalSimWindow.MousePosition)
+            {
+                OrbitalSimWindow.MouseXCoord.Content = OrbitalSimWindow.MousePosition.X.ToString();
+                OrbitalSimWindow.MouseYCoord.Content = OrbitalSimWindow.MousePosition.Y.ToString();
+                LastMousePosition = OrbitalSimWindow.MousePosition;
+            }
         }
     }
 }

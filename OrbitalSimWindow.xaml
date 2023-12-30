@@ -15,12 +15,16 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <glWpfControl:GLWpfControl Grid.Row="0" x:Name="OpenTkControl" Render="OnRender" Loaded="OnLoaded" MouseMove="MouseMove"/>
+        <glWpfControl:GLWpfControl Grid.Row="0" x:Name="OpenTkControl" Render="OnRender" Loaded="OnLoaded" 
+                                   MouseMove="MouseMove" MouseLeave="MouseLeave"/>
         <Rectangle Grid.Row="1" Fill="White" />
         <GroupBox Header="Info" Grid.Row="1">
             <Canvas>
                 <Label Content="FPS" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="43"/>
                 <Label x:Name="FPSValue" Content="0" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="38" Canvas.Left="28"/>
+                <Label x:Name="MouseOverBody" Content="" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="133" Canvas.Left="72"/>
+                <Label x:Name="MouseXCoord" Content="0" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="38" Canvas.Left="1" Canvas.Top="55"/>
+                <Label x:Name="MouseYCoord" Content="0" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="38" Canvas.Top="55" Canvas.Left="44"/>
             </Canvas>
         </GroupBox>
     </Grid>

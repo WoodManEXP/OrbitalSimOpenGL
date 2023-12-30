@@ -238,6 +238,13 @@ namespace OrbitalSimOpenGL
 
             VP_Matrix = ViewMatrix * ProjectionMatrix;
 
+            // Double precision version of VP_Matrix is useful
+            //Vector4d row0 = new(VP_Matrix.M11, VP_Matrix.M12, VP_Matrix.M13, VP_Matrix.M14);
+            //Vector4d row1 = new(VP_Matrix.M21, VP_Matrix.M22, VP_Matrix.M23, VP_Matrix.M24);
+            //Vector4d row2 = new(VP_Matrix.M31, VP_Matrix.M32, VP_Matrix.M33, VP_Matrix.M34);
+            //Vector4d row3 = new(VP_Matrix.M41, VP_Matrix.M42, VP_Matrix.M43, VP_Matrix.M44);
+            //VP_Matrix4d = new(row0, row1, row2, row3);
+
             FrustumCuller.GenerateFrustum();
 
             // Test Frustrum culling
