@@ -159,18 +159,22 @@ namespace OrbitalSimOpenGL
         }
         private void CameraMoveUp(object sender, RoutedEventArgs e)
         {
+            KeepOff();
             OrbitalSimCmds?.MoveCamera(SimCamera.CameraMoveDirections.MoveUp);
         }
         private void CameraMoveLeft(object sender, RoutedEventArgs e)
         {
+            KeepOff();
             OrbitalSimCmds?.MoveCamera(SimCamera.CameraMoveDirections.MoveLeft);
         }
         private void CameraMoveDown(object sender, RoutedEventArgs e)
         {
+            KeepOff();
             OrbitalSimCmds?.MoveCamera(SimCamera.CameraMoveDirections.MoveDown);
         }
         private void CameraMoveRight(object sender, RoutedEventArgs e)
         {
+            KeepOff();
             OrbitalSimCmds?.MoveCamera(SimCamera.CameraMoveDirections.MoveRight);
         }
         private void FileExitMenu(object sender, RoutedEventArgs e)
@@ -482,25 +486,41 @@ namespace OrbitalSimOpenGL
         /// </summary>
         private void KeepOff()
         {
-            KeepCheckbox.IsChecked = false;
-            OrbitalSimCmds?.Keep(false);
-        }
-
-        /// <summary>
-        /// Keep checkbox clicked
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void KeepClicked(object sender, RoutedEventArgs e)
-        {
-            CheckBox checkBox = (CheckBox)sender;
-            OrbitalSimCmds.Keep(checkBox.IsChecked.Value);
+            //KeepCheckbox.IsChecked = false;
+            KeepCombo.SelectedIndex = 0;
+            OrbitalSimCmds?.Keep(SimCamera.KindOfKeep.None);
         }
 
         private void ReticleCheckbox(object sender, RoutedEventArgs e)
         {
             CheckBox checkBox = (CheckBox)sender;
             OrbitalSimCmds.Reticle(checkBox.IsChecked.Value);
+        }
+
+        /// <summary>
+        /// Tell sim what kind of Keep to use
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void KeepChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int iSel = KeepCombo.SelectedIndex;
+
+            SimCamera.KindOfKeep keepKind = SimCamera.KindOfKeep.None; 
+
+            switch(KeepCombo.SelectedIndex)
+            {
+                case 0:
+                    keepKind = SimCamera.KindOfKeep.None;
+                    break;
+                case 1:
+                    keepKind = SimCamera.KindOfKeep.LookAt;
+                    break;
+                default:
+                    keepKind = SimCamera.KindOfKeep.LookAtAndDistance;
+                    break;
+            }
+            OrbitalSimCmds?.Keep(keepKind);
         }
     }
 }

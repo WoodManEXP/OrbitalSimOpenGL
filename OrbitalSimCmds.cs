@@ -60,9 +60,9 @@ namespace OrbitalSimOpenGL
         #endregion
 
         #region Keep
-        public void Keep(bool show)
+        public void Keep(SimCamera.KindOfKeep kindOfKeep)
         {
-            object[] args = { OrbitalSimWindow.GenericCommands.Keep, show };
+            object[] args = { OrbitalSimWindow.GenericCommands.Keep, kindOfKeep };
             GenericCommand(args);
         }
         #endregion

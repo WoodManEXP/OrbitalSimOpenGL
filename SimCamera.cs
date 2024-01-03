@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,14 +60,34 @@ namespace OrbitalSimOpenGL
         // Keep properties
         public enum KindOfKeep
         {
-            Nothing
-          , LookAt
-          , GoNear
+            None
+          , LookAt              // Camera keeps looking at last LookAt or GoNear choice
+          , LookAtAndDistance   // LookAt + camera maintains current distance
         };
         private int KeepBody { get; set; } = -2; // -2 is nothing set
-        private KindOfKeep KeepKind { get; set; } = KindOfKeep.Nothing;
+
+        private bool _KeepIsOnStation = false;
+        private bool KeepIsOnStation // Camera currently being kept On Station
+        {
+            get => _KeepIsOnStation;
+            set { _KeepIsOnStation = value; }
+        }
+        private KindOfKeep _KeepKind = KindOfKeep.None;
+        private Vector3d KeepPosition;
+        public KindOfKeep KeepKind
+        {
+            get { return _KeepKind; }
+            set
+            {
+                _KeepKind = value;
+                if (KindOfKeep.None == _KeepKind)
+                {
+                    KeepIsOnStation = false;
+                }
+            }
+        }
+        private KindOfKeep RetainedKeep { get; set; }
         public bool Keep { get; set; } = false;
-        private bool RetainedKeep { get; set; }
 
         public Single ViewWidth { get; set; }
         public Single ViewHeight { get; set; }
@@ -83,13 +104,13 @@ namespace OrbitalSimOpenGL
         public FrustumCuller FrustumCuller { get; set; }
 
         private int FramerateMS { get; set; } // Current framerate, ms/frame
-        private Boolean AnimatingLook { get; set; } = false; // Look Dir or LookAt
-        private Boolean AnimatingTilt { get; set; } = false; // Up Dir or Tilt
-        private Boolean AnimatingLookAt { get; set; } = false;
-        private Boolean AnimatingUDLRFB { get; set; } = false; // Up, Down, Left, Right, Forward, Backward or Move
-        private Boolean AnimatingOrbit { get; set; } = false;
-        private Boolean AnimatingGoNear { get; set; } = false;
-        private Boolean AnimatingCamera
+        private bool AnimatingLook { get; set; } = false; // Look Dir or LookAt
+        private bool AnimatingTilt { get; set; } = false; // Up Dir or Tilt
+        private bool AnimatingLookAt { get; set; } = false;
+        private bool AnimatingUDLRFB { get; set; } = false; // Up, Down, Left, Right, Forward, Backward or Move
+        private bool AnimatingOrbit { get; set; } = false;
+        private bool AnimatingGoNear { get; set; } = false;
+        private bool AnimatingCamera
         {
             get { return AnimatingLook | AnimatingTilt | AnimatingLookAt | AnimatingUDLRFB | AnimatingOrbit | AnimatingGoNear; }
         }
@@ -154,40 +175,31 @@ namespace OrbitalSimOpenGL
         /// <param name="framerateMS">Moving average frame rate. A frame is happening on average every framerateMS</param>
         public void AnimateCamera(int ms, int framerateMS)
         {
-            // If Keep is true (on) perform the kind of keep specified.
-            // Keep is never true while camera animation is active.
-            if (Keep)
+            bool uVM = false; // Update View Matrix
+
+            // If Keep is on perform the kind of keep specified.
+            // Keep is never on while camera animation is active.
+            if (SimCamera.KindOfKeep.None != KeepKind)
             {
-                if (0 <= KeepBody)  // A body has been selected (and not Origin (-1))
-                                    // Start the keep operation
-                    switch (KeepKind)
-                    {
-                        case KindOfKeep.LookAt:
-                            LookAt(KeepBody);
-                            break;
-
-//                        case KindOfKeep.GoNear:
-//                            GoNear(KeepBody);
-//                            break;
-
-                        default:
-                            break;
-                    }
+                KeepOnStation();
+                uVM = true;
             }
 
-            if (!AnimatingCamera)
-                return;
+            if (AnimatingCamera)
+            {
+                uVM = true;
+                FramerateMS = framerateMS; // Rather than a param to each method call
 
-            FramerateMS = framerateMS; // Rather than a param to each method call
+                AnimateOrbit();
+                AnimateUDLRFB();
+                AnimateTilt();
+                AnimateLook();
+                AnimateLookAt();
+                AnimateGoNear();
+            }
 
-            AnimateOrbit();
-            AnimateUDLRFB();
-            AnimateTilt();
-            AnimateLook();
-            AnimateLookAt();
-            AnimateGoNear();
-
-            UpdateViewMatrix();
+            if (uVM)
+                UpdateViewMatrix();
         }
 
         /// <summary>
@@ -213,6 +225,24 @@ namespace OrbitalSimOpenGL
         public void SetNormalVector3(Vector3d nVec)
         {
             NormalVector3d = nVec;
+        }
+
+        /// <summary>
+        /// Target body's current position
+        /// </summary>
+        /// <param name="position"></param>
+        private void BodyPosn(SimBody sB, out Vector3d position)
+        {
+            if (sB is null)
+            {
+                position.X = position.Y = position.Z = 0D;
+            }
+            else
+            {
+                position.X = sB.X;
+                position.Y = sB.Y;
+                position.Z = sB.Z;
+            }
         }
 
         /// <summary>
@@ -251,9 +281,81 @@ namespace OrbitalSimOpenGL
             //bool culled = SimCamera.FrustumCuller.SphereCulls(new Vector3d(0D, 0D, -3D), 2D);
         }
 
+
+        Int32 iCtr = -1;
+
+        /// <summary>
+        /// Keeps camera OnStation according to value of KeepKind
+        /// </summary>
+        private void KeepOnStation()
+        {
+            SimBody? sB;
+
+            if (-2 == KeepBody)
+                return;
+
+            if (-1 == KeepBody)
+                sB = null;
+            else
+                sB = SimModel.SimBodyList.BodyList[KeepBody];
+
+            if (!KeepIsOnStation)
+            {
+                if (SimCamera.KindOfKeep.LookAtAndDistance == KeepKind)
+                {
+                    BodyPosn(sB, out KeepPosition); // Location of target when starting KeepOnStation
+#if false
+                    Double diaAdj = (sB is not null) ? sB.EphemerisDiameter / 2D : 0;
+                    System.Diagnostics.Debug.WriteLine("KeepOnStation first call:"
+                            + " distance:" + ((CameraPosition - KeepPosition).Length- diaAdj).ToString("#,##0")
+                            );
+#endif                
+                }
+
+                // First call. Ensure a smooth animation from where ever camera is now looking
+                // to looking at the KeepBody.
+                LookAt(KeepBody);
+
+                KeepIsOnStation = true; // LookAt had caused this to be set this to false. Set it here.
+            }
+            else
+            {
+                // Already OnStation, adjust camera to stay OnStation
+
+                // Look direction
+                LookAt(sB, 2D * Math.PI);
+
+                // Distance
+                if (SimCamera.KindOfKeep.LookAtAndDistance == KeepKind)
+                {
+                    // Shift camera position by whatever about the body has shifted.
+                    Vector3d currPosition, distVector3d;
+
+                    BodyPosn(sB, out currPosition); // Current location of target
+
+                    distVector3d = currPosition - KeepPosition;
+                    Double distance = distVector3d.Length;
+                    if (0D != distance)
+                        distVector3d.Normalize();
+
+                    CameraPosition += (distVector3d * distance);
+#if false
+                    if (0 == ++iCtr % 60)
+                    {
+                        Double diaAdj = (sB is not null) ? sB.EphemerisDiameter / 2D : 0;
+                        System.Diagnostics.Debug.WriteLine("KeepOnStation:"
+                                    + " KeepKind:" + KeepKind.ToString()
+                                    + " distance:" + ((CameraPosition - currPosition).Length - diaAdj).ToString("#,##0")
+                                    );
+                    }
+#endif
+                    KeepPosition = currPosition;
+                }
+            }
+        }
+
         #region Animate camera LookAt
         private SimBody? LookAtSimBody { get; set; }
-        private Vector3d LookAtPoint3d;
         private static float LookAtRadiansPerFrame = 2.0f * (MathHelper.Pi / 180); // 2.0 degrees
 
         /// <summary>
@@ -271,17 +373,13 @@ namespace OrbitalSimOpenGL
             AnimatingLookAt = true;
 
             // Disable Keep during this animation
-            RetainedKeep = Keep;
-            Keep = false;
+            RetainedKeep = KeepKind;
+            KeepKind = KindOfKeep.None;
             KeepBody = bodyIndex;
-            KeepKind = KindOfKeep.LookAt;
 
             // Where to?
             if (-1 == bodyIndex)
-            {
                 LookAtSimBody = null;
-                LookAtPoint3d.X = LookAtPoint3d.Y = LookAtPoint3d.Z = 0D;
-            }
             else
                 LookAtSimBody = SimModel.SimBodyList.BodyList[bodyIndex];
         }
@@ -296,32 +394,26 @@ namespace OrbitalSimOpenGL
             if (angleBetweenLookVectors <= LookAtRadiansPerFrame)
             {
                 AnimatingLookAt = false; // Animation completed, close enough
-                Keep = RetainedKeep; // Resore
+                KeepKind = RetainedKeep; // Resore
             }
         }
 
         /// <summary>
         /// Update camera vectors to look at LookAtSimBody, rotating a max of maxRadians.
         /// </summary>
-        /// <param name="minRotateRadians">MAx amount to rotate the vectors</param>
+        /// <param name="minRotateRadians">Max amount to rotate the vectors</param>
         /// <returns>
         /// Radians between current and target LookVectors -> which may not be the same
         /// angle the vectors are rotated.
         /// </returns>
         private Double LookAt(SimBody? sB, Double minRotateRadians)
         {
-            // New look direction (vector)
-            if (null != sB) // Otherwise moving to look at (0,0,0)
-            {
-                LookAtPoint3d.X = sB.X;
-                LookAtPoint3d.Y = sB.Y;
-                LookAtPoint3d.Z = sB.Z;
-            }
-            else
-                LookAtPoint3d.X = LookAtPoint3d.Y = LookAtPoint3d.Z = 0D;
+            Vector3d lookAtPt;
+
+            BodyPosn(sB, out lookAtPt); // Current location of target
 
             // Prior to normalization this vector could be really long
-            Vector3d newLookVector3d = LookAtPoint3d - CameraPosition;
+            Vector3d newLookVector3d = lookAtPt - CameraPosition;
             newLookVector3d.Normalize();
 
             Vector3d rotateAboutVector3d = Vector3d.Cross(newLookVector3d, LookVector3d);
@@ -343,7 +435,6 @@ namespace OrbitalSimOpenGL
         #endregion
 
         #region Animate camera orbit
-
         private CameraOrbitDirections OrbitDirection { get; set; }
         private Single OrbitRadiansGoal { get; set; }
         private Matrix3d OrbitRotationMatrix { get; set; }
@@ -541,7 +632,12 @@ namespace OrbitalSimOpenGL
 
             // https://math.stackexchange.com/questions/1650877/how-to-find-a-point-which-lies-at-distance-d-on-3d-line-given-a-position-vector
 
-            double f;
+            // Disable Keep during this animation
+            RetainedKeep = KeepKind;
+            KeepKind = KindOfKeep.None;
+            KeepIsOnStation = false; // Moving camera takes it off station
+
+            Double f;
             UDLRFB_To = CameraPosition;
 
             switch (moveDirection)
@@ -604,9 +700,11 @@ namespace OrbitalSimOpenGL
             CameraPosition = currPosn;
 
             if (++UDLRFB_FramesSoFar >= ODLRFB_FramesGoal)
+            {
                 AnimatingUDLRFB = false; // Animation completed
+                KeepKind = RetainedKeep; // Resore
+            }
         }
-
         #endregion
 
         #region Animate GoNear
@@ -615,7 +713,7 @@ namespace OrbitalSimOpenGL
         private bool StartedGN_LookAtAnimation { get; set; }
         private int GN_FramesGoal { get; set; }
         private int GN_FramesSoFar { get; set; }
-//        private bool GN_RetainedKeep { get; set; }
+        //        private bool GN_RetainedKeep { get; set; }
 
         private Vector3d GN_TargetPoint; //
         private SimBody GN_SimBody { get; set; }
@@ -638,6 +736,7 @@ namespace OrbitalSimOpenGL
             // Where to?
             if (-1 == GN_BodyIndex)
             {
+                GN_SimBody = null;
                 GN_TargetPoint.X = GN_TargetPoint.Y = GN_TargetPoint.Z = 0D;
                 GN_NearDistance = 3E6; // 3M km from origin
             }
@@ -648,27 +747,9 @@ namespace OrbitalSimOpenGL
             }
 
             // Disable Keep during this animation
-//            GN_RetainedKeep = Keep;
-//            Keep = false;
-//            KeepBody = GN_BodyIndex;
-        }
-
-        /// <summary>
-        /// Target body's current position
-        /// </summary>
-        /// <param name="position"></param>
-        private void GN_TargetPosn(out Vector3d position)
-        {
-            if (-1 == GN_BodyIndex)
-            {
-                position.X = position.Y = position.Z = 0D;
-            }
-            else
-            {
-                position.X = GN_SimBody.X;
-                position.Y = GN_SimBody.Y;
-                position.Z = GN_SimBody.Z;
-            }
+            RetainedKeep = KeepKind;
+            KeepKind = KindOfKeep.None;
+            KeepBody = bodyIndex;
         }
 
         private void AnimateGoNear()
@@ -689,14 +770,14 @@ namespace OrbitalSimOpenGL
             }
             else
             {
-//                KeepKind = KindOfKeep.GoNear;
+                //                KeepKind = KindOfKeep.GoNear;
 
                 // Animating LookAt phase complete, perform cruise/decelerate phases
                 // Bodies are constantlly in motion (except for origin), hence the continual recalculation.
                 // Route will be as an arc continually adjusting to the target's position rather than direct line
                 // to a stationary target.
                 Vector3d targetPosition3D;
-                GN_TargetPosn(out targetPosition3D); // Current location of target
+                BodyPosn(GN_SimBody, out targetPosition3D); // Current location of target
 
                 Vector3d distVector3d;
                 distVector3d.X = targetPosition3D.X - CameraPosition.X;
@@ -707,7 +788,7 @@ namespace OrbitalSimOpenGL
                 if (currDistToTarget <= GN_NearDistance)
                 {
                     AnimatingGoNear = false; // Stop 
-//                    Keep = GN_RetainedKeep; // Resore
+                    KeepKind = RetainedKeep; // Resore
                     return;
                 }
 
@@ -770,7 +851,7 @@ namespace OrbitalSimOpenGL
                 if (++GN_FramesSoFar >= GN_FramesGoal)
                 {
                     AnimatingGoNear = false;
-//                    Keep = GN_RetainedKeep; // Resore
+                    KeepKind = RetainedKeep; // Resore
                 }
             }
         }

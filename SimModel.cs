@@ -42,6 +42,7 @@ namespace OrbitalSimOpenGL
         public String? AppDataFolder { get; set; }
         public int IterationSeconds { get; set; } = 60; // Each frame iteration represents this many seconds of model simulation
         public int TimeCompression { get; set; } = 1; // Number of times to iterate per frame
+        public Int64 ElapsedSeconds { get; set; } = 0;
         public bool IncludeAxis { get; set; } = true; // Render the three axis elements (X, Y, Z)
         public SimCamera SimCamera { get; set; }
         public bool SimRunning { get; set; } = false;
@@ -172,7 +173,10 @@ namespace OrbitalSimOpenGL
             if (simRunning)
             {
                 for (int i = 0; i < TimeCompression; i++)
+                {
                     NextPosition?.IterateOnce(IterationSeconds);
+                    ElapsedSeconds += IterationSeconds;
+                }
 
                 // Process path traces (lines showing where bodies have been)
                 //PathTrace.UpdateTracePaths(SimBodyList, NextPosition.IterationNumber);

@@ -47,7 +47,6 @@ namespace OrbitalSimOpenGL
 
         public OrbitalSimWindow()
         {
-
             ThisOrbitalSimWindow = this; // In order to find this in the static method(s)
 
             InitializeComponent();
@@ -333,7 +332,7 @@ namespace OrbitalSimOpenGL
                         break;
 
                     case GenericCommands.Keep:
-                        SimModel.SimCamera.Keep = (bool)args[1];
+                        SimModel.SimCamera.KeepKind = (SimCamera.KindOfKeep)args[1];
                         break;
 
                     case GenericCommands.Reticle:

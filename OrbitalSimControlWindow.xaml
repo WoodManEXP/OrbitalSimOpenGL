@@ -113,6 +113,11 @@
         <CheckBox x:Name="ShowAxis" Content="Axis" Canvas.Left="438" Canvas.Top="311" HorizontalAlignment="Center" VerticalAlignment="Top" Width="137" Click="AxisCheckbox" IsChecked="True"/>
         <CheckBox x:Name="ShowReticle" Content="Reticle" Canvas.Left="438" Canvas.Top="347" HorizontalAlignment="Center" VerticalAlignment="Top" Width="57" IsChecked="True" Click="ReticleCheckbox"/>
         <CheckBox x:Name="ShowWireframe" Content="Wireframe" Canvas.Left="438" Canvas.Top="329" HorizontalAlignment="Center" VerticalAlignment="Top" Width="126" Click="WireframeCheckbox" IsChecked="True"/>
-        <CheckBox x:Name="KeepCheckbox" Content="Keep loooking at" Canvas.Left="124" Canvas.Top="267" HorizontalAlignment="Center" VerticalAlignment="Top" Width="123" Click="KeepClicked"/>
+        <ComboBox x:Name="KeepCombo" Canvas.Left="232" Canvas.Top="266" Width="92" RenderTransformOrigin="0.833,4.829" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="KeepChanged">
+            <ComboBoxItem Content = "None" IsSelected="True" />
+            <ComboBoxItem Content = "Look" />
+            <ComboBoxItem Content = "Look and Distance" />
+        </ComboBox>
+        <Label Content="Keep" Canvas.Left="188" Canvas.Top="264" HorizontalAlignment="Left" VerticalAlignment="Center"/>
     </Canvas>
 </Window>
