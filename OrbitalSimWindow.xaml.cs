@@ -34,13 +34,13 @@ namespace OrbitalSimOpenGL
         private static OrbitalSimWindow? ThisOrbitalSimWindow { get; set; }
 
         private Stats Stats { get; set; }
-        CommandDelegate CommandDelegate { get; set; }
+        CommandControlWindow CommandControlWindow { get; set; }
         #endregion
 
-        public OrbitalSimWindow(CommandDelegate commandDelegate)
+        public OrbitalSimWindow(CommandControlWindow commandControlWindow)
         {
             // In order to send commands/info to the controller window
-            CommandDelegate = commandDelegate;
+            CommandControlWindow = commandControlWindow;
 
             ThisOrbitalSimWindow = this; // In order to find this in the static method(s)
 
@@ -165,10 +165,16 @@ namespace OrbitalSimOpenGL
         /// <param name="args"></param>
         private void OrbitCamera(object[] args)
         {
+            // If the body to be orbited, SimCamera.OrbitBodyIndex, is not the same as the current 
+            // Keep body, SimCamera.KeepBody, disable Keep.
+            if (SimCamera.OrbitTurnOffKeep())
+                CommandControlWindow.KeepOff(); // Inform controller of Keep disable
+
             CameraOrbitDirections orbitDirection = (CameraOrbitDirections)args[0];
             Single degrees = (Single)args[1];
             SimCamera?.OrbitCamera(orbitDirection, degrees);
         }
+        
         /// <summary>
         /// Orbit About
         /// Set which system body,or system origin, about which to orbit camera
@@ -186,6 +192,7 @@ namespace OrbitalSimOpenGL
 
             SimCamera?.OrbitAbout(index);
         }
+        
         /// <summary>
         /// Use between 0 and 20
         /// Scaled movement amounts for U, D, L, R, F, B

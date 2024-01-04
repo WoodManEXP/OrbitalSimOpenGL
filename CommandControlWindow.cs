@@ -32,5 +32,13 @@ namespace OrbitalSimOpenGL
             : base(dispatcher)
         {
         }
+
+        #region Keep
+        public void KeepOff()
+        {
+            object[] args = { GenericCommands.KeepTurnedOff };
+            GenericCommand(args);
+        }
+        #endregion
     }
 }

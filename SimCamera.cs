@@ -469,7 +469,7 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Body about which camera orbits
         /// </summary>
-        int OrbitBodyIndex; // Getter/Setter do not seem to work here...
+        private int OrbitBodyIndex { get; set; }
 
         // .03 degrees/ms. 90 degrees in 3 seconds
         // Adjust this value to change camera orbit rate. ( degrees / seconds / 1000 )
@@ -496,10 +496,9 @@ namespace OrbitalSimOpenGL
             OrbitRadiansGoal = MathHelper.DegreesToRadians(degrees);
             OrbitFramesSoFar = 0;
 
-            // If orbiting about current Keep selection then preserve Keep. Otherwise,
-            // disable Keep.
-            if (OrbitBodyIndex != KeepBody) ;
-
+            // Disable Keep during this animation
+            OrbitRetainedKeep = KeepKind;
+            KeepKind = KindOfKeep.None;
         }
 
         /// <summary>
@@ -576,7 +575,10 @@ namespace OrbitalSimOpenGL
             OrbitPrevCenterPoint3d = aPoint; // Remember
 
             if (++OrbitFramesSoFar >= OrbitFramesGoal)
+            {
                 AnimatingOrbit = false; // Animation completed
+                KeepKind = OrbitRetainedKeep; // Restore
+            }
         }
 
         private OpenTK.Mathematics.Quaterniond CalcOrbitQuaternion(Single radians)
@@ -608,6 +610,22 @@ namespace OrbitalSimOpenGL
         public void OrbitAbout(int bodyIndex)
         {
             OrbitBodyIndex = bodyIndex;
+        }
+
+        /// <summary>
+        /// Check if Keep should be disabled for this orbit. If so disable.
+        /// </summary>
+        /// <returns>
+        /// true if disabled, false otherwise
+        /// </returns>
+        public bool OrbitTurnOffKeep()
+        {
+            if (OrbitBodyIndex != KeepBody)
+            {
+                KeepKind = KindOfKeep.None;
+                return true;
+            }
+            return false;
         }
         #endregion
 
