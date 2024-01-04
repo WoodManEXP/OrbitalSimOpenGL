@@ -86,8 +86,6 @@ namespace OrbitalSimOpenGL
                 }
             }
         }
-        public bool Keep { get; set; } = false;
-
         public Single ViewWidth { get; set; }
         public Single ViewHeight { get; set; }
 
@@ -227,21 +225,43 @@ namespace OrbitalSimOpenGL
         }
 
         /// <summary>
-        /// Target body's current position
+        /// Target body's current position from SimBody reference
         /// </summary>
         /// <param name="position"></param>
-        private void BodyPosn(SimBody sB, out Vector3d position)
+        private void BodyPosition(SimBody sB, out Vector3d position)
         {
             if (sB is null)
-            {
                 position.X = position.Y = position.Z = 0D;
-            }
             else
             {
-                position.X = sB.X;
-                position.Y = sB.Y;
-                position.Z = sB.Z;
+                position.X = sB.X; position.Y = sB.Y; position.Z = sB.Z;
             }
+        }
+
+        /// <summary>
+        /// Body's current position from body index;
+        /// </summary>
+        /// <param name="bodyIndex"></param>
+        /// <param name="position"></param>
+        private void BodyPosition(int bodyIndex, out Vector3d position)
+        {
+            SimBody sB = (-1 == OrbitBodyIndex) ? null : SimModel.SimBodyList.BodyList[bodyIndex];
+            BodyPosition(sB, out position);
+        }
+
+        /// <summary>
+        /// Shift camera by the delta between these two points
+        /// </summary>
+        /// <param name="currPosition"></param>
+        /// <param name="prevPosition"></param>
+        private void ShiftCamera(Vector3d currPosition, Vector3d prevPosition)
+        {
+            Vector3d distVector3d = currPosition - prevPosition;
+            Double distance = distVector3d.Length;
+            if (0D != distance)
+                distVector3d.Normalize();
+
+            CameraPosition += (distVector3d * distance);
         }
 
         /// <summary>
@@ -281,7 +301,7 @@ namespace OrbitalSimOpenGL
         }
 
         #region Keep
-        Int32 iCtr = -1;
+//        Int32 iCtr = -1;
 
         /// <summary>
         /// Keeps camera OnStation according to value of KeepKind
@@ -302,8 +322,8 @@ namespace OrbitalSimOpenGL
             {
                 if (SimCamera.KindOfKeep.LookAtAndDistance == KeepKind)
                 {
-                    BodyPosn(sB, out KeepPosition); // Location of target when starting KeepOnStation
-#if true
+                    BodyPosition(sB, out KeepPosition); // Location of target when starting KeepOnStation
+#if false
                     Double diaAdj = (sB is not null) ? sB.EphemerisDiameter / 2D : 0;
                     System.Diagnostics.Debug.WriteLine("KeepOnStation first call:"
                             + " distance:" + ((CameraPosition - KeepPosition).Length- diaAdj).ToString("#,##0")
@@ -327,18 +347,20 @@ namespace OrbitalSimOpenGL
                 // Distance
                 if (SimCamera.KindOfKeep.LookAtAndDistance == KeepKind)
                 {
-                    // Shift camera position by whatever about the body has shifted.
+                    // Shift camera position by whatever amount the body has shifted.
                     Vector3d currPosition, distVector3d;
 
-                    BodyPosn(sB, out currPosition); // Current location of target
+                    BodyPosition(sB, out currPosition); // Current location of target
 
-                    distVector3d = currPosition - KeepPosition;
-                    Double distance = distVector3d.Length;
-                    if (0D != distance)
-                        distVector3d.Normalize();
+//                    distVector3d = currPosition - KeepPosition;
+//                    Double distance = distVector3d.Length;
+//                    if (0D != distance)
+//                        distVector3d.Normalize();
 
-                    CameraPosition += (distVector3d * distance);
-#if true
+//                    CameraPosition += (distVector3d * distance);
+
+                    ShiftCamera(currPosition, KeepPosition);
+#if false
                     if (0 == ++iCtr % 60)
                     {
                         Double diaAdj = (sB is not null) ? sB.EphemerisDiameter / 2D : 0;
@@ -411,7 +433,7 @@ namespace OrbitalSimOpenGL
         {
             Vector3d lookAtPt;
 
-            BodyPosn(sB, out lookAtPt); // Current location of target
+            BodyPosition(sB, out lookAtPt); // Current location of target
 
             // Prior to normalization this vector could be really long
             Vector3d newLookVector3d = lookAtPt - CameraPosition;
@@ -441,7 +463,8 @@ namespace OrbitalSimOpenGL
         private Matrix3d OrbitRotationMatrix { get; set; }
         private int OrbitFramesGoal { get; set; }
         private int OrbitFramesSoFar { get; set; }
-        private Vector3d OrbitCenterPoint3d, OrbitCameraPosition;
+        private Vector3d OrbitPrevCenterPoint3d { get; set; }
+        private KindOfKeep OrbitRetainedKeep { get; set; }
 
         /// <summary>
         /// Body about which camera orbits
@@ -472,6 +495,11 @@ namespace OrbitalSimOpenGL
             OrbitDirection = orbitDirection;
             OrbitRadiansGoal = MathHelper.DegreesToRadians(degrees);
             OrbitFramesSoFar = 0;
+
+            // If orbiting about current Keep selection then preserve Keep. Otherwise,
+            // disable Keep.
+            if (OrbitBodyIndex != KeepBody) ;
+
         }
 
         /// <summary>
@@ -498,9 +526,8 @@ namespace OrbitalSimOpenGL
                 OrbitRotationMatrix = Matrix3d.CreateFromQuaternion(CalcOrbitQuaternion(radiansPerFrame));
 
                 // Init conditions for orbit
-                OrbitCenter(out aPoint);
-                OrbitCenterPoint3d = aPoint;            // Orbit about this and translate to new posn as body moves.
-                OrbitCameraPosition = CameraPosition;   // Camera handled similarly
+                BodyPosition(OrbitBodyIndex, out aPoint);
+                OrbitPrevCenterPoint3d = aPoint;         // Remember where body was on previous frame
             }
 
             // Perform rotations of camera vectors and position
@@ -513,16 +540,18 @@ namespace OrbitalSimOpenGL
             //
             // Translate to orbit center, rotate, translate back
             //
-            Vector3d rotateVec = new(CameraPosition.X - OrbitCenterPoint3d.X,
-                                     CameraPosition.Y - OrbitCenterPoint3d.Y,
-                                     CameraPosition.Z - OrbitCenterPoint3d.Z);
+            BodyPosition(OrbitBodyIndex, out aPoint);
+            Vector3d rotateVec = new(CameraPosition.X - aPoint.X,
+                                     CameraPosition.Y - aPoint.Y,
+                                     CameraPosition.Z - aPoint.Z);
+
             Double len = rotateVec.Length;
 
             rotateVec.Normalize();
 
             rotateVec *= OrbitRotationMatrix;
 
-            CameraPosition = OrbitCenterPoint3d + len * rotateVec;
+            CameraPosition = aPoint + len * rotateVec;
 
             switch (OrbitDirection)
             {
@@ -540,21 +569,12 @@ namespace OrbitalSimOpenGL
                     // UpDirection is unchanged
                     break;
             }
-#if false
-            // All orbit-about targets, other than origin, are in motion. So at each frame find location of body
-            // about which camera is orbiting.
-            OrbitCenter(out aPoint);
 
             // Offset camera to new position relative to body's current position
-            CameraPosition = OrbitCameraPosition + (aPoint - OrbitCenterPoint3d);
+            ShiftCamera(aPoint, OrbitPrevCenterPoint3d);
 
-            System.Diagnostics.Debug.WriteLine("AnimateOrbit:"
-                                            + " body position:" + aPoint.ToString()
-                                            + " OrbitCenterPoint3D:" + OrbitCenterPoint3d.ToString()
-                                            + " OrbitCameraPosition:" + OrbitCameraPosition.ToString()
-                                            + " CameraPosition:" + CameraPosition.ToString()
-                                            );
-#endif
+            OrbitPrevCenterPoint3d = aPoint; // Remember
+
             if (++OrbitFramesSoFar >= OrbitFramesGoal)
                 AnimatingOrbit = false; // Animation completed
         }
@@ -579,22 +599,6 @@ namespace OrbitalSimOpenGL
             }
 
             return Util.MakeQuaterniond(orbitAboutVector3D, radians);
-        }
-
-        /// <summary>
-        /// Current posiion of body being rotated about
-        /// </summary>
-        /// <param name="position"></param>
-        public void OrbitCenter(out Vector3d position)
-        {
-            if (-1 == OrbitBodyIndex)
-                position.X = position.Y = position.Z = 0D;
-            else
-            {
-                position.X = SimModel.SimBodyList.BodyList[OrbitBodyIndex].X;
-                position.Y = SimModel.SimBodyList.BodyList[OrbitBodyIndex].Y;
-                position.Z = SimModel.SimBodyList.BodyList[OrbitBodyIndex].Z;
-            }
         }
 
         /// <summary>
@@ -776,7 +780,7 @@ namespace OrbitalSimOpenGL
                 // Route will be as an arc continually adjusting to the target's position rather than direct line
                 // to a stationary target.
                 Vector3d targetPosition3D;
-                BodyPosn(GN_SimBody, out targetPosition3D); // Current location of target
+                BodyPosition(GN_SimBody, out targetPosition3D); // Current location of target
 
                 Vector3d distVector3d;
                 distVector3d.X = targetPosition3D.X - CameraPosition.X;

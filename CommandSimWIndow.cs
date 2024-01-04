@@ -5,14 +5,21 @@ using static OrbitalSimOpenGL.OrbitalSimWindow;
 namespace OrbitalSimOpenGL
 {
     /// <summary>
-    /// OrbitalSimCmds expposes commands available for the OrbitalSimWindow
+    /// Exposes commands available for the OrbitalSimWindow
     /// </summary>
-    public class OrbitalSimCmds
+    public class CommandSimWindow : CommandDelegate
     {
 
         #region Properties
 
-        readonly System.Windows.Threading.Dispatcher Dispatcher;
+        // Commands
+        public enum GenericCommands
+        {
+            Axis
+          , Wireframe
+          , Reticle
+          , Keep
+        };
 
         #endregion
 
@@ -21,32 +28,15 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="dispatcher"></param>
         ///
-        public OrbitalSimCmds(System.Windows.Threading.Dispatcher dispatcher)
+        public CommandSimWindow(System.Windows.Threading.Dispatcher dispatcher)
+            : base(dispatcher)
         {
-            Dispatcher = dispatcher;
         }
-
-        #region Generic Command
-
-        // Seems easier to use a generic command entry setting parameters for specific commands.
-        // Rather than pulling together a delegate for each command.
-        public delegate void GenericDelegate(object[] args);
-        private GenericDelegate? _GenericDelegate = null;
-        public void GenericRegister(GenericDelegate aDelegate)
-        {
-            _GenericDelegate = aDelegate;
-        }
-        public void GenericCommand(object[] args)
-        {
-            if (_GenericDelegate is not null)
-                Dispatcher?.BeginInvoke(DispatcherPriority.Normal, _GenericDelegate, args);
-        }
-        #endregion
 
         #region Axis
         public void Axis(bool show)
         {
-            object[] args = { OrbitalSimWindow.GenericCommands.Axis, show };
+            object[] args = { CommandSimWindow.GenericCommands.Axis, show };
             GenericCommand(args);
         }
         #endregion
@@ -54,7 +44,7 @@ namespace OrbitalSimOpenGL
         #region Wireframe
         public void Wireframe(bool show)
         {
-            object[] args = { OrbitalSimWindow.GenericCommands.Wireframe, show };
+            object[] args = { CommandSimWindow.GenericCommands.Wireframe, show };
             GenericCommand(args);
         }
         #endregion
@@ -62,7 +52,7 @@ namespace OrbitalSimOpenGL
         #region Keep
         public void Keep(SimCamera.KindOfKeep kindOfKeep)
         {
-            object[] args = { OrbitalSimWindow.GenericCommands.Keep, kindOfKeep };
+            object[] args = { CommandSimWindow.GenericCommands.Keep, kindOfKeep };
             GenericCommand(args);
         }
         #endregion
@@ -70,7 +60,7 @@ namespace OrbitalSimOpenGL
         #region Reticle
         public void Reticle(bool show)
         {
-            object[] args = { OrbitalSimWindow.GenericCommands.Reticle, show };
+            object[] args = { CommandSimWindow.GenericCommands.Reticle, show };
             GenericCommand(args);
         }
         #endregion

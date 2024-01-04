@@ -16,7 +16,7 @@ namespace OrbitalSimOpenGL
     public partial class OrbitalSimWindow : Window
     {
         #region Properties
-        public OrbitalSimCmds? OrbitalSimCmds { get; set; }
+        public CommandSimWindow? OrbitalSimCmds { get; set; }
         private EphemerisBodyList? EphemerisBodyList { get; set; }
         public SimBodyList? SimBodyList { get; set; }
         public SimCamera? SimCamera { get; set; }
@@ -33,20 +33,15 @@ namespace OrbitalSimOpenGL
         /// </summary>
         private static OrbitalSimWindow? ThisOrbitalSimWindow { get; set; }
 
-        // Commands
-        public enum GenericCommands
-        {
-            Axis
-          , Wireframe
-          , Reticle
-          , Keep
-        };
-
         private Stats Stats { get; set; }
+        CommandDelegate CommandDelegate { get; set; }
         #endregion
 
-        public OrbitalSimWindow()
+        public OrbitalSimWindow(CommandDelegate commandDelegate)
         {
+            // In order to send commands/info to the controller window
+            CommandDelegate = commandDelegate;
+
             ThisOrbitalSimWindow = this; // In order to find this in the static method(s)
 
             InitializeComponent();
@@ -65,9 +60,7 @@ namespace OrbitalSimOpenGL
             string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             AppDataFolder = Path.Combine(localAppData, appName); // appDataFolder = "C:\\Users\\Robert\\AppData\\Local\\OrbitalSimOpenGL"
 
-            InitializeComponent();
-
-            OrbitalSimCmds = new OrbitalSimCmds(Dispatcher);
+            OrbitalSimCmds = new CommandSimWindow(Dispatcher);
 
             // Register command delegates
             OrbitalSimCmds.ScaleCameraRegister(ScaleCamera);
@@ -159,6 +152,7 @@ namespace OrbitalSimOpenGL
             int compressionRate = (int)args[0];
             SimModel.TimeCompression = compressionRate;
         }
+        
         private void IterationRate(object[] args)
         {
             int seconds = (int)args[0];
@@ -173,7 +167,6 @@ namespace OrbitalSimOpenGL
         {
             CameraOrbitDirections orbitDirection = (CameraOrbitDirections)args[0];
             Single degrees = (Single)args[1];
-            //System.Diagnostics.Debug.WriteLine("TiltCamera " + tiltDirection.ToString());
             SimCamera?.OrbitCamera(orbitDirection, degrees);
         }
         /// <summary>
@@ -204,10 +197,12 @@ namespace OrbitalSimOpenGL
             if (SimModel is not null)
                 SimModel.Scale.CamMoveAmt = (int)scale; // 0 .. 20
         }
+        
         // Window loaded
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
         }
+        
         // Move camera
         private void MoveCamera(object[] args)
         {
@@ -215,6 +210,7 @@ namespace OrbitalSimOpenGL
             //System.Diagnostics.Debug.WriteLine("MoveCamera " + moveDirection.ToString());
             SimCamera?.Move(moveDirection);
         }
+        
         // Go Near
         private void GoNear(object[] args)
         {
@@ -231,6 +227,7 @@ namespace OrbitalSimOpenGL
             // Make Keep settings
 
         }
+        
         // Look camera
         private void LookCamera(object[] args)
         {
@@ -254,6 +251,7 @@ namespace OrbitalSimOpenGL
                     break;
             }
         }
+        
         private void TiltCamera(object[] args)
         {
             CameraTiltDirections tiltDirection = (CameraTiltDirections)args[0];
@@ -281,6 +279,7 @@ namespace OrbitalSimOpenGL
         }
 
         // Start sim (and continue paused sim)
+        
         private void StartSim(object[] args)
         {
             if (!SimHasBeenStarted)
@@ -310,6 +309,7 @@ namespace OrbitalSimOpenGL
             UpdateFrameLastMS = 0; // Reset on each start
             FrameRateMovingAverage.Reset();
         }
+        
         // Pause sim
         private void PauseSim(object[] args)
         {
@@ -318,24 +318,24 @@ namespace OrbitalSimOpenGL
 
         private void GenericCommand(object[] args)
         {
-            GenericCommands cmd;
+            CommandSimWindow.GenericCommands cmd;
 
             if (SimModel is not null)
-                switch (cmd = (GenericCommands)args[0])
+                switch (cmd = (CommandSimWindow.GenericCommands)args[0])
                 {
-                    case GenericCommands.Axis:
+                    case CommandSimWindow.GenericCommands.Axis:
                         SimModel.IncludeAxis = (bool)args[1];
                         break;
 
-                    case GenericCommands.Wireframe:
+                    case CommandSimWindow.GenericCommands.Wireframe:
                         SimModel.Wireframe = (bool)args[1];
                         break;
 
-                    case GenericCommands.Keep:
+                    case CommandSimWindow.GenericCommands.Keep:
                         SimModel.SimCamera.KeepKind = (SimCamera.KindOfKeep)args[1];
                         break;
 
-                    case GenericCommands.Reticle:
+                    case CommandSimWindow.GenericCommands.Reticle:
                         SimModel.SimCamera.ShowReticle = (bool)args[1];
                         break;
 

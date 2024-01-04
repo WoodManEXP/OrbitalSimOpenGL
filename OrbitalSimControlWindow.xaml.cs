@@ -24,7 +24,8 @@ namespace OrbitalSimOpenGL
         private String AppDataFolder { get; set; }
         #endregion
 
-        private OrbitalSimCmds? OrbitalSimCmds { get; set; }
+        private CommandSimWindow? OrbitalSimCmds { get; set; } // For sending commands to SimWindow
+        public CommandControlWindow? OrbitalControlCmds { get; set; }
 
         public OrbitalSimControlWindow()
         {
@@ -68,10 +69,15 @@ namespace OrbitalSimOpenGL
         // Window loaded
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            // Receives commands for control window
+            OrbitalControlCmds = new CommandControlWindow(Dispatcher);
+
+            // Register command delegate(s)
+            OrbitalControlCmds.GenericRegister(GenericCommand);
 
             // Create the sim window
             //var orbitalSimWindow = new OrbitalSimWindow();
-            OrbitalSimWindow = new OrbitalSimWindow();
+            OrbitalSimWindow = new OrbitalSimWindow(OrbitalControlCmds);
 
             OrbitalSimCmds = OrbitalSimWindow.OrbitalSimCmds;
 
@@ -100,6 +106,25 @@ namespace OrbitalSimOpenGL
             OrbitalSimWindow.Show();
 
             //System.Diagnostics.Debug.WriteLine("OrbitalSimControlWindow: Window_Loaded ");
+        }
+
+        /// <summary>
+        /// Respond to messages coming in over OrbitalControlCmds
+        /// </summary>
+        /// <param name="args"></param>
+        private void GenericCommand(object[] args)
+        {
+            CommandControlWindow.GenericCommands cmd;
+
+            switch (cmd = (CommandControlWindow.GenericCommands)args[0])
+            {
+                case CommandControlWindow.GenericCommands.KeepTurnedOff:
+                    KeepCombo.SelectedIndex = 0; // Keep was turned off so set KeepCombo to first entry (None)
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private void CameraLookUp(object sender, RoutedEventArgs e)
@@ -372,22 +397,18 @@ namespace OrbitalSimOpenGL
         }
         private void CameraOrbitUp(object sender, RoutedEventArgs e)
         {
-            KeepOff();
             OrbitalSimCmds?.OrbitCamera(SimCamera.CameraOrbitDirections.OrbitUp, OrbitCameraDegrees);
         }
         private void CameraOrbitLeft(object sender, RoutedEventArgs e)
         {
-            KeepOff();
             OrbitalSimCmds?.OrbitCamera(SimCamera.CameraOrbitDirections.OrbitLeft, OrbitCameraDegrees);
         }
         private void CameraOrbitDown(object sender, RoutedEventArgs e)
         {
-            KeepOff();
             OrbitalSimCmds?.OrbitCamera(SimCamera.CameraOrbitDirections.OrbitDown, OrbitCameraDegrees);
         }
         private void CameraOrbitRight(object sender, RoutedEventArgs e)
         {
-            KeepOff();
             OrbitalSimCmds?.OrbitCamera(SimCamera.CameraOrbitDirections.OrbitRight, OrbitCameraDegrees);
         }
         private void IterationUnitsChecked(object sender, RoutedEventArgs e)
@@ -413,7 +434,7 @@ namespace OrbitalSimOpenGL
                     baseSeconds = 60 * 60;  // an hour
 
                 if (IterationScale.SelectedValue is not null) // Happens during app start-up before all controls initialized
-                {      
+                {
                     // Num seconds to iterate per frame.
                     int scale = int.Parse((String)IterationScale.SelectedValue);
 
@@ -506,9 +527,9 @@ namespace OrbitalSimOpenGL
         {
             int iSel = KeepCombo.SelectedIndex;
 
-            SimCamera.KindOfKeep keepKind = SimCamera.KindOfKeep.None; 
+            SimCamera.KindOfKeep keepKind = SimCamera.KindOfKeep.None;
 
-            switch(KeepCombo.SelectedIndex)
+            switch (KeepCombo.SelectedIndex)
             {
                 case 0:
                     keepKind = SimCamera.KindOfKeep.None;
