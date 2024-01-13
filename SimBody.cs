@@ -31,7 +31,7 @@ namespace OrbitalSimOpenGL
         public Double RR { get; set; }
         public Double EphemerisDiameter { get; set; } // U coords
         public Double UseDiameter { get; set; } // U coords, gets adjusted for visability
-        Double HalfEphemerisD { get; set; }
+        Double HalfEphemerisDiameter { get; set; }
         public Double Mass { get; set; }
         public Double GM { get; set; }
         public string ID { get; private set; }
@@ -64,7 +64,7 @@ namespace OrbitalSimOpenGL
             RG = double.TryParse(ephemerisBody.RG_Str, out dVal) ? dVal : -1D;
             RR = double.TryParse(ephemerisBody.RR_Str, out dVal) ? dVal : -1D;
             EphemerisDiameter = double.TryParse(ephemerisBody.DiameterStr, out dVal) ? dVal : -1D;
-            HalfEphemerisD = EphemerisDiameter / 2D;
+            HalfEphemerisDiameter = EphemerisDiameter / 2D;
             Mass = double.TryParse(ephemerisBody.MassStr, out dVal) ? dVal : -1D;
             GM = double.TryParse(ephemerisBody.GM_Str, out dVal) ? dVal : -1D;
 
@@ -166,22 +166,12 @@ namespace OrbitalSimOpenGL
             Vector2 ndcCenter; // Center of body in Normalized Device Coords
             Single pixelDiameter; // Of body as presented in pixels
 
-            // Calc Point3D coordinates for both ends of a vector parallel to camera's UpDirection,
-            // centered at sB.X, sB.Y, sB.Z with length = sB's diameter. These represents widest
-            // points of sphere as seen by the camera.
-            Vector3d oneSideUniv = new(X + HalfEphemerisD * halfNorm.X, Y + HalfEphemerisD * halfNorm.Y, Z + HalfEphemerisD * halfNorm.Z);
-            Vector3d otherSideUniv = new(X - HalfEphemerisD * halfNorm.X, Y - HalfEphemerisD * halfNorm.Y, Z - HalfEphemerisD * halfNorm.Z);
-
-            // U coords to W coords
-            Scale.ScaleVector3D(ref oneSideUniv);
-            Scale.ScaleVector3D(ref otherSideUniv);
-
             if (EphemerisDiameter < 100D)
             {
                 // Small bodies are lost in Single precision rounding errors.
                 // In these cases jump the calculation to Double precision.
                 Double distSquaredD;
-                DistSquaredD(simCamera, EphemerisDiameter, ref halfNorm, minSize, out distSquaredD, out pixelDiameter, out ndcCenter);
+                DistSquaredD(simCamera, HalfEphemerisDiameter, ref halfNorm, minSize, out distSquaredD, out pixelDiameter, out ndcCenter);
 
                 if (distSquaredD < (Double)minSizeSquared)
                     // Change the body's diameter such that distSquared will transform to minSizeSquared
@@ -192,7 +182,7 @@ namespace OrbitalSimOpenGL
 
                 // What is new distSquareD after diameter adjustment
                 Double newDistSquaredD;
-                DistSquaredD(simCamera, UseDiameter, ref halfNorm, minSize, out newDistSquaredD, out pixelDiameter, out ndcCenter);
+                DistSquaredD(simCamera, UseDiameter/2D, ref halfNorm, minSize, out newDistSquaredD, out pixelDiameter, out ndcCenter);
 #if false
                 if ("Phobos".Equals(Name))
                 {
@@ -232,7 +222,7 @@ namespace OrbitalSimOpenGL
             {
                 // Body not so small
                 Single distSquared;
-                DistSquared(simCamera, EphemerisDiameter, ref halfNorm, minSize, out distSquared, out pixelDiameter, out ndcCenter);
+                DistSquared(simCamera, HalfEphemerisDiameter, ref halfNorm, minSize, out distSquared, out pixelDiameter, out ndcCenter);
 
                 if (distSquared < minSizeSquared)
                     // Change the body's diameter such that distSquared will transform to minSizeSquared
@@ -298,11 +288,12 @@ namespace OrbitalSimOpenGL
         /// <param name="distSquared"></param>
         /// <param name="pixelDiameter"></param>
         /// <param name="ndcCenter"></param>
-        private void DistSquared(SimCamera simCamera, Double diameter, ref Vector3d halfNorm, Single minSize, out Single distSquared,
+        private void DistSquared(SimCamera simCamera, Double halfD, ref Vector3d halfNorm, Single minSize, out Single distSquared,
             out Single pixelDiameter, out Vector2 ndcCenter)
         {
-            Double halfD = diameter / 2D;
-
+            // Calc Point3D coordinates for both ends of a vector parallel to camera's UpDirection,
+            // centered at sB.X, sB.Y, sB.Z with length = sB's diameter. These represents widest
+            // points of sphere as seen by the camera.
             Vector3d oneSideUniv = new(X + halfD * halfNorm.X, Y + halfD * halfNorm.Y, Z + halfD * halfNorm.Z);
             Vector3d otherSideUniv = new(X - halfD * halfNorm.X, Y - halfD * halfNorm.Y, Z - halfD * halfNorm.Z);
 
@@ -347,11 +338,12 @@ namespace OrbitalSimOpenGL
         /// <param name="distSquaredD"></param>
         /// <param name="pixelDiameter"></param>
         /// <param name="ndcCenter"></param>
-        private void DistSquaredD(SimCamera simCamera, Double diameter, ref Vector3d halfNorm, Single minSize, out Double distSquaredD, 
+        private void DistSquaredD(SimCamera simCamera, Double halfD, ref Vector3d halfNorm, Single minSize, out Double distSquaredD, 
                     out Single pixelDiameter, out Vector2 ndcCenter)
         {
-            Double halfD = diameter / 2D;
-
+            // Calc Point3D coordinates for both ends of a vector parallel to camera's UpDirection,
+            // centered at sB.X, sB.Y, sB.Z with length = sB's diameter. These represents widest
+            // points of sphere as seen by the camera.
             Vector3d oneSideUniv = new(X + halfD * halfNorm.X, Y + halfD * halfNorm.Y, Z + halfD * halfNorm.Z);
             Vector3d otherSideUniv = new(X - halfD * halfNorm.X, Y - halfD * halfNorm.Y, Z - halfD * halfNorm.Z);
 
