@@ -30,7 +30,7 @@ namespace OrbitalSimOpenGL
         public Double RG { get; set; }
         public Double RR { get; set; }
         public Double EphemerisDiameter { get; set; } // U coords
-        public Double UseD { get; set; } // U coords, gets adjusted for visability
+        public Double UseDiameter { get; set; } // U coords, gets adjusted for visability
         Double HalfEphemerisD { get; set; }
         public Double Mass { get; set; }
         public Double GM { get; set; }
@@ -119,7 +119,7 @@ namespace OrbitalSimOpenGL
             locationMatrix4.M42 = Scale.ScaleU_ToW(Y); // Y
             locationMatrix4.M43 = Scale.ScaleU_ToW(Z); // Z
 
-            sizeMatrix4.M11 = sizeMatrix4.M22 = sizeMatrix4.M33 = Scale.ScaleU_ToW(UseD);
+            sizeMatrix4.M11 = sizeMatrix4.M22 = sizeMatrix4.M33 = Scale.ScaleU_ToW(UseDiameter);
 
             Matrix4 mvp = sizeMatrix4 * locationMatrix4 * vp;
 
@@ -140,7 +140,7 @@ namespace OrbitalSimOpenGL
             position.Z = Z;
         }
 
-        int Ctr = -1;
+        int iCtr = 0;
 
         /// <summary>
         /// If body has become too small in 3D to 2D projection adjust its size so it remains visible.
@@ -158,11 +158,14 @@ namespace OrbitalSimOpenGL
         /// </returns>
         /// <remarks>
         /// This works only on spheres. The hit testing is a poor-man's RayCasting. Becasue each body visible in the 
-        /// frustum is examined before being sent to OpenGL an oppty avails to perfom hit testing, inexpensively.
+        /// frustum is examined before being sent to OpenGL an inexpensive oppty avails to perfom hit testing.
         /// </remarks>
         public Double KeepVisible(SimCamera simCamera, ref Vector3d halfNorm, Single minSize, Single minSizeSquared,
             ref System.Windows.Point mousePosition)
         {
+            Vector2 ndcCenter; // Center of body in Normalized Device Coords
+            Single pixelDiameter; // Of body as presented in pixels
+
             // Calc Point3D coordinates for both ends of a vector parallel to camera's UpDirection,
             // centered at sB.X, sB.Y, sB.Z with length = sB's diameter. These represents widest
             // points of sphere as seen by the camera.
@@ -173,47 +176,79 @@ namespace OrbitalSimOpenGL
             Scale.ScaleVector3D(ref oneSideUniv);
             Scale.ScaleVector3D(ref otherSideUniv);
 
-            // 3D to homogeneous 4D
-            Vector4 oneSideV4 = new((Vector3)oneSideUniv, 1f);
-            Vector4 otherSideV4 = new((Vector3)otherSideUniv, 1f);
+            if (EphemerisDiameter < 100D)
+            {
+                // Small bodies are lost in Single precision rounding errors.
+                // In these cases jump the calculation to Double precision.
+                Double distSquaredD;
+                DistSquaredD(simCamera, EphemerisDiameter, ref halfNorm, minSize, out distSquaredD, out pixelDiameter, out ndcCenter);
 
-            // To clip space (normalized device coordinates), -1 .. 1 (through View and projection matrices)
-            Vector4 oneSide = oneSideV4 * simCamera.VP_Matrix;
-            Vector4 otherSide = otherSideV4 * simCamera.VP_Matrix;
-            oneSide /= oneSide.W;
-            otherSide /= otherSide.W;
+                if (distSquaredD < (Double)minSizeSquared)
+                    // Change the body's diameter such that distSquared will transform to minSizeSquared
+                    UseDiameter = (minSize * EphemerisDiameter) / Math.Sqrt(distSquaredD);
+                else
+                    // Not too small, keep the diameter as the original value
+                    UseDiameter = EphemerisDiameter;
 
-            // Retain center point ndc, normalized device coordinates, (for hit-testing below)
-            Vector2 ndcCenter = new((oneSide.X + otherSide.X) / 2F, (oneSide.Y + otherSide.Y) / 2F);
+                // What is new distSquareD after diameter adjustment
+                Double newDistSquaredD;
+                DistSquaredD(simCamera, UseDiameter, ref halfNorm, minSize, out newDistSquaredD, out pixelDiameter, out ndcCenter);
+#if false
+                if ("Phobos".Equals(Name))
+                {
+                    if (iCtr == 0)
+                    {
+                        iCtr = 1;
+                        System.Diagnostics.Debug.WriteLine("SimBody.KeepVisible - " + Name
+                            + " EphemerisDiameter"
+                            //+ " CamX,CamY,CamZ"
+                            //+ ",X,Y,Z"
+                            + ",camDist"
+                            //+ ",oneSideX,oneSideY"
+                            //+ ",otherSideX,otherSideY"
+                            //+ ",dX,dY"
+                            + ",distSquared"
+                            + ",UseD"
+                            );
+                    }
+                    Vector3d camDist = simCamera.CameraPosition;
+                    camDist -= new Vector3d(X, Y, Z);
 
-            // To pixel values
-            // https://stackoverflow.com/questions/8491247/c-opengl-convert-world-coords-to-screen2d-coords
-            Single oneSideX = ((oneSide.X + 1F) / 2F) * simCamera.ViewWidth;
-            Single oneSideY = ((oneSide.Y + 1F) / 2F) * simCamera.ViewHeight;
-            Single otherSideX = ((otherSide.X + 1F) / 2F) * simCamera.ViewWidth;
-            Single otherSideY = ((otherSide.Y + 1F) / 2F) * simCamera.ViewHeight;
-
-            Single dX = oneSideX - otherSideX;
-            Single dY = oneSideY - otherSideY;
-            Single distSquared = dX * dX + dY * dY;
-
-            if (distSquared < minSizeSquared)
-                // Change the body's diameter such that distSquared will transform to minSizeSquared
-                UseD = (minSize * EphemerisDiameter) / Math.Sqrt(distSquared);
+                    System.Diagnostics.Debug.WriteLine(
+                        EphemerisDiameter.ToString()
+                        //simCamera.CameraPosition.X.ToString() + "," + simCamera.CameraPosition.Z.ToString() + "," + simCamera.CameraPosition.Z.ToString()
+                        //+ "," + X.ToString() + "," + Y.ToString() + "," + Z.ToString()
+                        + "," + camDist.Length.ToString()
+                        //+ "," + oneSideX.ToString() + "," + oneSideY.ToString()
+                        //+ "," + otherSideX.ToString() + "," + otherSideY.ToString()
+                        //+ "," + dXD.ToString() + "," + dYD.ToString()
+                        + "," + distSquaredD.ToString()
+                        + "," + UseDiameter.ToString()
+                        );
+                }
+#endif
+            }
             else
-                // Not too small, keep the diameter as the original value
-                UseD = EphemerisDiameter;
+            {
+                // Body not so small
+                Single distSquared;
+                DistSquared(simCamera, EphemerisDiameter, ref halfNorm, minSize, out distSquared, out pixelDiameter, out ndcCenter);
+
+                if (distSquared < minSizeSquared)
+                    // Change the body's diameter such that distSquared will transform to minSizeSquared
+                    UseDiameter = (minSize * EphemerisDiameter) / Math.Sqrt(distSquared);
+                else
+                    // Not too small, keep the diameter as the original value
+                    UseDiameter = EphemerisDiameter;
+            }
 
             // Hit-test
             // OpenGL's window-space is relative to the bottom-left of the window, not the top-left as in Windows.
 
-            // Diameter of sphere as projected onto 2D (pixels)
-            Single pixelDiameter = oneSide.X - otherSide.X;
-
             Single cX = ((ndcCenter.X + 1F) / 2F) * simCamera.ViewWidth;
             Single cY = ((1F - ndcCenter.Y) / 2F) * simCamera.ViewHeight;
 
-            distSquared = (pixelDiameter <= minSize) ? minSizeSquared : pixelDiameter * pixelDiameter;
+            Single distSquared2 = (pixelDiameter <= minSize) ? minSizeSquared : pixelDiameter * pixelDiameter;
 
             // distSquared from mouse cursor position to Center of sphere as projected onto 2D
             Single mX = (Single)mousePosition.X - cX; mX *= mX;
@@ -236,7 +271,7 @@ namespace OrbitalSimOpenGL
                     );
 #endif
             Double dist;
-            if (mouseDistSquared <= distSquared)
+            if (mouseDistSquared <= distSquared2)
             {
                 // A hit
                 Vector3D distVector3D;
@@ -251,6 +286,104 @@ namespace OrbitalSimOpenGL
                 dist = -1;
 
             return dist;
+        }
+
+        /// <summary>
+        /// Calculate distSquared in double precision
+        /// </summary>
+        /// <param name="simCamera"></param>
+        /// <param name="diameter"></param>
+        /// <param name="halfNorm"></param>
+        /// <param name="minSize"></param>
+        /// <param name="distSquared"></param>
+        /// <param name="pixelDiameter"></param>
+        /// <param name="ndcCenter"></param>
+        private void DistSquared(SimCamera simCamera, Double diameter, ref Vector3d halfNorm, Single minSize, out Single distSquared,
+            out Single pixelDiameter, out Vector2 ndcCenter)
+        {
+            Double halfD = diameter / 2D;
+
+            Vector3d oneSideUniv = new(X + halfD * halfNorm.X, Y + halfD * halfNorm.Y, Z + halfD * halfNorm.Z);
+            Vector3d otherSideUniv = new(X - halfD * halfNorm.X, Y - halfD * halfNorm.Y, Z - halfD * halfNorm.Z);
+
+            // U coords to W coords
+            Scale.ScaleVector3D(ref oneSideUniv);
+            Scale.ScaleVector3D(ref otherSideUniv);
+
+            // 3D to homogeneous 4D
+            Vector4 oneSideV4 = new((Vector3)oneSideUniv, 1f);
+            Vector4 otherSideV4 = new((Vector3)otherSideUniv, 1f);
+
+            // To clip space (normalized device coordinates), -1 .. 1 (through View and projection matrices)
+            Vector4 oneSide = oneSideV4 * simCamera.VP_Matrix;
+            Vector4 otherSide = otherSideV4 * simCamera.VP_Matrix;
+            oneSide /= oneSide.W;
+            otherSide /= otherSide.W;
+
+            // Retain center point ndc, normalized device coordinates, (for hit-testing below)
+            ndcCenter = new((oneSide.X + otherSide.X) / 2F, (oneSide.Y + otherSide.Y) / 2F);
+
+            // To pixel values
+            // https://stackoverflow.com/questions/8491247/c-opengl-convert-world-coords-to-screen2d-coords
+            Single oneSideX = ((oneSide.X + 1F) / 2F) * simCamera.ViewWidth;
+            Single oneSideY = ((oneSide.Y + 1F) / 2F) * simCamera.ViewHeight;
+            Single otherSideX = ((otherSide.X + 1F) / 2F) * simCamera.ViewWidth;
+            Single otherSideY = ((otherSide.Y + 1F) / 2F) * simCamera.ViewHeight;
+
+            Single dX = oneSideX - otherSideX;
+            Single dY = oneSideY - otherSideY;
+            distSquared = dX * dX + dY * dY;
+
+            pixelDiameter = Math.Max(minSize, dX);
+        }
+
+        /// <summary>
+        /// Calculate distSquared in double precision
+        /// </summary>
+        /// <param name="simCamera"></param>
+        /// <param name="diameter"></param>
+        /// <param name="halfNorm"></param>
+        /// <param name="minSize"></param>
+        /// <param name="distSquaredD"></param>
+        /// <param name="pixelDiameter"></param>
+        /// <param name="ndcCenter"></param>
+        private void DistSquaredD(SimCamera simCamera, Double diameter, ref Vector3d halfNorm, Single minSize, out Double distSquaredD, 
+                    out Single pixelDiameter, out Vector2 ndcCenter)
+        {
+            Double halfD = diameter / 2D;
+
+            Vector3d oneSideUniv = new(X + halfD * halfNorm.X, Y + halfD * halfNorm.Y, Z + halfD * halfNorm.Z);
+            Vector3d otherSideUniv = new(X - halfD * halfNorm.X, Y - halfD * halfNorm.Y, Z - halfD * halfNorm.Z);
+
+            // U coords to W coords
+            Scale.ScaleVector3D(ref oneSideUniv);
+            Scale.ScaleVector3D(ref otherSideUniv);
+
+            // Make 3D to Homogenous 4D
+            Vector4d oneSideV4D = new(oneSideUniv, 1d);
+            Vector4d otherSideV4D = new(otherSideUniv, 1d);
+
+            // To clip space (normalized device coordinates), -1 .. 1 (through View and projection matrices)
+            Vector4d oneSideD = oneSideV4D * simCamera.VP_MatrixD;
+            Vector4d otherSideD = otherSideV4D * simCamera.VP_MatrixD;
+            oneSideD /= oneSideD.W;
+            otherSideD /= otherSideD.W;
+
+            // Retain center point ndc, normalized device coordinates, (for hit-testing below)
+            ndcCenter = new((Single)((oneSideD.X + otherSideD.X) / 2D), (Single)((oneSideD.Y + otherSideD.Y) / 2D));
+
+            // To pixel values
+            // https://stackoverflow.com/questions/8491247/c-opengl-convert-world-coords-to-screen2d-coords
+            Double oneSideX = ((oneSideD.X + 1D) / 2D) * simCamera.ViewWidth;
+            Double oneSideY = ((oneSideD.Y + 1D) / 2D) * simCamera.ViewHeight;
+            Double otherSideX = ((otherSideD.X + 1D) / 2D) * simCamera.ViewWidth;
+            Double otherSideY = ((otherSideD.Y + 1D) / 2D) * simCamera.ViewHeight;
+
+            Double dXD = oneSideX - otherSideX;
+            Double dYD = oneSideY - otherSideY;
+            distSquaredD = dXD * dXD + dYD * dYD;
+
+            pixelDiameter = Math.Max(minSize, (Single)dXD);
         }
     }
 }

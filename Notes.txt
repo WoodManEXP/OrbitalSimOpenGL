@@ -37,7 +37,7 @@ SimBody
 	- Reimplement GoNear deceleration phase (maybe later, no so great with bodies in motion)
 - Add point-at and ID (hit testing)
 - Keep looking at (done)
-- Stay near (not doing this)
+- Stay near (done)
 - Does hours iteration work? (done)
 - Axis on/off (done)
 - Wireframe on/off (done)
@@ -46,4 +46,5 @@ SimBody
 - Barrycenter not adjusting. Either cause it to adjust or remove it as target in bodies selections
 - Implement generic command entry point in OrbitalSimCmds (done)
 - Reticle as X or + or somesuch
-- Orbit about work with moving bodies
+- Orbit about work with moving bodies (done)
+- More efficiently update VP_Matrix4d in SimCamera:UpdateViewMatrix (rather than doing "new")

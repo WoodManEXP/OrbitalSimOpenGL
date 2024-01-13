@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media.Media3D;
 
 namespace OrbitalSimOpenGL
@@ -33,7 +34,7 @@ namespace OrbitalSimOpenGL
         #region Properties
         //readonly static float ToRadians = Math.PI / 180D;
         //readonly static Double ToDegrees = 180D / Math.PI;
-        readonly static Double OneAU = 1.49668992E8D; // KM (93M miles);
+        static Double OneAU { get; } = 1.49668992E8D; // KM (93M miles);
 
         // Amount camera moves increses exponentially as the scale increases (0 .. N)
         public Double[] CamMoveKMs { get; }
@@ -88,10 +89,13 @@ namespace OrbitalSimOpenGL
         }
         public Single ViewWidth { get; set; }
         public Single ViewHeight { get; set; }
-
         public Matrix4 ProjectionMatrix { get; private set; } = Matrix4.Identity;
         public Matrix4 ViewMatrix { get; private set; } = Matrix4.Identity;
         public Matrix4 VP_Matrix = Matrix4.Identity; // View * Projection
+
+        // Double precision version of VP_Matrix
+        public Matrix4d VP_MatrixD = Matrix4d.Identity; // View * Projection (Double precision version)
+//        private Vector4d Col0, Col1, Col2, Col3;
 
         public Vector3d CameraPosition;
         public Vector3d LookVector3d;
@@ -287,12 +291,22 @@ namespace OrbitalSimOpenGL
 
             VP_Matrix = ViewMatrix * ProjectionMatrix;
 
-            // Double precision version of VP_Matrix is useful
+            // Double precision version of VP_Matrix is useful.
+            // VP_MatrixD is on heap, reuse it rather than making a new each time.
+            Vector4d aRowD = new(VP_Matrix.M11, VP_Matrix.M12, VP_Matrix.M13, VP_Matrix.M14); // Stored on stack, not heap
+            VP_MatrixD.Row0 = aRowD;
+            aRowD.Y = VP_Matrix.M21; aRowD.Y = VP_Matrix.M22; aRowD.Y = VP_Matrix.M23; aRowD.Y = VP_Matrix.M24;
+            VP_MatrixD.Column1 = aRowD;
+            aRowD.Z = VP_Matrix.M31; aRowD.Z = VP_Matrix.M32; aRowD.Z = VP_Matrix.M33; aRowD.Z = VP_Matrix.M34;
+            VP_MatrixD.Column2 = aRowD;
+            aRowD.W = VP_Matrix.M41; aRowD.W = VP_Matrix.M42; aRowD.W = VP_Matrix.M43; aRowD.W = VP_Matrix.M44;
+            VP_MatrixD.Column3 = aRowD;
+
             //Vector4d row0 = new(VP_Matrix.M11, VP_Matrix.M12, VP_Matrix.M13, VP_Matrix.M14);
             //Vector4d row1 = new(VP_Matrix.M21, VP_Matrix.M22, VP_Matrix.M23, VP_Matrix.M24);
             //Vector4d row2 = new(VP_Matrix.M31, VP_Matrix.M32, VP_Matrix.M33, VP_Matrix.M34);
             //Vector4d row3 = new(VP_Matrix.M41, VP_Matrix.M42, VP_Matrix.M43, VP_Matrix.M44);
-            //VP_Matrix4d = new(row0, row1, row2, row3);
+            //VP_MatrixD = new(Row0, Row1, Row2, Row3);
 
             FrustumCuller.GenerateFrustum();
 

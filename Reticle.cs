@@ -25,8 +25,8 @@ namespace OrbitalSimOpenGL
         Single[] ReticleSphereMesh;
         UInt16[] ReticleSphereIndices;
 
-        private Shader ReticleShader;
-        public static String ReticleVertexShader = @"
+        private readonly Shader ReticleShader;
+        private static String ReticleVertexShader = @"
 #version 330 core
 layout (location = 0) in vec3 aPosition;
 uniform mat4 MVP;
@@ -38,7 +38,7 @@ void main(void)
     vertexColor = objColor;
 }
 ";
-        public static String ReticleFragmentShader = @"
+        private static String ReticleFragmentShader = @"
 #version 330 core
 in vec4 vertexColor;  // the input variable from the vertex shader (same name and same type)
 out vec4 FragColor;
@@ -49,8 +49,8 @@ void main()
 ";
 
         Color4 ReticleColor { get; } = Color4.Red;
-        int ReticleColorUniform { get; set; }
-        int MVP_Uniform { get; set; }
+        private int ReticleColorUniform { get; set; }
+        private int MVP_Uniform { get; set; }
 
         Matrix4 SizeMatrix = Matrix4.Identity;
         Matrix4 LocationMatrix = Matrix4.Identity;
