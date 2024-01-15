@@ -108,7 +108,7 @@ void main()
                     // a. Keep its rendering to a minimum size (so something will be visible no matter how far from camera)
                     // b. Render it
                     Double dist = sB.KeepVisible(simCamera, ref halfNorm, minSize, minSizeSqared, ref mousePosition);
-                    sB.Render(SharedSphereIndices.Length, BodyColorUniform, MVP_Uniform, ref simCamera.VP_Matrix, ref LocationMatrix4, ref SizeMatrix4);
+                    sB.Render(SharedSphereIndices.Length, BodyColorUniform, MVP_Uniform, ref simCamera._VP_Matrix, ref LocationMatrix4, ref SizeMatrix4);
                     if (-1D != dist)
                         if (dist < lastHitDist) // Keep only hit closest to camera
                         {

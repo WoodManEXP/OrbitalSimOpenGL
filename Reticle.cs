@@ -22,8 +22,8 @@ namespace OrbitalSimOpenGL
         public Double ReticleSize { get; set; } = 25D; // recticle sphere diameter in meters, U coords
 
         // Shared sphere
-        Single[] ReticleSphereMesh;
-        UInt16[] ReticleSphereIndices;
+        Single[]? ReticleSphereMesh;
+        UInt16[]? ReticleSphereIndices;
 
         private readonly Shader ReticleShader;
         private static String ReticleVertexShader = @"

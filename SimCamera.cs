@@ -52,8 +52,10 @@ namespace OrbitalSimOpenGL
                 _aspectRatio = value;
                 // Projection matrix changes when aspect ratio changes
                 // On average, Pluto is 3.7 billion miles (5.9 billion kilometers) away from the Sun
-                ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(FieldOfView, _aspectRatio,
+                // (hence depth of field of view)
+                ProjectionMatrixD = Matrix4d.CreatePerspectiveFieldOfView(FieldOfView, _aspectRatio,
                                            Scale.ScaleU_ToW(DepthNear), Scale.ScaleU_ToW(DepthFar));
+                Matrix4D_toS(ref _ProjectionMatrixD, ref _ProjectionMatrix);
                 Reticle.AspectRatio = _aspectRatio; // Tell the Reticle
             }
         }
@@ -89,13 +91,18 @@ namespace OrbitalSimOpenGL
         }
         public Single ViewWidth { get; set; }
         public Single ViewHeight { get; set; }
-        public Matrix4 ProjectionMatrix { get; private set; } = Matrix4.Identity;
-        public Matrix4 ViewMatrix { get; private set; } = Matrix4.Identity;
-        public Matrix4 VP_Matrix = Matrix4.Identity; // View * Projection
 
-        // Double precision version of VP_Matrix
-        public Matrix4d VP_MatrixD = Matrix4d.Identity; // View * Projection (Double precision version)
-//        private Vector4d Col0, Col1, Col2, Col3;
+        // Single precision versions of ViewMatrix, ProjectionMatrix, and VP_Matrix
+        public Matrix4 _ProjectionMatrix = Matrix4.Identity, _ViewMatrix = Matrix4.Identity, _VP_Matrix = Matrix4.Identity;
+        public Matrix4 ProjectionMatrix { get { return _ProjectionMatrix; } private set { _ProjectionMatrix = value; } }
+        public Matrix4 ViewMatrix { get { return _ViewMatrix; } private set { _ViewMatrix = value; } }
+        public Matrix4 VP_Matrix { get { return _VP_Matrix; } private set { _VP_Matrix = value; } } // View * Projection
+
+        // Double precision version of ViewMatrix, ProjectionMatrix, and VP_Matrix
+        private Matrix4d _ProjectionMatrixD = Matrix4d.Identity, _ViewMatrixD = Matrix4d.Identity, _VP_MatrixD = Matrix4d.Identity;
+        public Matrix4d ProjectionMatrixD { get { return _ProjectionMatrixD; } private set { _ProjectionMatrixD = value; } }
+        public Matrix4d ViewMatrixD { get { return _ViewMatrixD; } private set { _ViewMatrixD = value; } }
+        public Matrix4d VP_MatrixD { get { return _VP_MatrixD; } private set { _VP_MatrixD = value; } } // View * Projection (Double precision version)
 
         public Vector3d CameraPosition;
         public Vector3d LookVector3d;
@@ -232,7 +239,7 @@ namespace OrbitalSimOpenGL
         /// Target body's current position from SimBody reference
         /// </summary>
         /// <param name="position"></param>
-        private void BodyPosition(SimBody sB, out Vector3d position)
+        private void BodyPosition(SimBody? sB, out Vector3d position)
         {
             if (sB is null)
                 position.X = position.Y = position.Z = 0D;
@@ -271,47 +278,63 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Given current values of CameraPosition, UpDirection and LookDirection construct ViewMatrix.
         /// </summary>
-        /// <remarks>To be called after any series of changes to camera (e.g. position or vectors)</remarks>
+        /// <remarks>
+        /// To be called after any series of changes to camera (e.g. position or vectors).
+        /// Calculations performed in double precision. Single precision version of VP Matrix is
+        /// kept for feeding OpenGL's fragement shader.
+        /// </remarks>
         public void UpdateViewMatrix()
         {
-            Vector3 eye = new();
+            Vector3d eye = new();
             Scale.ScaleU_ToW(ref eye, CameraPosition);
 
-            Vector3 target = eye; // new();
-            target.X += (float)LookVector3d.X;
-            target.Y += (float)LookVector3d.Y;
-            target.Z += (float)LookVector3d.Z;
+            Vector3d target = eye;
+            target.X += LookVector3d.X;
+            target.Y += LookVector3d.Y;
+            target.Z += LookVector3d.Z;
 
-            Vector3 up;
-            up.X = (float)UpVector3d.X;
-            up.Y = (float)UpVector3d.Y;
-            up.Z = (float)UpVector3d.Z;
+            Vector3d up;
+            up.X = UpVector3d.X;
+            up.Y = UpVector3d.Y;
+            up.Z = UpVector3d.Z;
 
-            ViewMatrix = Matrix4.LookAt(eye, target, up);
+            ViewMatrixD = Matrix4d.LookAt(eye, target, up);
 
-            VP_Matrix = ViewMatrix * ProjectionMatrix;
+            VP_MatrixD = ViewMatrixD * ProjectionMatrixD;
 
-            // Double precision version of VP_Matrix is useful.
-            // VP_MatrixD is on heap, reuse it rather than making a new each time.
-            Vector4d aRowD = new(VP_Matrix.M11, VP_Matrix.M12, VP_Matrix.M13, VP_Matrix.M14); // Stored on stack, not heap
-            VP_MatrixD.Row0 = aRowD;
-            aRowD.X = VP_Matrix.M21; aRowD.Y = VP_Matrix.M22; aRowD.Z = VP_Matrix.M23; aRowD.W = VP_Matrix.M24;
-            VP_MatrixD.Row1 = aRowD;
-            aRowD.X = VP_Matrix.M31; aRowD.Y = VP_Matrix.M32; aRowD.Z = VP_Matrix.M33; aRowD.W = VP_Matrix.M34;
-            VP_MatrixD.Row2 = aRowD;
-            aRowD.X = VP_Matrix.M41; aRowD.Y = VP_Matrix.M42; aRowD.Z = VP_Matrix.M43; aRowD.W = VP_Matrix.M44;
-            VP_MatrixD.Row3 = aRowD;
-
-            //Vector4d row0 = new(VP_Matrix.M11, VP_Matrix.M12, VP_Matrix.M13, VP_Matrix.M14);
-            //Vector4d row1 = new(VP_Matrix.M21, VP_Matrix.M22, VP_Matrix.M23, VP_Matrix.M24);
-            //Vector4d row2 = new(VP_Matrix.M31, VP_Matrix.M32, VP_Matrix.M33, VP_Matrix.M34);
-            //Vector4d row3 = new(VP_Matrix.M41, VP_Matrix.M42, VP_Matrix.M43, VP_Matrix.M44);
-            //VP_MatrixD = new(Row0, Row1, Row2, Row3);
+            // Single precision versions for OpenGL
+            Matrix4D_toS(ref _ViewMatrixD, ref _ViewMatrix);
+            Matrix4D_toS(ref _VP_MatrixD, ref _VP_Matrix);
 
             FrustumCuller.GenerateFrustum();
 
             // Test Frustrum culling
             //bool culled = SimCamera.FrustumCuller.SphereCulls(new Vector3d(0D, 0D, -3D), 2D);
+        }
+
+        /// <summary>
+        /// Matrix4d to Matrix4
+        /// </summary>
+        /// <param name="matrix4d"></param>
+        /// <param name="matrix4"></param>
+        private void Matrix4D_toS(ref Matrix4d matrix4d, ref Matrix4 matrix4)
+        {
+            matrix4.M11 = (Single)matrix4d.M11;
+            matrix4.M12 = (Single)matrix4d.M12;
+            matrix4.M13 = (Single)matrix4d.M13;
+            matrix4.M14 = (Single)matrix4d.M14;
+            matrix4.M21 = (Single)matrix4d.M21;
+            matrix4.M22 = (Single)matrix4d.M22;
+            matrix4.M23 = (Single)matrix4d.M23;
+            matrix4.M24 = (Single)matrix4d.M24;
+            matrix4.M31 = (Single)matrix4d.M31;
+            matrix4.M32 = (Single)matrix4d.M32;
+            matrix4.M33 = (Single)matrix4d.M33;
+            matrix4.M34 = (Single)matrix4d.M34;
+            matrix4.M41 = (Single)matrix4d.M41;
+            matrix4.M42 = (Single)matrix4d.M42;
+            matrix4.M43 = (Single)matrix4d.M43;
+            matrix4.M44 = (Single)matrix4d.M44;
         }
 
         #region Keep
@@ -752,7 +775,7 @@ namespace OrbitalSimOpenGL
         private int GN_FramesSoFar { get; set; }
 
         private Vector3d GN_TargetPoint; //
-        private SimBody GN_SimBody { get; set; }
+        private SimBody GN_SimBody { get; set; } = null;
         private int GN_BodyIndex { get; set; }
         private KindOfKeep GN_RetainedKeep { get; set; }
         /// <summary>

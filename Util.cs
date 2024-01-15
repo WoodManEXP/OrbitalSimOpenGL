@@ -8,7 +8,7 @@ namespace OrbitalSimOpenGL
 {
     internal class Util
     {
-        static public void MakeUnitSphere(ref float[] sharedSphereMesh, ref UInt16[] sharedSphereIndices)
+        static public void MakeUnitSphere(ref float[]? sharedSphereMesh, ref UInt16[]? sharedSphereIndices)
         {
             Point3DCollection mesh = new();
             Int32Collection indices = new();
