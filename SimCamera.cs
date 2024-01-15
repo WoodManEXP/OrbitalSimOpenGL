@@ -295,12 +295,12 @@ namespace OrbitalSimOpenGL
             // VP_MatrixD is on heap, reuse it rather than making a new each time.
             Vector4d aRowD = new(VP_Matrix.M11, VP_Matrix.M12, VP_Matrix.M13, VP_Matrix.M14); // Stored on stack, not heap
             VP_MatrixD.Row0 = aRowD;
-            aRowD.Y = VP_Matrix.M21; aRowD.Y = VP_Matrix.M22; aRowD.Y = VP_Matrix.M23; aRowD.Y = VP_Matrix.M24;
-            VP_MatrixD.Column1 = aRowD;
-            aRowD.Z = VP_Matrix.M31; aRowD.Z = VP_Matrix.M32; aRowD.Z = VP_Matrix.M33; aRowD.Z = VP_Matrix.M34;
-            VP_MatrixD.Column2 = aRowD;
-            aRowD.W = VP_Matrix.M41; aRowD.W = VP_Matrix.M42; aRowD.W = VP_Matrix.M43; aRowD.W = VP_Matrix.M44;
-            VP_MatrixD.Column3 = aRowD;
+            aRowD.X = VP_Matrix.M21; aRowD.Y = VP_Matrix.M22; aRowD.Z = VP_Matrix.M23; aRowD.W = VP_Matrix.M24;
+            VP_MatrixD.Row1 = aRowD;
+            aRowD.X = VP_Matrix.M31; aRowD.Y = VP_Matrix.M32; aRowD.Z = VP_Matrix.M33; aRowD.W = VP_Matrix.M34;
+            VP_MatrixD.Row2 = aRowD;
+            aRowD.X = VP_Matrix.M41; aRowD.Y = VP_Matrix.M42; aRowD.Z = VP_Matrix.M43; aRowD.W = VP_Matrix.M44;
+            VP_MatrixD.Row3 = aRowD;
 
             //Vector4d row0 = new(VP_Matrix.M11, VP_Matrix.M12, VP_Matrix.M13, VP_Matrix.M14);
             //Vector4d row1 = new(VP_Matrix.M21, VP_Matrix.M22, VP_Matrix.M23, VP_Matrix.M24);

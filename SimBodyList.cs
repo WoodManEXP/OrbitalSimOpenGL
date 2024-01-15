@@ -15,7 +15,7 @@ namespace OrbitalSimOpenGL
         Single[] SharedSphereMesh;
         UInt16[] SharedSphereIndices;
 
-        private Shader BodyShader;
+        private Shader SinglePrecisionShader { get; set; }
         public static String VertexShader = @"
 #version 330 core
 layout (location = 0) in vec3 aPosition;
@@ -59,10 +59,10 @@ void main()
                 //                if (eB.Name.Equals("Sun"))
                 BodyList.Add(new SimBody(eB, AppDataFolder));
 
-            BodyShader = new(VertexShader, FragmentShader);
+            SinglePrecisionShader = new(VertexShader, FragmentShader);
 
-            BodyColorUniform = GL.GetUniformLocation(BodyShader.ShaderHandle, "objColor");
-            MVP_Uniform = GL.GetUniformLocation(BodyShader.ShaderHandle, "MVP");
+            BodyColorUniform = GL.GetUniformLocation(SinglePrecisionShader.ShaderHandle, "objColor");
+            MVP_Uniform = GL.GetUniformLocation(SinglePrecisionShader.ShaderHandle, "MVP");
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ void main()
             SimBody? hitSB = null;
             Double lastHitDist = Double.MaxValue;
 
-            BodyShader.Use();
+            SinglePrecisionShader.Use();
 
             // Model (Scale * Trans) * View * Projection
 

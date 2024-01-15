@@ -2,6 +2,11 @@
 
 https://www.nuget.org/packages/OpenTK.GLWpfControl - Installed OpenGL PKG
 
+Runtime changes
+ - Change he constant
+ - Remove body(ies)
+ - Change mass of body(ies)
+ - Extra bodies 
 
 SimModel
 
@@ -47,4 +52,4 @@ SimBody
 - Implement generic command entry point in OrbitalSimCmds (done)
 - Reticle as X or + or somesuch
 - Orbit about work with moving bodies (done)
-- More efficiently update VP_Matrix4d in SimCamera:UpdateViewMatrix (rather than doing "new")
+- More efficiently update VP_Matrix4d in SimCamera:UpdateViewMatrix (rather than doing "new") (done)
