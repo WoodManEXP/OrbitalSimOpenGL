@@ -36,7 +36,7 @@ SimBody
 	Draw
 
 
-- Mars moons draw strangely (done, sort of, still rounding effects in some cases)
+- Mars moons draw strangely/flicker and Pluto (done)
 - Control windows not so "on-top"
 - GoNear draws strangely when sim running (Done)
 	- Reimplement GoNear deceleration phase (maybe later, no so great with bodies in motion)

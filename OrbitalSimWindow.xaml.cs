@@ -346,6 +346,10 @@ namespace OrbitalSimOpenGL
                         SimModel.SimCamera.ShowReticle = (bool)args[1];
                         break;
 
+                    case CommandSimWindow.GenericCommands.GravConstant:
+                        SimModel.GravConstant((int)args[1]);
+                        break;
+
                     default:
                         break;
                 }

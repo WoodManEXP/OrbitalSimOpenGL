@@ -37,6 +37,8 @@ namespace OrbitalSimOpenGL
         public bool SceneReady { get; set; } = false;
         public SimBodyList? SimBodyList { get; set; }
         private NextPosition? NextPosition { get; set; }
+        private Double GravConstantSetting { get; set; } = 0D; // Grav Constant starts unmodified
+
         private PathTrace PathTrace;
         public Scale Scale { get; set; } = new();
         public String? AppDataFolder { get; set; }
@@ -130,7 +132,7 @@ namespace OrbitalSimOpenGL
                 //BodiesModel3DGroup.Children.Add(g);     // Add to BodiesModel3DGroup
             }
 
-            NextPosition = new(SimBodyList);
+            NextPosition = new(SimBodyList, GravConstantSetting);
         }
 
         /// <summary>
@@ -310,5 +312,16 @@ void main()
         }
         #endregion
 
+        /// <summary>
+        /// Alter the Gravational Constant
+        /// </summary>
+        /// <param name="v"><0 divides GC by that value, >0 multiplies GC by that value, 0 sets to std value</param>
+        /// <exception cref="NotImplementedException"></exception>
+        internal void GravConstant(int v)
+        {
+            GravConstantSetting = (Double)v;
+            if (NextPosition is not null)
+                NextPosition.UseReg_G = GravConstantSetting;
+        }
     }
 }

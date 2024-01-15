@@ -19,6 +19,7 @@ namespace OrbitalSimOpenGL
           , Wireframe
           , Reticle
           , Keep
+          , GravConstant
         };
 
         #endregion
@@ -32,6 +33,18 @@ namespace OrbitalSimOpenGL
             : base(dispatcher)
         {
         }
+
+        #region Grav Constant
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"><0 divides GC by that value, >0 multiplies GC by that value, 0 sets to std value</param>
+        public void GravConstant(int value)
+        {
+            object[] args = { CommandSimWindow.GenericCommands.GravConstant, value };
+            GenericCommand(args);
+        }
+        #endregion
 
         #region Axis
         public void Axis(bool show)

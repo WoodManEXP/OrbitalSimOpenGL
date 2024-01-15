@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OrbitalSimOpenGL"
         mc:Ignorable="d"
-        Title="OrbitalSim Control - OpenGL" Height="438" Width="612"
+        Title="OrbitalSim Control - OpenGL" Height="450" Width="612"
         ResizeMode="NoResize"
         Topmost="True"
         Loaded="Window_Loaded"
         >
-    <Canvas RenderTransformOrigin="0.857,0.49" Height="431" VerticalAlignment="Top" Margin="0,0,-29,0">
+    <Canvas RenderTransformOrigin="0.857,0.49" Height="450" VerticalAlignment="Top" Margin="0,0,-29,0">
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
             <Menu Foreground="#FFFFF3F3" Background="Gray" Height="29" Width="144" BorderBrush="Black">
                 <MenuItem Header="_File" Height="31" FontFamily="Calibri" FontSize="14">
@@ -75,33 +75,33 @@
                 <Button x:Name="CameraOrbitLeftButton" Content="OL" Canvas.Left="314" Canvas.Top="29" Width="40" ToolTipService.ToolTip="Orbit left about origin" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CameraOrbitLeft"/>
                 <Button x:Name="CameraOrbitDownButton" Content="OD" Canvas.Left="346" Canvas.Top="55" Width="40" ToolTipService.ToolTip="Orbit down about origin" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CameraOrbitDown"/>
                 <Button x:Name="CameraOrbitRightButton" Content="OR" Canvas.Left="378" Canvas.Top="29" Width="40" ToolTipService.ToolTip="Orbit right about origin" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CameraOrbitRight"/>
-
                 <GroupBox Height="63" Header="Orbit about" Width="158" Canvas.Left="295" Canvas.Top="114" HorizontalAlignment="Center" VerticalAlignment="Top"/>
                 <ComboBox x:Name="OrbitAboutComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="135" RenderTransformOrigin="0.475,0" Canvas.Left="307" Canvas.Top="139" DropDownOpened="OrbitAboutDownOpened" SelectionChanged="OrbitAboutSelectionChanged"/>
-
                 <Slider x:Name="OrbitDegreesSlider" HorizontalAlignment="Left" Width="27" Orientation="Vertical" Height="75" Canvas.Left="421" Canvas.Top="1" VerticalAlignment="Center" Minimum="1" Maximum="180" ValueChanged="OrbitSiderChanged" ToolTip="Orbit response, 1 to 180" />
                 <Label x:Name="LookTiltDegreesLabel" Content="" Canvas.Left="112" Canvas.Top="83" HorizontalAlignment="Left" VerticalAlignment="Center" Width="40" ToolTip="Look-Tilt amount (degrees)" HorizontalContentAlignment="Center"/>
-                <ComboBox x:Name="ReticleBox" Canvas.Left="353" Canvas.Top="277" Width="92" RenderTransformOrigin="0.833,4.829" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <ComboBox x:Name="ReticleBox" Canvas.Left="318" Canvas.Top="236" Width="92" RenderTransformOrigin="0.833,4.829" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <ComboBoxItem Content = "None" IsSelected="True" />
                     <ComboBoxItem Content = "Sphere" />
                     <ComboBoxItem Content = "X" />
                 </ComboBox>
-                <Label Content="Reticle" Canvas.Left="309" Canvas.Top="275" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <Label Content="Reticle" Canvas.Left="274" Canvas.Top="234" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </Canvas>
         </GroupBox>
-        <GroupBox Height="54" Header="Time Compression" Width="190" HorizontalAlignment="Center" Canvas.Top="309" VerticalAlignment="Top" Canvas.Left="213">
-            <Slider x:Name="TimeCompressionSlider" HorizontalAlignment="Left" Width="137" ToolTipService.ToolTip="(De)Compress time" Height="20" Margin="-1,0,0,0" ValueChanged="TimeCompressionSliderChanged" Minimum="1" Maximum="100" LostMouseCapture="TimeCompressionSliderLostMouseCapture"/>
+        <GroupBox Height="54" Header="Time Compression" Width="190" HorizontalAlignment="Left" Canvas.Top="299" VerticalAlignment="Center" Canvas.Left="174">
+            <Canvas>
+                <Slider x:Name="TimeCompressionSlider" HorizontalAlignment="Center" Width="137" ToolTipService.ToolTip="(De)Compress time" Height="20" ValueChanged="TimeCompressionSliderChanged" Minimum="1" Maximum="100" LostMouseCapture="TimeCompressionSliderLostMouseCapture" Canvas.Left="-1" Canvas.Top="5" VerticalAlignment="Top"/>
+                <Label x:Name="TimeCompressionLabel" Content=""  HorizontalAlignment="Left" VerticalAlignment="Center" Width="40" Canvas.Left="138"/>
+            </Canvas>
         </GroupBox>
-        <Label x:Name="TimeCompressionLabel" Content="" Canvas.Left="359" Canvas.Top="326" HorizontalAlignment="Center" VerticalAlignment="Top" Width="40"/>
-        <GroupBox Height="54" Header="Calc iterations" Width="195" HorizontalAlignment="Center" Canvas.Top="308" VerticalAlignment="Top" Canvas.Left="4">
-            <ComboBox x:Name="IterationScale" HorizontalAlignment="Left" Width="51" Height="22" IsEditable="True" ToolTip="This many per iteration" SelectionChanged="IterationScaleChanged">
-
-            </ComboBox>
+        <GroupBox Height="54" Header="Calc iterations" Width="148" HorizontalAlignment="Left" Canvas.Top="299" VerticalAlignment="Center" Canvas.Left="15">
+            <Canvas>
+                <ComboBox x:Name="IterationScale" HorizontalAlignment="Center" Width="51" Height="22" IsEditable="True" ToolTip="This many per iteration" SelectionChanged="IterationScaleChanged" Canvas.Top="4" VerticalAlignment="Top"/>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Canvas.Left="68">
+                    <RadioButton x:Name="IterateMinutes" GroupName="CalcIterations" IsChecked="True" Content="Minute(s)" ToolTip="Movements calculated in minutes" Checked="IterationUnitsChecked"/>
+                    <RadioButton x:Name="IterateHours" GroupName="CalcIterations" Content="Hour(s)" ToolTip="Movements calculated in hours" Checked="IterationUnitsChecked"/>
+                </StackPanel>
+            </Canvas>
         </GroupBox>
-        <StackPanel Orientation="Vertical" Canvas.Left="104" Canvas.Top="323" HorizontalAlignment="Center" VerticalAlignment="Top">
-            <RadioButton x:Name="IterateMinutes" GroupName="CalcIterations" IsChecked="True" Content="Minute(s)" ToolTip="Movements calculated in minutes" Checked="IterationUnitsChecked"/>
-            <RadioButton x:Name="IterateHours" GroupName="CalcIterations" Content="Hour(s)" ToolTip="Movements calculated in hours" Checked="IterationUnitsChecked"/>
-        </StackPanel>
         <Button x:Name="ephemerisButton" Content="Ephemeris" Canvas.Left="14" Canvas.Top="68" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="EphemerisButton" ToolTip="Update ephemeris from JPL"/>
         <Button x:Name="editBodies" Content="Edit Bodies" Canvas.Left="14" Canvas.Top="134" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="EditBodiesButton" IsEnabled="False"/>
         <Button x:Name="saveBodiesButton" Content="Save Ephem" Canvas.Left="14" Canvas.Top="159" RenderTransformOrigin="0.379,0.403" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="SaveBodiesButton"/>
@@ -110,14 +110,20 @@
         <ComboBox x:Name="LookAtComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.475,0" Canvas.Left="121" Canvas.Top="228" SelectionChanged="LookAtSelectionChanged" DropDownOpened="LookAtDropDownOpened"/>
         <GroupBox Height="61" Header="Go near" Width="146" Canvas.Left="255" Canvas.Top="202" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <ComboBox x:Name="GoNearComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="126" RenderTransformOrigin="0.475,0" Canvas.Left="263" Canvas.Top="228" DropDownOpened="GoNearDropDownOpened" SelectionChanged="GoNearSelectionChanged"/>
-        <CheckBox x:Name="ShowAxis" Content="Axis" Canvas.Left="438" Canvas.Top="311" HorizontalAlignment="Center" VerticalAlignment="Top" Width="137" Click="AxisCheckbox" IsChecked="True"/>
-        <CheckBox x:Name="ShowReticle" Content="Reticle" Canvas.Left="438" Canvas.Top="347" HorizontalAlignment="Center" VerticalAlignment="Top" Width="57" IsChecked="True" Click="ReticleCheckbox"/>
-        <CheckBox x:Name="ShowWireframe" Content="Wireframe" Canvas.Left="438" Canvas.Top="329" HorizontalAlignment="Center" VerticalAlignment="Top" Width="126" Click="WireframeCheckbox" IsChecked="True"/>
+        <CheckBox x:Name="ShowAxis" Content="Axis" Canvas.Left="370" Canvas.Top="301" HorizontalAlignment="Left" VerticalAlignment="Center" Width="49" Click="AxisCheckbox" IsChecked="True"/>
+        <CheckBox x:Name="ShowReticle" Content="Reticle" Canvas.Left="511" Canvas.Top="301" HorizontalAlignment="Center" VerticalAlignment="Top" Width="57" IsChecked="True" Click="ReticleCheckbox"/>
+        <CheckBox x:Name="ShowWireframe" Content="Wireframe" Canvas.Left="425" Canvas.Top="301" HorizontalAlignment="Left" VerticalAlignment="Center" Width="82" Click="WireframeCheckbox" IsChecked="True"/>
         <ComboBox x:Name="KeepCombo" Canvas.Left="232" Canvas.Top="266" Width="92" RenderTransformOrigin="0.833,4.829" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="KeepChanged">
             <ComboBoxItem Content = "None" IsSelected="True" />
             <ComboBoxItem Content = "Look" />
             <ComboBoxItem Content = "Look and Distance" />
         </ComboBox>
         <Label Content="Keep" Canvas.Left="188" Canvas.Top="264" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <GroupBox Height="54" Header="Gravitational constant" Width="209" Canvas.Left="15" Canvas.Top="353" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Canvas Margin="0,0,11,0">
+                <Slider x:Name="GravConstantSlider" HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Gravational Contant" Height="20" ValueChanged="GravConstantSliderChanged" Minimum="-9" Maximum="9" Value="0" LostMouseCapture="GravConstantSliderLostMouseCapture" Canvas.Top="6" VerticalAlignment="Center" Width="159" Canvas.Left="3"/>
+                <Label x:Name="GravConstantLabel" Content="Std"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="28" Canvas.Left="170" Canvas.Top="3"/>
+            </Canvas>
+        </GroupBox>
     </Canvas>
 </Window>

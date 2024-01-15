@@ -24,9 +24,24 @@ namespace OrbitalSimOpenGL
         private int NumBodies { get; set; }
         private SimBodyList SimBodyList { get; set; }
         private MassMass MassMass { get; set; }
-        private Double Reg_G { get; } = 1E-3 * 6.6743E-11;   // Gravitational constant is kg m / sec-squared
-                                                             // The 1E-3 converts from kg*m/s-squared to kg*km/s-squared
-                                                             // (sim distancs are in km rather than m)
+        private static Double Reg_G { get; } = 1E-3 * 6.6743E-11;   // Gravitational constant is kg m / sec-squared
+                                                                    // The 1E-3 converts from kg*m/s-squared to kg*km/s-squared
+                                                                    // (sim distancs are in km rather than m)
+        private Double _UseReg_G = Reg_G;
+        public Double UseReg_G
+        {
+            get { return _UseReg_G; }
+            set
+            {   // <0 divides GC by that value, >0 multiplies GC by that value, 0 sets to std value
+                if (0D == value)
+                    _UseReg_G = Reg_G;
+                else if (0D > value)
+                    _UseReg_G = Reg_G / value;
+                else
+                    _UseReg_G = Reg_G * value;
+            }
+        }
+
         public int IterationNumber { get; set; } = -1;
         #endregion
 
@@ -34,10 +49,13 @@ namespace OrbitalSimOpenGL
         /// 
         /// </summary>
         /// <param name="simBodyList"></param>
-        public NextPosition(SimBodyList simBodyList)
+        /// <param name="initialGravConstantSetting">Any initial modification to gravitational constant</param>
+        public NextPosition(SimBodyList simBodyList, Double initialGravConstantSetting)
         {
             SimBodyList = simBodyList;
             NumBodies = simBodyList.BodyList.Count;
+
+            UseReg_G = initialGravConstantSetting;
 
             MassMass = new(SimBodyList);
 
@@ -214,7 +232,7 @@ namespace OrbitalSimOpenGL
                     ForceVectors[i].Normalize();
 
                     // Newton's gravational attraction/force calculation
-                    Double newtons = Reg_G * MassMass.GetMassMass(bL, bH) / (d * d);
+                    Double newtons = UseReg_G * MassMass.GetMassMass(bL, bH) / (d * d);
 
                     // Each force vector's length is the Newtons of force the pair of bodies exert on one another.
                     ForceVectors[i] *= newtons;

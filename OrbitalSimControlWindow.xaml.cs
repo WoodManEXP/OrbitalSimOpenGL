@@ -481,14 +481,15 @@ namespace OrbitalSimOpenGL
         }
 
         /// <summary>
-        /// Axix checkbox clicked
+        /// Axis checkbox clicked
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void AxisCheckbox(object sender, RoutedEventArgs e)
         {
             CheckBox checkBox = (CheckBox)sender;
-            OrbitalSimCmds.Axis(checkBox.IsChecked.Value);
+            if (checkBox is not null)
+                OrbitalSimCmds?.Axis(checkBox.IsChecked.Value);
         }
 
         /// <summary>
@@ -542,6 +543,56 @@ namespace OrbitalSimOpenGL
                     break;
             }
             OrbitalSimCmds?.Keep(keepKind);
+        }
+
+        /// <summary>
+        /// Tracks slider value as slider changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GravConstantSliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            // ... Get Slider reference.
+            var slider = sender as Slider;
+            String aStr;
+
+            // ... Get Value.
+            if (slider is not null)
+            {
+                int value = (int)slider.Value;
+                if (0 == value)
+                    aStr = "Std";
+                else if (0 > value)
+                    aStr = "/" + (-value + 1).ToString();
+                else
+                    aStr = "*" + (value + 1).ToString();
+
+                if (GravConstantLabel is not null)
+                    GravConstantLabel.Content = aStr;
+            }
+        }
+
+        /// <summary>
+        /// Receives control when changes to time compression slider are complete
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GravConstantSliderLostMouseCapture(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            // ... Get Slider reference.
+            var slider = sender as Slider;
+            // ... Get Value.
+            if (slider is not null)
+            {
+                int value = (int)slider.Value;
+
+                if (0 > value)
+                    value -= 1;
+                else if (0 < value) 
+                    value += 1;
+
+                OrbitalSimCmds?.GravConstant(value);
+            }
         }
     }
 }
