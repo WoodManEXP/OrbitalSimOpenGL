@@ -363,7 +363,7 @@ namespace OrbitalSimOpenGL
                 OrbitAboutComboBox.SelectedIndex = 0;   // Origin
 
                 // IterationScale combobox
-                var lStr = new List<String>() { "1", "2", "5", "10", "30" };
+                var lStr = new List<String>() { "1", "2", "5", "10", "20" };
                 foreach (String aStr in lStr)
                     IterationScale.Items.Add(aStr);
                 IterationScale.SelectedItem = IterationScale.Items.GetItemAt(0);

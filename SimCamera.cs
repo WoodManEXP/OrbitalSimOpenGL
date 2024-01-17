@@ -506,7 +506,7 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Body about which camera orbits
         /// </summary>
-        private int OrbitBodyIndex { get; set; }
+        private int OrbitBodyIndex { get; set; } = -1; 
 
         // .03 degrees/ms. 90 degrees in 3 seconds
         // Adjust this value to change camera orbit rate. ( degrees / seconds / 1000 )

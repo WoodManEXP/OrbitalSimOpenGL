@@ -22,7 +22,6 @@ namespace OrbitalSimOpenGL
         public SimCamera? SimCamera { get; set; }
         private SimModel SimModel { get; set; }
         private ToolTipHelper ToolTipHelper { get; set; } = new();
-        private bool SimRunning { get; set; } = false;
         private bool SimHasBeenStarted { get; set; } = false;
         private String AppDataFolder { get; set; }
 
@@ -98,6 +97,13 @@ namespace OrbitalSimOpenGL
             // https://stackoverflow.com/questions/4474670/how-to-catch-the-ending-resize-window
             HwndSource source = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle);
             source.AddHook(new HwndSourceHook(WndProc));
+
+            // Camera
+            Double cX = -1 * 6.0E06D, cY = 3 * 6.0E06D, cZ = 3 * 6.0E06D;
+            SimCamera = SimModel.SimCamera = Stats.SimCamera =
+                    new(SimModel,
+                        new Vector3d(cX, cY, cZ), new Vector3d(0d, 0d, 0d),
+                        OpenTkControl.ActualWidth, OpenTkControl.ActualHeight);
         }
 
         #region Frame rendering
@@ -138,9 +144,11 @@ namespace OrbitalSimOpenGL
 
             // Perform any active camera animations.
             // Camera animation occurs after SimModel.Render as it moves things in the model space
-            SimCamera?.AnimateCamera(ms, frameRateMS);
-
-            SimCamera?.Render(); // In case camera needs to render (e.g. recticle)
+            if (SimCamera is not null)
+            {
+                SimCamera.AnimateCamera(ms, frameRateMS);
+                SimCamera.Render(); // In case camera needs to render (e.g. recticle)
+            }
 
             Stats.Render(timeSpan, frameRateMS);
         }
@@ -301,15 +309,6 @@ namespace OrbitalSimOpenGL
 
                 // Instantiate model elements
                 SimModel.InitScene(EphemerisBodyList);
-
-                // Camera
-                Double cX = -1 * 6.0E06D, cY = 3 * 6.0E06D, cZ = 3 * 6.0E06D;
-                SimCamera = SimModel.SimCamera = Stats.SimCamera =
-                        new(SimModel,
-                            new Vector3d(cX, cY, cZ), new Vector3d(0d, 0d, 0d),
-                            OpenTkControl.ActualWidth, OpenTkControl.ActualHeight);
-
-                SimCamera.OrbitAbout(-1); // Initially orbit about system's origin
             }
 
             SimModel.SimRunning = true;

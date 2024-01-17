@@ -160,11 +160,6 @@ namespace OrbitalSimOpenGL
                 LastMouseOverSB = sB;
         }
 
-#if false
-        private int IterateTotalCalls = 0;
-        int IterateLastMS = 0;
-        int IterateTotalMS = 0;
-#endif
         /// <summary>
         /// Frame iteration
         /// </summary>
