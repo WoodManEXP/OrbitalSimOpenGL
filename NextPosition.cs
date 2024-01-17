@@ -50,14 +50,14 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="simBodyList"></param>
         /// <param name="initialGravConstantSetting">Any initial modification to gravitational constant</param>
-        public NextPosition(SimBodyList simBodyList, Double initialGravConstantSetting)
+        public NextPosition(SimBodyList simBodyList, MassMass massMas, Double initialGravConstantSetting)
         {
             SimBodyList = simBodyList;
             NumBodies = simBodyList.BodyList.Count;
 
             UseReg_G = initialGravConstantSetting;
 
-            MassMass = new(SimBodyList);
+            MassMass = massMas;
 
             // Construct sum of integers table/array
             SumOfIntegers = new int[NumBodies];

@@ -10,7 +10,7 @@ using System.Windows.Media.Media3D;
 namespace OrbitalSimOpenGL
 {
     /// <summary>
-    /// Each SimBody reoresents a body in the sumulation
+    /// Each SimBody reoresents a body in the simulation
     /// </summary>
     public class SimBody
     {
@@ -31,7 +31,7 @@ namespace OrbitalSimOpenGL
         public Double RR { get; set; }
         public Double EphemerisDiameter { get; set; } // U coords
         public Double UseDiameter { get; set; } // U coords, gets adjusted for visability
-        Double HalfEphemerisDiameter { get; set; }
+        public Double HalfEphemerisDiameter { get; set; }
         public Double Mass { get; set; }
         public Double GM { get; set; }
         public string ID { get; private set; }
@@ -42,10 +42,11 @@ namespace OrbitalSimOpenGL
         public Point3D LastTracePoint3D;        // U coords
 
         Color4 BodyColor { get; set; }
-
         private String AppDataFolder { get; set; }
 
+        public bool ExcludeFromSim { get; set; } = false; // Body is to be or not be excluded from the sim
         #endregion
+
         public SimBody(EphemerisBody ephemerisBody, String appDataFolder)
         {
             double dVal;

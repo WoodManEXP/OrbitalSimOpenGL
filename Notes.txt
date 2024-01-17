@@ -53,4 +53,5 @@ SimBody
 - Reticle as X or + or somesuch
 - Orbit about work with moving bodies (done)
 - More efficiently update VP_Matrix4d in SimCamera:UpdateViewMatrix (rather than doing "new") (done)
-- Stop frame redraw if nothjing happening
+- Suspend frame redraw if nothing happening
+- Move Axis code from SimModel to a separate class

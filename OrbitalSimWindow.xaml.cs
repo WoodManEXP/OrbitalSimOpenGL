@@ -111,8 +111,17 @@ namespace OrbitalSimOpenGL
         int UpdateFrameLastMS = 0;
 
         /// <summary>
-        /// 
+        /// Rendering and hit-testing
         /// </summary>
+        /// <remarks>
+        /// Rendering is necessary if
+        /// 1. Sim is running, or
+        /// 2. Camera is animating, or
+        /// 3. Cursor is moving over the graphics area (hit-testing), or
+        /// 4. Change has been sent for the display (axis, reticle, wireframe, ...)
+        /// Otherwise thus can return immediately.
+        /// Whenever it determined rendering is unnecessary FPS indicator, in stats area, should be set to 0.
+        /// </remarks>
         /// <param name="timeSpan">Elapsed tine since last render call</param>
         private void OnRender(TimeSpan timeSpan)
         {

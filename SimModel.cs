@@ -46,7 +46,20 @@ namespace OrbitalSimOpenGL
         public int TimeCompression { get; set; } = 1; // Number of times to iterate per frame
         public Int64 ElapsedSeconds { get; set; } = 0;
         public bool IncludeAxis { get; set; } = true; // Render the three axis elements (X, Y, Z)
-        public SimCamera SimCamera { get; set; }
+        public SimCamera? SimCamera { get; set; }
+        private MassMass? MassMass { get; set; }
+        private CollisionDetector? CollisionDetector { get; set; }
+
+        // Closest approach between any two bodies captured here, for each iteration
+        private Double _ClosestApproachDistSquared = -1D; // km-squared
+        private int _ApproachBodyA, _ApproachBodyB;
+        public Double ClosestApproachDistSquared // Distance between body surfaces
+        { get { return _ClosestApproachDistSquared; } }
+        public int ApproachBodyA
+        { get { return _ApproachBodyA; } }
+        public int ApproachBodyB
+        { get { return _ApproachBodyB; } }
+
         public bool SimRunning { get; set; } = false;
         public SimBody? LastMouseOverSB { get; set; } = null;
 
@@ -60,19 +73,9 @@ namespace OrbitalSimOpenGL
                 _Wireframe = value;
             }
         }
-
-        int VertexBufferObject, VertexArrayObject, ElementBufferObject;
-
-        float[] CubeVertices2D = {
-             0.5f,  0.5f, 0.0f, // top right
-             0.5f, -0.5f, 0.0f, // bottom right
-            -0.5f, -0.5f, 0.0f, // bottom left
-            -0.5f,  0.5f, 0.0f, // top left
-        };
-        uint[] CubeIndices2D = {
-            0, 1, 3, // The first triangle will be the top-right half of the triangle
-            1, 2, 3  // Then the second will be the bottom-left half of the triangle
-        };
+        int VertexBufferObject { get; set; }
+        int VertexArrayObject { get; set; }
+        int ElementBufferObject { get; set; }
         #endregion
 
         public SimModel()
@@ -85,8 +88,6 @@ namespace OrbitalSimOpenGL
             // Maximum number of vertex attributes supported
             //int nrAttributes = 0;
             //GL.GetInteger(GetPName.MaxVertexAttribs, out nrAttributes);
-
-            PathTrace = new(Scale);
         }
 
         public void InitScene(EphemerisBodyList ephemerismBodyList)
@@ -132,7 +133,10 @@ namespace OrbitalSimOpenGL
                 //BodiesModel3DGroup.Children.Add(g);     // Add to BodiesModel3DGroup
             }
 
-            NextPosition = new(SimBodyList, GravConstantSetting);
+            PathTrace = new(Scale);
+            MassMass = new(SimBodyList);
+            CollisionDetector = new(SimBodyList, MassMass);
+            NextPosition = new(SimBodyList, MassMass, GravConstantSetting);
         }
 
         /// <summary>
@@ -147,6 +151,9 @@ namespace OrbitalSimOpenGL
             if (!SceneReady)
                 return;
 
+            if (SimBodyList is null) // JIC
+                return;
+
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             Iterate(SimRunning, ms, frameRateMS); // Perform model calculations
@@ -156,7 +163,7 @@ namespace OrbitalSimOpenGL
             // Render bodies
             // If render returns non-null sB then the mouse was over that body.
             SimBody sB;
-            if (null != (sB = SimBodyList?.Render(SimCamera, mousePosition)))
+            if (null != (sB = SimBodyList.Render(SimCamera, mousePosition)))
                 LastMouseOverSB = sB;
         }
 
@@ -172,6 +179,10 @@ namespace OrbitalSimOpenGL
                 for (int i = 0; i < TimeCompression; i++)
                 {
                     NextPosition?.IterateOnce(IterationSeconds);
+
+                    // Collision detection
+                    CollisionDetector?.Detect(out _ClosestApproachDistSquared, out _ApproachBodyA, out _ApproachBodyB);
+
                     ElapsedSeconds += IterationSeconds;
                 }
 

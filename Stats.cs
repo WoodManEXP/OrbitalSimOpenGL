@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace OrbitalSimOpenGL
 {
@@ -22,8 +23,12 @@ namespace OrbitalSimOpenGL
         private int ElapsedMS_B { get; set; } = 0;
         private System.Windows.Point LastMousePosition { get; set; }
         private static int StatIntervalA { get; } = 1000;
-        private static int StatIntervalB { get; } = 30*1000;
+        private static int StatIntervalB { get; } = 30 * 1000;
         private SimBody? LastMouseOverSB { get; set; } = null;
+
+        private Double ClosestApproachDistSquared { get; set; } = Double.MaxValue;
+        private int ApproachBodyA { get; set; }
+        private int ApproachBodyB { get; set; }
         #endregion
 
         public Stats(OrbitalSimWindow orbitalSimWindow, SimModel simModel)
@@ -113,10 +118,26 @@ namespace OrbitalSimOpenGL
             // Mouse position over sim area
             if (LastMousePosition != OrbitalSimWindow.MousePosition)
             {
-                OrbitalSimWindow.MouseCoords.Content = 
+                OrbitalSimWindow.MouseCoords.Content =
                     OrbitalSimWindow.MousePosition.X.ToString() + ", " + OrbitalSimWindow.MousePosition.Y.ToString();
                 LastMousePosition = OrbitalSimWindow.MousePosition;
             }
+
+            // Closest approach distance
+            if (-1D != SimModel.ClosestApproachDistSquared)
+                if (SimModel.ClosestApproachDistSquared < ClosestApproachDistSquared)
+                    if (SimModel.SimBodyList is not null) // JIC
+                    {
+                        // A new closest approach is available
+                        ClosestApproachDistSquared = SimModel.ClosestApproachDistSquared;
+                        ApproachBodyA = SimModel.ApproachBodyA;
+                        ApproachBodyB = SimModel.ApproachBodyB;
+                        Double dist = Math.Sqrt(ClosestApproachDistSquared);
+                        OrbitalSimWindow.ClosestApproach.Content = dist.ToString("#,##0") + " km, "
+                                + SimModel.SimBodyList.BodyList[ApproachBodyA].Name
+                                + ", "
+                                + SimModel.SimBodyList.BodyList[ApproachBodyB].Name;
+                    }
         }
     }
 }
