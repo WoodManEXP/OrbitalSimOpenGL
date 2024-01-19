@@ -34,21 +34,7 @@ namespace OrbitalSimOpenGL
             // Number of entries needed is (NumBodies - 1) * NumBodies / 2
             MassMassValues = new Double[(NumBodies - 1) * NumBodies / 2];
 
-            for(int bL = 0; bL < NumBodies; bL++)       // bL - body low number
-                for (int bH=0; bH < NumBodies; bH++)    // bH - body high number
-                {
-                    // Nothing for diagonal or entries below the diagonal
-                    if (bH <= bL)
-                        continue;
-
-                    // Where this bL, bH combo lands in the MassMass table/array
-                    int i = ValuesIndex(bL, bH);
-
-                    Double lBodyMass = simBodyList.BodyList[bL].Mass;
-                    Double hBodyMass = simBodyList.BodyList[bH].Mass;
-
-                    MassMassValues[i] = lBodyMass * hBodyMass;
-                }
+            CalcMassMass(simBodyList);
         }
         /// <summary>
         /// Get MassMass value of two bodies in the system
@@ -59,6 +45,31 @@ namespace OrbitalSimOpenGL
         public Double GetMassMass(int body1, int body2)
         {
             return MassMassValues[ValuesIndex(body1, body2)];
+        }
+
+        /// <summary>
+        /// Fill in MassMass values from current state of SimBodyList
+        /// </summary>
+        public void CalcMassMass(SimBodyList simBodyList)
+        {
+            for (int bL = 0; bL < NumBodies; bL++)       // bL - body low number
+                for (int bH = 0; bH < NumBodies; bH++)    // bH - body high number
+                {
+                    // Nothing for diagonal or entries below the diagonal
+                    if (bH <= bL)
+                        continue;
+
+                    // Where this bL, bH combo lands in the MassMass table/array
+                    int i = ValuesIndex(bL, bH);
+
+                    SimBody lSB = simBodyList.BodyList[bL];
+                    SimBody hSB = simBodyList.BodyList[bH];
+
+                    Double lBodyMass = lSB.Mass * lSB.MassMultiplier;
+                    Double hBodyMass = hSB.Mass * hSB.MassMultiplier;
+
+                    MassMassValues[i] = lBodyMass * hBodyMass;
+                }
         }
 
         /// <summary>

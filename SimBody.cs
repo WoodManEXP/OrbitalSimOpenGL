@@ -40,10 +40,25 @@ namespace OrbitalSimOpenGL
         // For trace path drawing
         public Vector3D LastTraceVector3D;      // Watching curvature rate for drawing path "lines"
         public Point3D LastTracePoint3D;        // U coords
-
         Color4 BodyColor { get; set; }
         private String AppDataFolder { get; set; }
         public bool ExcludeFromSim { get; set; } = false; // Body is to be or not be excluded from the sim
+
+        private Double _MassMultiplier = 1D;
+        public Double MassMultiplier
+        {
+            get { return _MassMultiplier; }
+            set // < 0 divides GC by that value, > 0 multiplies GC by that value, 0 sets to std value
+            {
+                if (value < 0D)
+                    _MassMultiplier = -1D / value;
+                else if (value > 0D)
+                    _MassMultiplier = value;
+                else
+                    _MassMultiplier = 1D; // Std
+            }
+        }
+        public Double VelocityMultiplier { get; set; } = 1D;
         #endregion
 
         public SimBody(EphemerisBody ephemerisBody, String appDataFolder)
