@@ -191,6 +191,28 @@ namespace OrbitalSimOpenGL
             }
         }
 
+        /// <summary>
+        /// Alter the Gravational Constant
+        /// </summary>
+        /// <param name="v"><0 divides GC by that value, >0 multiplies GC by that value, 0 sets to std value</param>
+        /// <exception cref="NotImplementedException"></exception>
+        internal void GravConstant(int v)
+        {
+            GravConstantSetting = (Double)v;
+            if (NextPosition is not null)
+                NextPosition.UseReg_G = GravConstantSetting;
+        }
+
+        /// <summary>
+        /// Remove a body from the sim
+        /// </summary>
+        /// <param name="bodyName"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        internal void ExcludeBody(string bodyName)
+        {
+
+        }
+
         #region Axes
         private Shader AxisShader;
         public static String AxisVertexShader = @"
@@ -318,16 +340,5 @@ void main()
         }
         #endregion
 
-        /// <summary>
-        /// Alter the Gravational Constant
-        /// </summary>
-        /// <param name="v"><0 divides GC by that value, >0 multiplies GC by that value, 0 sets to std value</param>
-        /// <exception cref="NotImplementedException"></exception>
-        internal void GravConstant(int v)
-        {
-            GravConstantSetting = (Double)v;
-            if (NextPosition is not null)
-                NextPosition.UseReg_G = GravConstantSetting;
-        }
     }
 }

@@ -39,7 +39,7 @@ SimBody
 - Mars moons draw strangely/flicker and Pluto (done)
 - Control windows not so "on-top"
 - GoNear draws strangely when sim running (Done)
-	- Reimplement GoNear deceleration phase (maybe later, no so great with bodies in motion)
+	- Reimplement GoNear deceleration phase (maybe later, not so great with bodies in motion)
 - Add point-at and ID (hit testing)
 - Keep looking at (done)
 - Stay near (done)
@@ -54,4 +54,13 @@ SimBody
 - Orbit about work with moving bodies (done)
 - More efficiently update VP_Matrix4d in SimCamera:UpdateViewMatrix (rather than doing "new") (done)
 - Suspend frame redraw if nothing happening
-- Move Axis code from SimModel to a separate class
+- Move Axis from SimModel to a separate class
+- Collision detection
+	See CollisionDetection class
+	remove smaller body from list & update MassMass
+	add smaller body's mass to larger, retain larger's color
+	change name to larger-smaller
+	add vel/mass vectors, change vectors on retained body to match
+	Color Red nd larger for a while after collision
+	Sumultaneous > 2 body collision?
+	Add coloset approach, so far, indicator to SimWindows status area

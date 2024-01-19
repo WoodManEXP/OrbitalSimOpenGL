@@ -230,7 +230,6 @@ namespace OrbitalSimOpenGL
         }
         private void StartButton(object sender, RoutedEventArgs e)
         {
-
             EphemerisBodyList ephemerisBodyList = EphemerisBodyList;
 
             // If no EphemerisBodyList then read the ephemerides from JPL
@@ -238,9 +237,13 @@ namespace OrbitalSimOpenGL
             {
                 _ = new EphemerisReader(JPL_BodyList, ref ephemerisBodyList);
                 EphemerisBodyList = ephemerisBodyList;
+
+                // Here add in any bodies from the Extra Bodies List to EphemerisBodyList
             }
 
             PopulateComboBoxes();
+
+            PopulateBodyMods();
 
             startButton.IsEnabled = false;
             pauseButton.IsEnabled = true;
@@ -335,40 +338,40 @@ namespace OrbitalSimOpenGL
         }
         private void PopulateComboBoxes()
         {
+            if (SimHasBeenStarted)
+                return;
 
-            if (!SimHasBeenStarted)
+            // Populate the LookAt, GoNear, and OribitAbout Combobox
+            LookAtComboBox.Items.Clear();
+            LookAtComboBox.Items.Add(Properties.Settings.Default.Origin);
+            LookAtComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
+
+            GoNearComboBox.Items.Clear();
+            GoNearComboBox.Items.Add(Properties.Settings.Default.Origin);
+            GoNearComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
+
+            OrbitAboutComboBox.Items.Clear();
+            OrbitAboutComboBox.Items.Add(Properties.Settings.Default.Origin);
+            OrbitAboutComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
+
+            // Add an entry for each body in the sim
+            foreach (EphemerisBody b in EphemerisBodyList.Bodies)
             {
-                // Populate the LookAt, GoNear, and OribitAbout Combobox
-                LookAtComboBox.Items.Clear();
-                LookAtComboBox.Items.Add(Properties.Settings.Default.Origin);
-                LookAtComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
-
-                GoNearComboBox.Items.Clear();
-                GoNearComboBox.Items.Add(Properties.Settings.Default.Origin);
-                GoNearComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
-
-                OrbitAboutComboBox.Items.Clear();
-                OrbitAboutComboBox.Items.Add(Properties.Settings.Default.Origin);
-                OrbitAboutComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
-
-                // And an entry for each body in the sim
-                foreach (EphemerisBody b in EphemerisBodyList.Bodies)
-                {
-                    LookAtComboBox.Items.Add(b.Name);
-                    GoNearComboBox.Items.Add(b.Name);
-                    OrbitAboutComboBox.Items.Add(b.Name);
-                }
-
-                LookAtComboBox.SelectedIndex = 0;       // Origin
-                OrbitAboutComboBox.SelectedIndex = 0;   // Origin
-
-                // IterationScale combobox
-                var lStr = new List<String>() { "1", "2", "5", "10", "20" };
-                foreach (String aStr in lStr)
-                    IterationScale.Items.Add(aStr);
-                IterationScale.SelectedItem = IterationScale.Items.GetItemAt(0);
+                LookAtComboBox.Items.Add(b.Name);
+                GoNearComboBox.Items.Add(b.Name);
+                OrbitAboutComboBox.Items.Add(b.Name);
             }
+
+            LookAtComboBox.SelectedIndex = 0;       // Origin
+            OrbitAboutComboBox.SelectedIndex = 0;   // Origin
+
+            // IterationScale combobox
+            var lStr = new List<String>() { "1", "2", "5", "10", "20" };
+            foreach (String aStr in lStr)
+                IterationScale.Items.Add(aStr);
+            IterationScale.SelectedItem = IterationScale.Items.GetItemAt(0);
         }
+
         private void CameraMoveSliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             // ... Get Slider reference.
@@ -588,11 +591,150 @@ namespace OrbitalSimOpenGL
 
                 if (0 > value)
                     value -= 1;
-                else if (0 < value) 
+                else if (0 < value)
                     value += 1;
 
                 OrbitalSimCmds?.GravConstant(value);
             }
         }
+
+        #region BodyModsListBox
+        /// <summary>
+        /// Prep the BodyMods ListBox
+        /// </summary>
+        private void PopulateBodyMods()
+        {
+            if (SimHasBeenStarted)
+                return;
+
+            BodyModsListBox.Items.Clear();
+
+            // Add an entry for each body in the sim (dynamic buildup of list box contents)
+            foreach (EphemerisBody b in EphemerisBodyList.Bodies)
+            {
+                ListBoxItem listBoxItem = new() { HorizontalAlignment = HorizontalAlignment.Left, Width = 548 };
+
+                StackPanel stackPanel = new() { VerticalAlignment = VerticalAlignment.Center, Orientation = Orientation.Horizontal };
+                Label label0 = new() { Content = b.Name, Width = 99, Margin = new(0, 0, 5, 0) };
+
+                CheckBox excludeCheckBox = new() { Uid = b.Name, Content = "Exclude", VerticalAlignment = VerticalAlignment.Center, Margin = new(0, 0, 10, 0), ToolTip = "Exclude " + b.Name + " from sim" };
+                excludeCheckBox.Click += new(BodyModsExcludeCheckbox);
+
+                Slider massSlider = new() { Uid = b.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Alter " + b.Name + " +'s mass", Minimum = -9, Maximum = 9, Value = 0, Width = 150 };
+                massSlider.LostMouseCapture += new(BodyModsMassSliderLostMouseCapture);
+                massSlider.ValueChanged += new(BodyModsMassSliderChanged);
+
+                Label label1 = new() { Content = "Std", HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Width = 28, Margin = new(2, 0, 5, 0) };
+
+                Slider velSlider = new() { Uid = b.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Alter " + b.Name + "'s velocity", Minimum = -9, Maximum = 9, Value = 0, Width = 150 };
+                velSlider.LostMouseCapture += new(BodyModsVelocitySliderLostMouseCapture);
+                velSlider.ValueChanged += new(BodyModsVelocitySliderChanged);
+
+                Label label2 = new() { Content = "Std", HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Width = 28, Margin = new(2, 0, 5, 0) };
+
+                stackPanel.Children.Add(label0);
+                stackPanel.Children.Add(excludeCheckBox);
+                stackPanel.Children.Add(massSlider);
+                stackPanel.Children.Add(label1);
+                stackPanel.Children.Add(velSlider);
+                stackPanel.Children.Add(label2);
+
+                listBoxItem.Content = stackPanel;
+
+                BodyModsListBox.Items.Add(listBoxItem);
+            }
+        }
+
+        /// <summary>
+        /// Click on Exclude body checkboxes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// Once a body is excluded it cannot be unexcluded
+        /// </remarks>
+        private void BodyModsExcludeCheckbox(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            if (checkBox is null)
+                return;
+
+            // Send over name of body to exclude
+            OrbitalSimCmds?.ExcludeBody(checkBox.Uid);
+
+            // Once a body is excluded it is out of the sim. for good.
+            // Disable all its controls
+            FrameworkElement s = (StackPanel)checkBox.Parent;
+            s.IsEnabled = false;
+        }
+
+        private void BodyModsMassSliderLostMouseCapture(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            // ... Get Slider reference.
+            var slider = sender as Slider;
+            // ... Get Value.
+            if (slider is not null)
+            {
+                int value = (int)slider.Value;
+
+                if (0 > value)
+                    value -= 1;
+                else if (0 < value)
+                    value += 1;
+
+            }
+        }
+
+        private void BodyModsMassSliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            // ... Get Slider reference.
+            var slider = sender as Slider;
+            // ... Get Value.
+            if (slider is not null)
+            {
+                int value = (int)slider.Value;
+
+                if (0 > value)
+                    value -= 1;
+                else if (0 < value)
+                    value += 1;
+
+            }
+        }
+
+        private void BodyModsVelocitySliderLostMouseCapture(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            // ... Get Slider reference.
+            var slider = sender as Slider;
+            // ... Get Value.
+            if (slider is not null)
+            {
+                int value = (int)slider.Value;
+
+                if (0 > value)
+                    value -= 1;
+                else if (0 < value)
+                    value += 1;
+
+            }
+        }
+
+        private void BodyModsVelocitySliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            // ... Get Slider reference.
+            var slider = sender as Slider;
+            // ... Get Value.
+            if (slider is not null)
+            {
+                int value = (int)slider.Value;
+
+                if (0 > value)
+                    value -= 1;
+                else if (0 < value)
+                    value += 1;
+
+            }
+        }
+        #endregion
     }
 }

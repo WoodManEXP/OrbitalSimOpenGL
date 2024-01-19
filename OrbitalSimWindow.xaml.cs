@@ -358,6 +358,10 @@ namespace OrbitalSimOpenGL
                         SimModel.GravConstant((int)args[1]);
                         break;
 
+                    case CommandSimWindow.GenericCommands.ExcludeBody:
+                        SimModel.ExcludeBody((String)args[1]);
+                        break;
+
                     default:
                         break;
                 }

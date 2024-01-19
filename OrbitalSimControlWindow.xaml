@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OrbitalSimOpenGL"
         mc:Ignorable="d"
-        Title="OrbitalSim Control - OpenGL" Height="450" Width="612"
+        Title="OrbitalSim Control - OpenGL" Height="580" Width="612"
         ResizeMode="NoResize"
         Topmost="True"
         Loaded="Window_Loaded"
         >
-    <Canvas RenderTransformOrigin="0.857,0.49" Height="450" VerticalAlignment="Top" Margin="0,0,-29,0">
+    <Canvas RenderTransformOrigin="0.857,0.49" Height="580" VerticalAlignment="Top" Margin="0,0,-29,0">
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
             <Menu Foreground="#FFFFF3F3" Background="Gray" Height="29" Width="144" BorderBrush="Black">
                 <MenuItem Header="_File" Height="31" FontFamily="Calibri" FontSize="14">
@@ -79,12 +79,12 @@
                 <ComboBox x:Name="OrbitAboutComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="135" RenderTransformOrigin="0.475,0" Canvas.Left="307" Canvas.Top="139" DropDownOpened="OrbitAboutDownOpened" SelectionChanged="OrbitAboutSelectionChanged"/>
                 <Slider x:Name="OrbitDegreesSlider" HorizontalAlignment="Left" Width="27" Orientation="Vertical" Height="75" Canvas.Left="421" Canvas.Top="1" VerticalAlignment="Center" Minimum="1" Maximum="180" ValueChanged="OrbitSiderChanged" ToolTip="Orbit response, 1 to 180" />
                 <Label x:Name="LookTiltDegreesLabel" Content="" Canvas.Left="112" Canvas.Top="83" HorizontalAlignment="Left" VerticalAlignment="Center" Width="40" ToolTip="Look-Tilt amount (degrees)" HorizontalContentAlignment="Center"/>
-                <ComboBox x:Name="ReticleBox" Canvas.Left="318" Canvas.Top="236" Width="92" RenderTransformOrigin="0.833,4.829" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <ComboBox x:Name="ReticleBox" Canvas.Left="351" Canvas.Top="-50" Width="92" RenderTransformOrigin="0.833,4.829" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <ComboBoxItem Content = "None" IsSelected="True" />
                     <ComboBoxItem Content = "Sphere" />
                     <ComboBoxItem Content = "X" />
                 </ComboBox>
-                <Label Content="Reticle" Canvas.Left="274" Canvas.Top="234" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Label Content="Reticle" Canvas.Left="307" Canvas.Top="-52" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             </Canvas>
         </GroupBox>
         <GroupBox Height="54" Header="Time Compression" Width="190" HorizontalAlignment="Left" Canvas.Top="299" VerticalAlignment="Center" Canvas.Left="174">
@@ -110,20 +110,97 @@
         <ComboBox x:Name="LookAtComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.475,0" Canvas.Left="121" Canvas.Top="228" SelectionChanged="LookAtSelectionChanged" DropDownOpened="LookAtDropDownOpened"/>
         <GroupBox Height="61" Header="Go near" Width="146" Canvas.Left="255" Canvas.Top="202" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <ComboBox x:Name="GoNearComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="126" RenderTransformOrigin="0.475,0" Canvas.Left="263" Canvas.Top="228" DropDownOpened="GoNearDropDownOpened" SelectionChanged="GoNearSelectionChanged"/>
-        <CheckBox x:Name="ShowAxis" Content="Axis" Canvas.Left="370" Canvas.Top="301" HorizontalAlignment="Left" VerticalAlignment="Center" Width="49" Click="AxisCheckbox" IsChecked="True"/>
-        <CheckBox x:Name="ShowReticle" Content="Reticle" Canvas.Left="511" Canvas.Top="301" HorizontalAlignment="Center" VerticalAlignment="Top" Width="57" IsChecked="True" Click="ReticleCheckbox"/>
-        <CheckBox x:Name="ShowWireframe" Content="Wireframe" Canvas.Left="425" Canvas.Top="301" HorizontalAlignment="Left" VerticalAlignment="Center" Width="82" Click="WireframeCheckbox" IsChecked="True"/>
+        <CheckBox x:Name="ShowAxis" Content="Axis" Canvas.Left="14" Canvas.Top="221" HorizontalAlignment="Left" VerticalAlignment="Top" Width="49" Click="AxisCheckbox" IsChecked="True"/>
+        <CheckBox x:Name="ShowReticle" Content="Reticle" Canvas.Left="14" Canvas.Top="261" HorizontalAlignment="Left" VerticalAlignment="Top" Width="57" IsChecked="True" Click="ReticleCheckbox"/>
+        <CheckBox x:Name="ShowWireframe" Content="Wireframe" Canvas.Left="14" Canvas.Top="241" HorizontalAlignment="Left" VerticalAlignment="Top" Width="82" Click="WireframeCheckbox" IsChecked="True"/>
         <ComboBox x:Name="KeepCombo" Canvas.Left="232" Canvas.Top="266" Width="92" RenderTransformOrigin="0.833,4.829" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="KeepChanged">
             <ComboBoxItem Content = "None" IsSelected="True" />
             <ComboBoxItem Content = "Look" />
             <ComboBoxItem Content = "Look and Distance" />
         </ComboBox>
         <Label Content="Keep" Canvas.Left="188" Canvas.Top="264" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-        <GroupBox Height="54" Header="Gravitational constant" Width="209" Canvas.Left="15" Canvas.Top="353" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <GroupBox Height="54" Header="Gravitational constant" Width="191" Canvas.Left="375" Canvas.Top="298" HorizontalAlignment="Left" VerticalAlignment="Center">
             <Canvas Margin="0,0,11,0">
-                <Slider x:Name="GravConstantSlider" HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Gravational Contant" Height="20" ValueChanged="GravConstantSliderChanged" Minimum="-9" Maximum="9" Value="0" LostMouseCapture="GravConstantSliderLostMouseCapture" Canvas.Top="6" VerticalAlignment="Center" Width="159" Canvas.Left="3"/>
-                <Label x:Name="GravConstantLabel" Content="Std"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="28" Canvas.Left="170" Canvas.Top="3"/>
+                <Slider x:Name="GravConstantSlider" HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Gravational Contant" Height="20" Minimum="-9" Maximum="9" Value="0" Canvas.Top="6" VerticalAlignment="Center" Width="150" LostMouseCapture="GravConstantSliderLostMouseCapture" ValueChanged="GravConstantSliderChanged" />
+                <Label x:Name="GravConstantLabel" Content="Std"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="28" Canvas.Left="153" Canvas.Top="3"/>
+            </Canvas>
+        </GroupBox>
+        <GroupBox Height="174" Header="Body mods" Width="596" Canvas.Left="7" Canvas.Top="358" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Canvas>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Width="538">
+                    <Label Content="Body" ToolTip="Body name" Margin="10,0,0,0" Width="102" FontWeight="Bold"/>
+                    <Label Content="Exclude" ToolTip="Exclude from sim" Margin="0,0,0,0" Width="129" FontWeight="Bold"/>
+                    <Label Content="Mass" ToolTip="Alter mass" Margin="0,0,0,0" Width="176" FontWeight="Bold"/>
+                    <Label Content="Velocity" ToolTip="Alter velocity" Margin="0,0,0,0" FontWeight="Bold"/>
+                </StackPanel>
+                <ListBox x:Name="BodyModsListBox" BorderThickness="0" VerticalAlignment="Center" Width="574" HorizontalAlignment="Left" Height="125" Canvas.Top="26">
+                </ListBox>
             </Canvas>
         </GroupBox>
     </Canvas>
 </Window>
+    
+<!--
+                <GroupBox Height="174" Header="Body mods" Width="596" Canvas.Left="7" Canvas.Top="358" HorizontalAlignment="Left" VerticalAlignment="Center">
+    <Canvas>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Width="538">
+            <Label Content="Body" ToolTip="Body name" Margin="10,0,0,0" Width="102" FontWeight="Bold"/>
+            <Label Content="Exclude" ToolTip="Exclude from sim" Margin="0,0,0,0" Width="129" FontWeight="Bold"/>
+            <Label Content="Mass" ToolTip="Alter mass" Margin="0,0,0,0" Width="176" FontWeight="Bold"/>
+            <Label Content="Velocity" ToolTip="Alter velocity" Margin="0,0,0,0" FontWeight="Bold"/>
+        </StackPanel>
+        <ListBox x:Name="BodyModsListBox" BorderThickness="0" VerticalAlignment="Center" Width="574" HorizontalAlignment="Left" Height="125" Canvas.Top="26">
+                    <ListBoxItem Width="548" HorizontalAlignment="Left" >
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <Label Content="Body nameA" Width="99" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                            <CheckBox Content="Exclude" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim" Click="BodyModsExcludeCheckbox" Uid="1"/>
+                            <Slider HorizontalAlignment="Left" ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150" LostMouseCapture="BodyModsMassSliderLostMouseCapture" ValueChanged="BodyModsMassSliderChanged"/>
+                            <Label Content="Std"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="28" Margin="2,0,5,0"/>
+                            <Slider ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" Width="150"  LostMouseCapture="BodyModsVelocitySliderLostMouseCapture" ValueChanged="BodyModsVelocitySliderChanged" VerticalAlignment="Center"/>
+                            <Label Content="Std"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="28" Margin="2,0,5,0"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    <ListBoxItem Width="483" HorizontalAlignment="Left" Uid="1">
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <Label Content="Body nameB" Width="99" Margin="0,0,5,0"/>
+                            <CheckBox Content="Exclude" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim"/>
+                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
+                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    <ListBoxItem Width="483" HorizontalAlignment="Left" Uid="3">
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <Label Content="Body nameC" Width="99" Margin="0,0,5,0"/>
+                            <CheckBox Content="Exclude" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim"/>
+                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
+                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    <ListBoxItem Width="483" HorizontalAlignment="Left">
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <Label Content="Body nameD" Width="99" Margin="0,0,5,0"/>
+                            <CheckBox Content="Exclude" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim"/>
+                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
+                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    <ListBoxItem Width="483" HorizontalAlignment="Left">
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <Label Content="Body nameE" Width="99" Margin="0,0,5,0"/>
+                            <CheckBox Content="Exclude" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim"/>
+                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
+                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    <ListBoxItem Width="483" HorizontalAlignment="Left">
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <Label Content="Body nameF" Width="99" Margin="0,0,5,0"/>
+                            <CheckBox Content="Exclude" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim"/>
+                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
+                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
+                        </StackPanel>
+                    </ListBoxItem>
+        </ListBox>
+    </Canvas>
+    </GroupBox>
+    -->

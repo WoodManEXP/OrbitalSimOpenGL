@@ -20,6 +20,7 @@ namespace OrbitalSimOpenGL
           , Reticle
           , Keep
           , GravConstant
+          , ExcludeBody
         };
 
         #endregion
@@ -33,6 +34,18 @@ namespace OrbitalSimOpenGL
             : base(dispatcher)
         {
         }
+
+        #region Exclude Body
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="body"></param>
+        public void ExcludeBody(String body)
+        {
+            object[] args = { CommandSimWindow.GenericCommands.ExcludeBody, body };
+            GenericCommand(args);
+        }
+        #endregion
 
         #region Grav Constant
         /// <summary>
