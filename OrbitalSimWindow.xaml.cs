@@ -347,11 +347,13 @@ namespace OrbitalSimOpenGL
                         break;
 
                     case CommandSimWindow.GenericCommands.Keep:
-                        SimModel.SimCamera.KeepKind = (SimCamera.KindOfKeep)args[1];
+                        if (SimModel.SimCamera is not null)
+                            SimModel.SimCamera.KeepKind = (SimCamera.KindOfKeep)args[1];
                         break;
 
                     case CommandSimWindow.GenericCommands.Reticle:
-                        SimModel.SimCamera.ShowReticle = (bool)args[1];
+                        if (SimModel.SimCamera is not null)
+                            SimModel.SimCamera.ShowReticle = (bool)args[1];
                         break;
 
                     case CommandSimWindow.GenericCommands.GravConstant:
@@ -360,6 +362,14 @@ namespace OrbitalSimOpenGL
 
                     case CommandSimWindow.GenericCommands.ExcludeBody:
                         SimModel.ExcludeBody((String)args[1]);
+                        break;
+
+                    case CommandSimWindow.GenericCommands.MassMultiplier:
+                        SimModel.SetMassMultiplier((String)args[1], (int)args[2]);
+                        break;
+
+                    case CommandSimWindow.GenericCommands.VelocityMultiplier:
+                        SimModel.SetVelocityMultiplier((String)args[1], (int)args[2]);
                         break;
 
                     default:

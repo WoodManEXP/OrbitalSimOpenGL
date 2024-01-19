@@ -3,6 +3,8 @@ using System.Windows.Media.Media3D;
 using System.Windows.Media;
 using OpenTK.Mathematics;
 using System.Windows.Controls;
+using System.Windows;
+using System.Linq;
 
 namespace OrbitalSimOpenGL
 {
@@ -62,6 +64,28 @@ namespace OrbitalSimOpenGL
             float w = (float)Math.Cos(0.5 * angleInRadians);
 
             return new OpenTK.Mathematics.Quaternion(v, w);
+        }
+
+        /// <summary>
+        /// Search UIElement tree for element with specific Uid
+        /// </summary>
+        /// <param name="rootElement"></param>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// https://stackoverflow.com/questions/1887611/get-object-by-its-uid-in-wpf
+        /// </remarks>
+        public static UIElement GetByUid(DependencyObject rootElement, string uid)
+        {
+            foreach (UIElement element in LogicalTreeHelper.GetChildren(rootElement).OfType<UIElement>())
+            {
+                if (element.Uid == uid)
+                    return element;
+                UIElement resultChildren = GetByUid(element, uid);
+                if (resultChildren != null)
+                    return resultChildren;
+            }
+            return null;
         }
     }
 }

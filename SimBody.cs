@@ -43,7 +43,6 @@ namespace OrbitalSimOpenGL
 
         Color4 BodyColor { get; set; }
         private String AppDataFolder { get; set; }
-
         public bool ExcludeFromSim { get; set; } = false; // Body is to be or not be excluded from the sim
         #endregion
 
@@ -116,6 +115,9 @@ namespace OrbitalSimOpenGL
         /// </remarks>
         internal void Render(int indicesLength, int bodyColorUniform, int mvp_Uniform, ref Matrix4 vp, ref Matrix4 locationMatrix4, ref Matrix4 sizeMatrix4)
         {
+            if (ExcludeFromSim)
+                return;
+
             locationMatrix4.M41 = Scale.ScaleU_ToW(X); // X
             locationMatrix4.M42 = Scale.ScaleU_ToW(Y); // Y
             locationMatrix4.M43 = Scale.ScaleU_ToW(Z); // Z

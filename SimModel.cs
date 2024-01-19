@@ -208,7 +208,29 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="bodyName"></param>
         /// <exception cref="NotImplementedException"></exception>
-        internal void ExcludeBody(string bodyName)
+        internal void ExcludeBody(String bodyName)
+        {
+            if (!SceneReady)
+                return;
+
+            if (SimBodyList is null) // JIC
+                return;
+
+            int sBI = SimBodyList.GetIndex(bodyName);
+
+            if (-1 != sBI)
+            {
+                SimBody sB = SimBodyList.BodyList[sBI];
+                sB.ExcludeFromSim = true;
+            }
+        }
+
+        internal void SetMassMultiplier(String bodyName, int multiplier)
+        {
+
+        }
+
+        internal void SetVelocityMultiplier(String bodyName, int multiplier)
         {
 
         }

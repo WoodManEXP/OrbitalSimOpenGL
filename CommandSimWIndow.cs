@@ -21,6 +21,8 @@ namespace OrbitalSimOpenGL
           , Keep
           , GravConstant
           , ExcludeBody
+          , MassMultiplier
+          , VelocityMultiplier
         };
 
         #endregion
@@ -46,6 +48,31 @@ namespace OrbitalSimOpenGL
             GenericCommand(args);
         }
         #endregion
+
+        #region MassMultiplier
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="body"></param>
+        public void MassMultiplier(String body, int massMultiplier)
+        {
+            object[] args = { CommandSimWindow.GenericCommands.MassMultiplier, body, massMultiplier };
+            GenericCommand(args);
+        }
+        #endregion
+
+        #region VelocityMultiplier
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="body"></param>
+        public void VelocityMultiplier(String body, int velocityMultiplier)
+        {
+            object[] args = { CommandSimWindow.GenericCommands.VelocityMultiplier, body, velocityMultiplier };
+            GenericCommand(args);
+        }
+        #endregion
+
 
         #region Grav Constant
         /// <summary>

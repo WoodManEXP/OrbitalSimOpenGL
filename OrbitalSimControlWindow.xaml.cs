@@ -624,13 +624,13 @@ namespace OrbitalSimOpenGL
                 massSlider.LostMouseCapture += new(BodyModsMassSliderLostMouseCapture);
                 massSlider.ValueChanged += new(BodyModsMassSliderChanged);
 
-                Label label1 = new() { Content = "Std", HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Width = 28, Margin = new(2, 0, 5, 0) };
+                Label label1 = new() { Uid = b.Name + ":L1", Content = "Std", HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Width = 28, Margin = new(2, 0, 5, 0) };
 
                 Slider velSlider = new() { Uid = b.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Alter " + b.Name + "'s velocity", Minimum = -9, Maximum = 9, Value = 0, Width = 150 };
                 velSlider.LostMouseCapture += new(BodyModsVelocitySliderLostMouseCapture);
                 velSlider.ValueChanged += new(BodyModsVelocitySliderChanged);
 
-                Label label2 = new() { Content = "Std", HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Width = 28, Margin = new(2, 0, 5, 0) };
+                Label label2 = new() { Uid = b.Name + ":L2", Content = "Std", HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Width = 28, Margin = new(2, 0, 5, 0) };
 
                 stackPanel.Children.Add(label0);
                 stackPanel.Children.Add(excludeCheckBox);
@@ -663,9 +663,8 @@ namespace OrbitalSimOpenGL
             OrbitalSimCmds?.ExcludeBody(checkBox.Uid);
 
             // Once a body is excluded it is out of the sim. for good.
-            // Disable all its controls
-            FrameworkElement s = (StackPanel)checkBox.Parent;
-            s.IsEnabled = false;
+            // Disable all its controls. In this case disable the containing Parent (StackPanel).
+            ((FrameworkElement)(checkBox.Parent)).IsEnabled = false;
         }
 
         private void BodyModsMassSliderLostMouseCapture(object sender, System.Windows.Input.MouseEventArgs e)
@@ -682,6 +681,7 @@ namespace OrbitalSimOpenGL
                 else if (0 < value)
                     value += 1;
 
+                OrbitalSimCmds?.MassMultiplier(slider.Uid, value);
             }
         }
 
@@ -689,16 +689,23 @@ namespace OrbitalSimOpenGL
         {
             // ... Get Slider reference.
             var slider = sender as Slider;
+            String aStr;
+
             // ... Get Value.
             if (slider is not null)
             {
                 int value = (int)slider.Value;
+                if (0 == value)
+                    aStr = "Std";
+                else if (0 > value)
+                    aStr = "/" + (-value + 1).ToString();
+                else
+                    aStr = "*" + (value + 1).ToString();
 
-                if (0 > value)
-                    value -= 1;
-                else if (0 < value)
-                    value += 1;
-
+                // Set the label to show value
+                Label label = (Label)Util.GetByUid(slider.Parent, slider.Uid + ":L1");
+                if (label is not null)
+                    label.Content = aStr;
             }
         }
 
@@ -716,6 +723,7 @@ namespace OrbitalSimOpenGL
                 else if (0 < value)
                     value += 1;
 
+                OrbitalSimCmds?.VelocityMultiplier(slider.Uid, value);
             }
         }
 
@@ -723,18 +731,25 @@ namespace OrbitalSimOpenGL
         {
             // ... Get Slider reference.
             var slider = sender as Slider;
+            String aStr;
+
             // ... Get Value.
             if (slider is not null)
             {
                 int value = (int)slider.Value;
+                if (0 == value)
+                    aStr = "Std";
+                else if (0 > value)
+                    aStr = "/" + (-value + 1).ToString();
+                else
+                    aStr = "*" + (value + 1).ToString();
 
-                if (0 > value)
-                    value -= 1;
-                else if (0 < value)
-                    value += 1;
-
+                // Set the label to show value
+                Label label = (Label)Util.GetByUid(slider.Parent, slider.Uid + ":L2");
+                if (label is not null)
+                    label.Content = aStr;
             }
         }
-        #endregion
     }
+    #endregion
 }

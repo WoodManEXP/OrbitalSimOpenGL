@@ -138,7 +138,7 @@ void main()
         /// Location of a body, by name, in the list
         /// </summary>
         /// <param name="name"></param>
-        /// <returns></returns>
+        /// <returns>Integer index or -1 if not found</returns>
         public int GetIndex(String name)
         {
             int index = 0;
