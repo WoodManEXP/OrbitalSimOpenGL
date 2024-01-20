@@ -231,7 +231,7 @@ namespace OrbitalSimOpenGL
         /// <param name="bodyName"></param>
         /// <param name="multiplier"></param>
         /// <remarks>
-        /// < 0 divides GC by that value, > 0 multiplies GC by that value, 0 sets to std value.
+        /// < 0 divides mass by that value, > 0 multiplies mas by that value, 0 sets to std value.
         /// Causes recalculation of MassMass table.
         /// </remarks>
         internal void SetMassMultiplier(String bodyName, int multiplier)
@@ -248,9 +248,24 @@ namespace OrbitalSimOpenGL
             MassMass?.CalcMassMass(SimBodyList);
         }
 
+        /// <summary>
+        /// Alter current velocity of a specific body
+        /// </summary>
+        /// <param name="bodyName"></param>
+        /// <param name="multiplier"></param>
+        /// <remarks>
+        /// < 0 divides current velocity by that value, > 0 multiplies current velocity by that value, 0 leaves it unchanged.
+        /// </remarks>
         internal void SetVelocityMultiplier(String bodyName, int multiplier)
         {
+            if (!SceneReady)
+                return;
 
+            if (SimBodyList is null) // JIC
+                return;
+
+            int sBI = SimBodyList.GetIndex(bodyName);
+            SimBodyList.BodyList[sBI].AlterVelocity(multiplier);
         }
 
         #region Axes

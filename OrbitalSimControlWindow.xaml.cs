@@ -713,6 +713,11 @@ namespace OrbitalSimOpenGL
             }
         }
 
+        /// <summary>
+        /// Alter current velocity of a body
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BodyModsVelocitySliderLostMouseCapture(object sender, System.Windows.Input.MouseEventArgs e)
         {
             // ... Get Slider reference.

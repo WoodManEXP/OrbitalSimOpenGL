@@ -48,7 +48,7 @@ namespace OrbitalSimOpenGL
         public Double MassMultiplier
         {
             get { return _MassMultiplier; }
-            set // < 0 divides GC by that value, > 0 multiplies GC by that value, 0 sets to std value
+            set // < 0 divides mass by that value, > 0 multiplies mass by that value, 0 sets to std value
             {
                 if (value < 0D)
                     _MassMultiplier = -1D / value;
@@ -58,7 +58,6 @@ namespace OrbitalSimOpenGL
                     _MassMultiplier = 1D; // Std
             }
         }
-        public Double VelocityMultiplier { get; set; } = 1D;
         #endregion
 
         public SimBody(EphemerisBody ephemerisBody, String appDataFolder)
@@ -303,54 +302,28 @@ namespace OrbitalSimOpenGL
             distSquared = dX * dX + dY * dY;
         }
 
-#if false
         /// <summary>
-        /// Calculate distSquared in double precision
+        /// Alter current velocity
         /// </summary>
-        /// <param name="simCamera"></param>
-        /// <param name="diameter"></param>
-        /// <param name="halfNorm"></param>
-        /// <param name="minSize"></param>
-        /// <param name="distSquared"></param>
-        /// <param name="pixelDiameter"></param>
-        /// <param name="ndcCenter"></param>
-        private void DistSquared(SimCamera simCamera, Double halfD, ref Vector3d halfNorm, Single minSize, out Single distSquared,
-            out Vector2 ndcCenter)
+        /// <param name="iMultiplier"></param>
+        /// <remarks>
+        /// < 0 divides current velocity by that value, > 0 multiplies current velocity by that value, 0 leaves it unchanged.
+        /// </remarks>
+        internal void AlterVelocity(int iMultiplier)
         {
-            // Calc Point3D coordinates for both ends of a vector parallel to camera's UpDirection,
-            // centered at sB.X, sB.Y, sB.Z with length = sB's diameter. These represents widest
-            // points of sphere as seen by the camera.
-            Vector3d oneSideUniv = new(X + halfD * halfNorm.X, Y + halfD * halfNorm.Y, Z + halfD * halfNorm.Z);
-            Vector3d otherSideUniv = new(X - halfD * halfNorm.X, Y - halfD * halfNorm.Y, Z - halfD * halfNorm.Z);
+            Double dMultiplier;
 
-            // U coords to W coords
-            Scale.ScaleVector3D(ref oneSideUniv);
-            Scale.ScaleVector3D(ref otherSideUniv);
+            if (0 == iMultiplier)
+                return; // Mo change
 
-            // 3D to homogeneous 4D
-            Vector4 oneSideV4 = new((Vector3)oneSideUniv, 1f);
-            Vector4 otherSideV4 = new((Vector3)otherSideUniv, 1f);
+            if (iMultiplier < 0)
+                dMultiplier = -1D / (Double)iMultiplier;
+            else
+                dMultiplier = (Double)iMultiplier;
 
-            // To clip space (normalized device coordinates), -1 .. 1 (through View and projection matrices)
-            Vector4 oneSide = oneSideV4 * simCamera.VP_Matrix;
-            Vector4 otherSide = otherSideV4 * simCamera.VP_Matrix;
-            oneSide /= oneSide.W;
-            otherSide /= otherSide.W;
-
-            // Retain center point ndc, normalized device coordinates, (for hit-testing below)
-            ndcCenter = new((oneSide.X + otherSide.X) / 2F, (oneSide.Y + otherSide.Y) / 2F);
-
-            // To pixel values
-            // https://stackoverflow.com/questions/8491247/c-opengl-convert-world-coords-to-screen2d-coords
-            Single oneSideX = ((oneSide.X + 1F) / 2F) * simCamera.ViewWidth;
-            Single oneSideY = ((oneSide.Y + 1F) / 2F) * simCamera.ViewHeight;
-            Single otherSideX = ((otherSide.X + 1F) / 2F) * simCamera.ViewWidth;
-            Single otherSideY = ((otherSide.Y + 1F) / 2F) * simCamera.ViewHeight;
-
-            Single dX = oneSideX - otherSideX;
-            Single dY = oneSideY - otherSideY;
-            distSquared = dX * dX + dY * dY;
+            VX *= dMultiplier;
+            VY *= dMultiplier;
+            VY *= dMultiplier;
         }
-#endif
     }
 }
