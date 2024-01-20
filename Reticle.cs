@@ -79,7 +79,7 @@ void main()
             ReticleColorUniform = GL.GetUniformLocation(ReticleShader.ShaderHandle, "objColor");
             MVP_Uniform = GL.GetUniformLocation(ReticleShader.ShaderHandle, "MVP");
 
-            Util.MakeUnitSphere(ref ReticleSphereMesh, ref ReticleSphereIndices);
+            Util.MakeUnitSphere(out ReticleSphereMesh, out ReticleSphereIndices);
 
             Vector3 eye = new(0f, 0f, 1f);
             Vector3 target = new(0f, 0f, 0f);

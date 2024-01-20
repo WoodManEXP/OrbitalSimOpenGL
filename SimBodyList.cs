@@ -12,11 +12,11 @@ namespace OrbitalSimOpenGL
         #region Properties
 
         // Shared sphere
-        Single[] SharedSphereMesh;
-        UInt16[] SharedSphereIndices;
+        readonly Single[] SharedSphereMesh;
+        readonly UInt16[] SharedSphereIndices;
 
-        private Shader SinglePrecisionShader { get; set; }
-        public static String VertexShader = @"
+        private Shader Shader { get; set; }
+        private static String VertexShader = @"
 #version 330 core
 layout (location = 0) in vec3 aPosition;
 uniform mat4 MVP;
@@ -28,7 +28,7 @@ void main(void)
     vertexColor = objColor;
 }
 ";
-        public static String FragmentShader = @"
+        private static String FragmentShader = @"
 #version 330 core
 in vec4 vertexColor; // the input variable from the vertex shader (same name and same type)
 out vec4 FragColor;
@@ -51,7 +51,7 @@ void main()
         {
             AppDataFolder = appDataFolder;
 
-            Util.MakeUnitSphere(ref SharedSphereMesh, ref SharedSphereIndices);
+            Util.MakeUnitSphere(out SharedSphereMesh, out SharedSphereIndices);
 
             BodyList = new List<SimBody>();
 
@@ -59,10 +59,10 @@ void main()
                 //                if (eB.Name.Equals("Sun"))
                 BodyList.Add(new SimBody(eB, AppDataFolder));
 
-            SinglePrecisionShader = new(VertexShader, FragmentShader);
+            Shader = new(VertexShader, FragmentShader);
 
-            BodyColorUniform = GL.GetUniformLocation(SinglePrecisionShader.ShaderHandle, "objColor");
-            MVP_Uniform = GL.GetUniformLocation(SinglePrecisionShader.ShaderHandle, "MVP");
+            BodyColorUniform = GL.GetUniformLocation(Shader.ShaderHandle, "objColor");
+            MVP_Uniform = GL.GetUniformLocation(Shader.ShaderHandle, "MVP");
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ void main()
             SimBody? hitSB = null;
             Double lastHitDist = Double.MaxValue;
 
-            SinglePrecisionShader.Use();
+            Shader.Use();
 
             // Model (Scale * Trans) * View * Projection
 
