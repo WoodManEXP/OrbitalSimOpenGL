@@ -10,7 +10,6 @@ namespace OrbitalSimOpenGL
     public class SimBodyList
     {
         #region Properties
-
         // Shared sphere
         readonly Single[] SharedSphereMesh;
         readonly UInt16[] SharedSphereIndices;

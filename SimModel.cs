@@ -129,14 +129,30 @@ namespace OrbitalSimOpenGL
                 //                if (!sB.Name.Equals("Sun")) // Only Sol for now
                 //                    continue;
                 sB.InitBody(Scale);
-                //GeometryToBodyDict.Add(g, sB);          // Add to hit testing dictionary
-                //BodiesModel3DGroup.Children.Add(g);     // Add to BodiesModel3DGroup
             }
 
             PathTrace = new(Scale);
             MassMass = new(SimBodyList);
             CollisionDetector = new(SimBodyList, MassMass);
             NextPosition = new(SimBodyList, MassMass, GravConstantSetting);
+        }
+
+        /// <summary>
+        /// Reset sim back to initial state
+        /// </summary>
+        /// <param name="ephemerismBodyList"></param>
+        public void ResetScene(EphemerisBodyList ephemerismBodyList)
+        {
+
+            // Stop the sim, to avoid any timing and indetrerminate-state issues relative to
+            // OpenTK's calling OrbitalSimWindow:OnRender.
+            bool prevSimRunningState = SimRunning;
+            SimRunning = false;
+
+
+
+
+            SimRunning = prevSimRunningState;
         }
 
         /// <summary>

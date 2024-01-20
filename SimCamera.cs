@@ -142,6 +142,11 @@ namespace OrbitalSimOpenGL
             for (int i = 0; i < CamMoveKMs.Length; i++)
                 CamMoveKMs[i] = Math.Exp(i);
 
+            Reset(positionPt, lookAtPt);
+        }
+
+        internal void Reset(Vector3d positionPt, Vector3d lookAtPt)
+        {
             // Initial conditions
             // UpVector will be in +y direction
             SetCameraPosition(positionPt);
@@ -156,7 +161,7 @@ namespace OrbitalSimOpenGL
             upVec = -Vector3d.Cross(lookVec, nVec);
             upVec.Normalize();
 
-            SetLookVector3(lookVec);
+            SetLookVector(lookVec);
             SetUpVector3(upVec);
             SetNormalVector3(nVec);
 
@@ -222,7 +227,7 @@ namespace OrbitalSimOpenGL
         {
             CameraPosition = position;
         }
-        public void SetLookVector3(Vector3d lookVec)
+        public void SetLookVector(Vector3d lookVec)
         {
             LookVector3d = lookVec;
         }
@@ -1051,5 +1056,7 @@ namespace OrbitalSimOpenGL
                 AnimatingTilt = false; // Animation completed
         }
         #endregion
+
+
     }
 }

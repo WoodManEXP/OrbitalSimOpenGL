@@ -23,8 +23,8 @@ namespace OrbitalSimOpenGL
           , ExcludeBody
           , MassMultiplier
           , VelocityMultiplier
+          , ResetSim
         };
-
         #endregion
 
         /// <summary>
@@ -36,6 +36,18 @@ namespace OrbitalSimOpenGL
             : base(dispatcher)
         {
         }
+
+        #region Reset
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="body"></param>
+        public void ResetSim()
+        {
+            object[] args = { CommandSimWindow.GenericCommands.ResetSim };
+            GenericCommand(args);
+        }
+        #endregion
 
         #region Exclude Body
         /// <summary>

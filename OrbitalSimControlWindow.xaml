@@ -25,10 +25,12 @@
         <Button x:Name="bodiesButton"  RenderTransformOrigin="2.572,3.459" Canvas.Left="14" Canvas.Top="40" 
                 Content="Bodies" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75"
                 ToolTipService.ToolTip="Load/select bodies" Click="BodiesButton" ToolTip="Load/select bodies to read from JPL"/>
-        <Button x:Name="startButton" Content="Start" Canvas.Left="138" Canvas.Top="41" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75"
+        <Button x:Name="startButton" Content="Start" Canvas.Left="113" Canvas.Top="41" HorizontalAlignment="Left" VerticalAlignment="Center" Width="75"
                 ToolTipService.ToolTip="Start sim" Click="StartButton"/>
-        <Button x:Name="pauseButton" Content="Pause" Canvas.Left="243" Canvas.Top="41" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75"
+        <Button x:Name="pauseButton" Content="Pause" Canvas.Left="199" Canvas.Top="41" HorizontalAlignment="Left" VerticalAlignment="Center" Width="75"
                 ToolTipService.ToolTip="Pause sim" Click="PauseButton"/>
+        <Button x:Name="resetButton" Content="Reset" Canvas.Left="284" Canvas.Top="41" HorizontalAlignment="Left" VerticalAlignment="Center" Width="75"
+                ToolTipService.ToolTip="Reset sim" Click="ResetButton"/>
         <GroupBox Height="222" Header="Camera" Width="464" Canvas.Left="111" Canvas.Top="71" HorizontalAlignment="Center" VerticalAlignment="Top">
             <Canvas>
                 <Button x:Name="LookLeftButton" Content="LL" Canvas.Left="10" Canvas.Top="29" RenderTransformOrigin="-0.328,-0.399" HorizontalAlignment="Center" VerticalAlignment="Top"
@@ -69,7 +71,7 @@
                 <Button x:Name="MoveLeftButton" Content="ML" Canvas.Left="198" Canvas.Top="35" Width="30" ToolTip="Move camera left" Click="CameraMoveLeft" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Button x:Name="MoveDownButton" Content="MD" Canvas.Left="218" Canvas.Top="61" Width="30" ToolTip="Move camera down" Click="CameraMoveDown" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Button x:Name="MoveRightButton" Content="MR" Canvas.Left="241" Canvas.Top="35" HorizontalAlignment="Left" VerticalAlignment="Center" Width="30" ToolTip="Move camera right" Click="CameraMoveRight"/>
-                <Slider x:Name="LookTiltDegreesSlider" HorizontalAlignment="Left" Width="27" Orientation="Vertical" Height="75" Canvas.Left="121" Canvas.Top="1" VerticalAlignment="Center" Maximum="180" ValueChanged="LookTiltDegreesSliderChanged" ToolTip="Look-Tile degrees" Minimum="1"/>
+                <Slider x:Name="LookTiltDegreesSlider" HorizontalAlignment="Left" Width="27" Orientation="Vertical" Height="75" Canvas.Left="121" Canvas.Top="1" VerticalAlignment="Center" Minimum="1" Maximum="180" Value="1" ValueChanged="LookTiltDegreesSliderChanged" ToolTip="Look-Tilt degrees"/>
                 <Label x:Name="MoveScaleLabel" Content="" Canvas.Left="235" Canvas.Top="84" HorizontalAlignment="Left" VerticalAlignment="Center" Width="102" ToolTip="Move amount (km)" HorizontalContentAlignment="Center"/>
                 <Button x:Name="CameraOrbitUpButton" Content="OU" Canvas.Left="346" Canvas.Top="5" Width="40" ToolTipService.ToolTip="Orbit up about origin" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CameraOrbitUp"/>
                 <Button x:Name="CameraOrbitLeftButton" Content="OL" Canvas.Left="314" Canvas.Top="29" Width="40" ToolTipService.ToolTip="Orbit left about origin" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CameraOrbitLeft"/>
@@ -79,7 +81,7 @@
                 <ComboBox x:Name="OrbitAboutComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="135" RenderTransformOrigin="0.475,0" Canvas.Left="307" Canvas.Top="139" DropDownOpened="OrbitAboutDownOpened" SelectionChanged="OrbitAboutSelectionChanged"/>
                 <Slider x:Name="OrbitDegreesSlider" HorizontalAlignment="Left" Width="27" Orientation="Vertical" Height="75" Canvas.Left="421" Canvas.Top="1" VerticalAlignment="Center" Minimum="1" Maximum="180" ValueChanged="OrbitSiderChanged" ToolTip="Orbit response, 1 to 180" />
                 <Label x:Name="LookTiltDegreesLabel" Content="" Canvas.Left="112" Canvas.Top="83" HorizontalAlignment="Left" VerticalAlignment="Center" Width="40" ToolTip="Look-Tilt amount (degrees)" HorizontalContentAlignment="Center"/>
-                <ComboBox x:Name="ReticleBox" Canvas.Left="351" Canvas.Top="-50" Width="92" RenderTransformOrigin="0.833,4.829" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <ComboBox x:Name="ReticleCombo" Canvas.Left="351" Canvas.Top="-50" Width="92" RenderTransformOrigin="0.833,4.829" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <ComboBoxItem Content = "None" IsSelected="True" />
                     <ComboBoxItem Content = "Sphere" />
                     <ComboBoxItem Content = "X" />

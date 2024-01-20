@@ -228,6 +228,7 @@ namespace OrbitalSimOpenGL
 
             bool? result = dialog.ShowDialog();
         }
+
         private void StartButton(object sender, RoutedEventArgs e)
         {
             EphemerisBodyList ephemerisBodyList = EphemerisBodyList;
@@ -263,6 +264,51 @@ namespace OrbitalSimOpenGL
             saveBodiesButton.IsEnabled = true;
 
             OrbitalSimCmds?.PauseSim();
+        }
+
+        /// <summary>
+        /// REset the sim and controls to initial state
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ResetButton(object sender, RoutedEventArgs e)
+        {
+            // Issue this command prior to OrbitalSimControlWindow reset activities. With OrbitalSimControlWindow
+            // and OrbitalSimWindow on separate threads the avtivities will then happen "simultaneously."
+            OrbitalSimCmds?.ResetSim();
+
+            // Reset various elements of OrbitalSimControlWindow
+            // Set move camera scale control initial
+            MoveScaleSlider.Value = MoveScaleSlider.Maximum / 2;
+            MoveScaleLabel.Content = Math.Exp(MoveScaleSlider.Value).ToString("N0") + " km";
+            OrbitalSimCmds?.ScaleCamera(MoveScaleSlider.Value);
+
+            OrbitDegreesSlider.Value = OrbitCameraDegrees = 90F;
+            OrbitDegreesLabel.Content = "90";
+
+            LookTiltDegreesSlider.Value = LookTiltCameraDegrees = 10F;
+            LookTiltDegreesLabel.Content = "10";
+
+            TimeCompressionSlider.Value = TimeCompressionSlider.Minimum;
+            TimeCompressionLabel.Content = "1 x";
+            OrbitalSimCmds?.SimTimeCompression((int)TimeCompressionSlider.Value);
+
+            GravConstantLabel.Content = "Std";
+            GravConstantSlider.Value = 0D;
+
+            ShowAxis.IsChecked = ShowReticle.IsChecked = ShowWireframe.IsChecked = true;
+            OrbitalSimCmds?.Axis(true);
+            OrbitalSimCmds?.Wireframe(true);
+            OrbitalSimCmds?.Reticle(true);
+
+            KeepCombo.SelectedIndex = 0;
+            ReticleCombo.SelectedIndex = 0;
+            LookAtComboBox.SelectedIndex = -1;
+            LookAtComboBox.SelectedIndex = 0;       // Origin
+            OrbitAboutComboBox.SelectedIndex = 0;   // Origin
+
+            PopulateBodyMods();
+
         }
 
         /// <summary>
@@ -479,7 +525,7 @@ namespace OrbitalSimOpenGL
             if (slider is not null)
             {
                 int value = (int)slider.Value;
-                OrbitalSimCmds.SimTimeCompression(value);
+                OrbitalSimCmds?.SimTimeCompression(value);
             }
         }
 
@@ -519,7 +565,7 @@ namespace OrbitalSimOpenGL
         private void ReticleCheckbox(object sender, RoutedEventArgs e)
         {
             CheckBox checkBox = (CheckBox)sender;
-            OrbitalSimCmds.Reticle(checkBox.IsChecked.Value);
+            OrbitalSimCmds?.Reticle(checkBox.IsChecked.Value);
         }
 
         /// <summary>
@@ -604,8 +650,8 @@ namespace OrbitalSimOpenGL
         /// </summary>
         private void PopulateBodyMods()
         {
-            if (SimHasBeenStarted)
-                return;
+//            if (SimHasBeenStarted)
+//                return;
 
             BodyModsListBox.Items.Clear();
 

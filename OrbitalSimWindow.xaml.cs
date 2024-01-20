@@ -331,6 +331,21 @@ namespace OrbitalSimOpenGL
             SimModel.SimRunning = false;
         }
 
+        /// <summary>
+        /// Perform reset of Sim to initial state
+        /// </summary>
+        private void ResetSim()
+        {
+            if (EphemerisBodyList is null)
+                return;
+
+            // Camera to starting position and startying lookVector
+            Double cX = -1 * 6.0E06D, cY = 3 * 6.0E06D, cZ = 3 * 6.0E06D;
+            SimCamera?.Reset(new Vector3d(cX, cY, cZ), new Vector3d(0d, 0d, 0d));
+
+            SimModel.ResetScene(EphemerisBodyList);
+        }
+
         private void GenericCommand(object[] args)
         {
             CommandSimWindow.GenericCommands cmd;
@@ -370,6 +385,10 @@ namespace OrbitalSimOpenGL
 
                     case CommandSimWindow.GenericCommands.VelocityMultiplier:
                         SimModel.SetVelocityMultiplier((String)args[1], (int)args[2]);
+                        break;
+
+                    case CommandSimWindow.GenericCommands.ResetSim:
+                        ResetSim();
                         break;
 
                     default:

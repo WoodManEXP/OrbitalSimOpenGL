@@ -63,4 +63,5 @@ SimBody
 	add vel/mass vectors, change vectors on retained body to match
 	Color Red nd larger for a while after collision
 	Sumultaneous > 2 body collision?
-	Add coloset approach, so far, indicator to SimWindows status area
+	Add closest approach, so far, indicator to SimWindows status area (done)
+- Reset sim button/capability
