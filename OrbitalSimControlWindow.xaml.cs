@@ -612,21 +612,24 @@ namespace OrbitalSimOpenGL
             // Add an entry for each body in the sim (dynamic buildup of list box contents)
             foreach (EphemerisBody b in EphemerisBodyList.Bodies)
             {
-                ListBoxItem listBoxItem = new() { HorizontalAlignment = HorizontalAlignment.Left, Width = 548 };
+                ListBoxItem listBoxItem = new() { };
 
                 StackPanel stackPanel = new() { VerticalAlignment = VerticalAlignment.Center, Orientation = Orientation.Horizontal };
-                Label label0 = new() { Content = b.Name, Width = 99, Margin = new(0, 0, 5, 0) };
+                Label label0 = new() { Content = b.Name, Width = 102, Margin = new(0, 0, 5, 0) };
 
-                CheckBox excludeCheckBox = new() { Uid = b.Name, Content = "Exclude", VerticalAlignment = VerticalAlignment.Center, Margin = new(0, 0, 10, 0), ToolTip = "Exclude " + b.Name + " from sim" };
+                CheckBox excludeCheckBox = new() { Uid = b.Name, VerticalAlignment = VerticalAlignment.Center, Width = 33, Margin = new(0, 0, 10, 0), ToolTip = "Exclude " + b.Name + " from sim" };
                 excludeCheckBox.Click += new(BodyModsExcludeCheckbox);
 
-                Slider massSlider = new() { Uid = b.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Alter " + b.Name + " +'s mass", Minimum = -9, Maximum = 9, Value = 0, Width = 150 };
+                CheckBox traceCheckBox = new() { Uid = b.Name, VerticalAlignment = VerticalAlignment.Center, Width = 31, Margin = new(0, 0, 10, 0), ToolTip = "Trace " + b.Name + "'s path" };
+                traceCheckBox.Click += new(BodyModsTraceCheckbox);
+
+                Slider massSlider = new() { Uid = b.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Alter " + b.Name + " +'s mass", Minimum = -9, Maximum = 9, Value = 0, Width = 145 };
                 massSlider.LostMouseCapture += new(BodyModsMassSliderLostMouseCapture);
                 massSlider.ValueChanged += new(BodyModsMassSliderChanged);
 
                 Label label1 = new() { Uid = b.Name + ":L1", Content = "Std", HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Width = 28, Margin = new(2, 0, 5, 0) };
 
-                Slider velSlider = new() { Uid = b.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Alter " + b.Name + "'s velocity", Minimum = -9, Maximum = 9, Value = 0, Width = 150 };
+                Slider velSlider = new() { Uid = b.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Alter " + b.Name + "'s velocity", Minimum = -9, Maximum = 9, Value = 0, Width = 145 };
                 velSlider.LostMouseCapture += new(BodyModsVelocitySliderLostMouseCapture);
                 velSlider.ValueChanged += new(BodyModsVelocitySliderChanged);
 
@@ -634,6 +637,7 @@ namespace OrbitalSimOpenGL
 
                 stackPanel.Children.Add(label0);
                 stackPanel.Children.Add(excludeCheckBox);
+                stackPanel.Children.Add(traceCheckBox);
                 stackPanel.Children.Add(massSlider);
                 stackPanel.Children.Add(label1);
                 stackPanel.Children.Add(velSlider);
@@ -749,6 +753,11 @@ namespace OrbitalSimOpenGL
                 if (label is not null)
                     label.Content = aStr;
             }
+        }
+
+        private void BodyModsTraceCheckbox(object sender, RoutedEventArgs e)
+        {
+
         }
     }
     #endregion

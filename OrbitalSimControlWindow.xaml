@@ -128,18 +128,19 @@
         <GroupBox Height="174" Header="Body mods" Width="596" Canvas.Left="7" Canvas.Top="358" HorizontalAlignment="Left" VerticalAlignment="Center">
             <Canvas>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Width="538">
-                    <Label Content="Body" ToolTip="Body name" Margin="10,0,0,0" Width="102" FontWeight="Bold"/>
-                    <Label Content="Exclude" ToolTip="Exclude from sim" Margin="0,0,0,0" Width="129" FontWeight="Bold"/>
-                    <Label Content="Mass" ToolTip="Alter mass" Margin="0,0,0,0" Width="176" FontWeight="Bold"/>
+                    <Label Content="Body" ToolTip="Body name" Margin="10,0,0,0" Width="86" FontWeight="Bold"/>
+                    <Label Content="Exclude" ToolTip="Exclude from sim" Margin="0,0,0,0" Width="53" FontWeight="Bold"/>
+                    <Label Content="Trace" ToolTip="Exclude from sim" Margin="0,0,0,0" Width="103" FontWeight="Bold"/>
+                    <Label Content="Mass" ToolTip="Alter mass" Margin="0,0,0,0" Width="169" FontWeight="Bold"/>
                     <Label Content="Velocity" ToolTip="Alter velocity" Margin="0,0,0,0" FontWeight="Bold"/>
                 </StackPanel>
-                <ListBox x:Name="BodyModsListBox" BorderThickness="0" VerticalAlignment="Center" Width="574" HorizontalAlignment="Left" Height="125" Canvas.Top="26">
+                <ListBox x:Name="BodyModsListBox" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center" Height="125" Canvas.Top="26">
                 </ListBox>
             </Canvas>
         </GroupBox>
     </Canvas>
 </Window>
-    
+
 <!--
                 <GroupBox Height="174" Header="Body mods" Width="596" Canvas.Left="7" Canvas.Top="358" HorizontalAlignment="Left" VerticalAlignment="Center">
     <Canvas>
@@ -150,54 +151,26 @@
             <Label Content="Velocity" ToolTip="Alter velocity" Margin="0,0,0,0" FontWeight="Bold"/>
         </StackPanel>
         <ListBox x:Name="BodyModsListBox" BorderThickness="0" VerticalAlignment="Center" Width="574" HorizontalAlignment="Left" Height="125" Canvas.Top="26">
-                    <ListBoxItem Width="548" HorizontalAlignment="Left" >
+                    <ListBoxItem>
                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                            <Label Content="Body nameA" Width="99" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                            <CheckBox Content="Exclude" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim" Click="BodyModsExcludeCheckbox" Uid="1"/>
-                            <Slider HorizontalAlignment="Left" ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150" LostMouseCapture="BodyModsMassSliderLostMouseCapture" ValueChanged="BodyModsMassSliderChanged"/>
+                            <Label Content="Body nameA" Width="102" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                            <CheckBox VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim" Click="BodyModsExcludeCheckbox" Uid="1" Width="33"/>
+                            <CheckBox VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Trace body path" Click="BodyModsTraceCheckbox" Uid="1" Width="31"/>
+                            <Slider HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" Width="145"  LostMouseCapture="BodyModsMassSliderLostMouseCapture" ValueChanged="BodyModsMassSliderChanged"/>
                             <Label Content="Std"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="28" Margin="2,0,5,0"/>
-                            <Slider ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" Width="150"  LostMouseCapture="BodyModsVelocitySliderLostMouseCapture" ValueChanged="BodyModsVelocitySliderChanged" VerticalAlignment="Center"/>
+                            <Slider HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" Width="145"  LostMouseCapture="BodyModsVelocitySliderLostMouseCapture" ValueChanged="BodyModsVelocitySliderChanged"/>
                             <Label Content="Std"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="28" Margin="2,0,5,0"/>
                         </StackPanel>
                     </ListBoxItem>
-                    <ListBoxItem Width="483" HorizontalAlignment="Left" Uid="1">
+                    <ListBoxItem>
                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                            <Label Content="Body nameB" Width="99" Margin="0,0,5,0"/>
-                            <CheckBox Content="Exclude" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim"/>
-                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
-                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
-                        </StackPanel>
-                    </ListBoxItem>
-                    <ListBoxItem Width="483" HorizontalAlignment="Left" Uid="3">
-                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                            <Label Content="Body nameC" Width="99" Margin="0,0,5,0"/>
-                            <CheckBox Content="Exclude" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim"/>
-                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
-                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
-                        </StackPanel>
-                    </ListBoxItem>
-                    <ListBoxItem Width="483" HorizontalAlignment="Left">
-                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                            <Label Content="Body nameD" Width="99" Margin="0,0,5,0"/>
-                            <CheckBox Content="Exclude" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim"/>
-                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
-                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
-                        </StackPanel>
-                    </ListBoxItem>
-                    <ListBoxItem Width="483" HorizontalAlignment="Left">
-                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                            <Label Content="Body nameE" Width="99" Margin="0,0,5,0"/>
-                            <CheckBox Content="Exclude" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim"/>
-                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
-                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
-                        </StackPanel>
-                    </ListBoxItem>
-                    <ListBoxItem Width="483" HorizontalAlignment="Left">
-                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                            <Label Content="Body nameF" Width="99" Margin="0,0,5,0"/>
-                            <CheckBox Content="Exclude" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim"/>
-                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
-                            <Slider HorizontalAlignment="Left" ToolTipService.ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" VerticalAlignment="Center" Width="150"/>
+                            <Label Content="Body nameA" Width="102" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                            <CheckBox VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Exclude from sim" Click="BodyModsExcludeCheckbox" Uid="1" Width="33"/>
+                            <CheckBox VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Trace body path" Click="BodyModsTraceCheckbox" Uid="1" Width="31"/>
+                            <Slider HorizontalAlignment="Left" ToolTip="Alter Body Mass" Minimum="-9" Maximum="9" Value="0" Width="145" VerticalAlignment="Center" LostMouseCapture="BodyModsMassSliderLostMouseCapture" ValueChanged="BodyModsMassSliderChanged"/>
+                            <Label Content="Std"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="28" Margin="2,0,5,0"/>
+                            <Slider HorizontalAlignment="Left" ToolTip="Alter Body Velocity" Minimum="-9" Maximum="9" Value="0" Width="145"  LostMouseCapture="BodyModsVelocitySliderLostMouseCapture" ValueChanged="BodyModsVelocitySliderChanged" VerticalAlignment="Center"/>
+                            <Label Content="Std"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="28" Margin="2,0,5,0"/>
                         </StackPanel>
                     </ListBoxItem>
         </ListBox>
