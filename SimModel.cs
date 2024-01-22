@@ -138,30 +138,30 @@ namespace OrbitalSimOpenGL
         }
 
         /// <summary>
-        /// Reset sim back to initial state
+        /// Reset sim to initial state
         /// </summary>
         /// <param name="ephemerismBodyList"></param>
         public void ResetScene(EphemerisBodyList ephemerismBodyList)
         {
-
             // Stop the sim, to avoid any timing and indetrerminate-state issues relative to
-            // OpenTK's calling OrbitalSimWindow:OnRender.
-            bool prevSimRunningState = SimRunning;
-            SimRunning = false;
+            // OpenTK's calling OrbitalSimWindow:OnRender during reset.
+            SceneReady = false;
+            ElapsedSeconds = 0;
 
+            InitBodies(ephemerismBodyList);
 
-
-
-            SimRunning = prevSimRunningState;
+            SceneReady = true;
         }
 
         /// <summary>
-        /// This is called repeatedly by the OpenTK system
+        /// Render current state of the model
         /// </summary>
         /// <param name="ms"></param>
         /// <param name="frameRateMS"></param>
         /// <param name="mousePosition">Current mouse cursor position, for hit-testing</param>
-        /// <remarks>Renders the current model state</remarks>
+        /// <remarks>
+        /// Renders the current model state
+        /// </remarks>
         public void Render(int ms, int frameRateMS, System.Windows.Point mousePosition)
         {
             if (!SceneReady)
