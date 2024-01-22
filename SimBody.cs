@@ -41,8 +41,8 @@ namespace OrbitalSimOpenGL
         public Vector3D LastTraceVector3D;      // Watching curvature rate for drawing path "lines"
         public Point3D LastTracePoint3D;        // U coords
         Color4 BodyColor { get; set; }
-        private String AppDataFolder { get; set; }
         public bool ExcludeFromSim { get; set; } = false; // Body is to be or not be excluded from the sim
+        private PathTracer? PathTracer { get; set; } = null;
 
         private Double _MassMultiplier = 1D;
         public Double MassMultiplier
@@ -60,11 +60,9 @@ namespace OrbitalSimOpenGL
         }
         #endregion
 
-        public SimBody(EphemerisBody ephemerisBody, String appDataFolder)
+        public SimBody(EphemerisBody ephemerisBody)
         {
             double dVal;
-
-            AppDataFolder = appDataFolder;
 
             // Save ephemeris values into current settings (universe coords)
             X = double.TryParse(ephemerisBody.X_Str, out dVal) ? dVal : -1D;
@@ -127,7 +125,7 @@ namespace OrbitalSimOpenGL
         /// Assumes the shared unit sphere is what's currently loaded in OpenGL ArrayBuffer. So this
         /// is applying a set of transformations to that sphere to render this body.
         /// </remarks>
-        internal void Render(int indicesLength, int bodyColorUniform, int mvp_Uniform, ref Matrix4 vp, ref Matrix4 locationMatrix4, ref Matrix4 sizeMatrix4)
+        internal void RenderBody(int indicesLength, int bodyColorUniform, int mvp_Uniform, ref Matrix4 vp, ref Matrix4 locationMatrix4, ref Matrix4 sizeMatrix4)
         {
             if (ExcludeFromSim)
                 return;
@@ -144,6 +142,11 @@ namespace OrbitalSimOpenGL
             GL.UniformMatrix4(mvp_Uniform, false, ref mvp);
 
             GL.DrawElements(PrimitiveType.Triangles, indicesLength, DrawElementsType.UnsignedShort, 0);
+        }
+
+        internal void RenderPath(FrustumCuller fC)
+        {
+
         }
 
         /// <summary>
@@ -324,6 +327,21 @@ namespace OrbitalSimOpenGL
             VX *= dMultiplier;
             VY *= dMultiplier;
             VY *= dMultiplier;
+        }
+
+        /// <summary>
+        /// Path trace on or off
+        /// </summary>
+        /// <param name="onOff"></param>
+        /// <remarks>
+        /// If turned off path history for the body is lost.
+        /// </remarks>
+        internal void TracePath(bool onOff)
+        {
+            if (onOff)
+                PathTracer ??= new(Scale); // Start a PathTracer for this body, if not already started (the null-coalescing operators)
+            else
+                PathTracer = null; // Let go the resources
         }
     }
 }

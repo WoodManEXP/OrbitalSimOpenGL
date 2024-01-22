@@ -164,6 +164,58 @@ namespace OrbitalSimOpenGL
         #endregion
 
         #region Commands
+        private void GenericCommand(object[] args)
+        {
+            if (SimModel is not null)
+                switch ((CommandSimWindow.GenericCommands)args[0])
+                {
+                    case CommandSimWindow.GenericCommands.Axis:
+                        SimModel.IncludeAxis = (bool)args[1];
+                        break;
+
+                    case CommandSimWindow.GenericCommands.Wireframe:
+                        SimModel.Wireframe = (bool)args[1];
+                        break;
+
+                    case CommandSimWindow.GenericCommands.Keep:
+                        if (SimModel.SimCamera is not null)
+                            SimModel.SimCamera.KeepKind = (SimCamera.KindOfKeep)args[1];
+                        break;
+
+                    case CommandSimWindow.GenericCommands.Reticle:
+                        if (SimModel.SimCamera is not null)
+                            SimModel.SimCamera.ShowReticle = (bool)args[1];
+                        break;
+
+                    case CommandSimWindow.GenericCommands.GravConstant:
+                        SimModel.GravConstant((int)args[1]);
+                        break;
+
+                    case CommandSimWindow.GenericCommands.ExcludeBody:
+                        SimModel.ExcludeBody((String)args[1]);
+                        break;
+
+                    case CommandSimWindow.GenericCommands.MassMultiplier:
+                        SimModel.SetMassMultiplier((String)args[1], (int)args[2]);
+                        break;
+
+                    case CommandSimWindow.GenericCommands.VelocityMultiplier:
+                        SimModel.SetVelocityMultiplier((String)args[1], (int)args[2]);
+                        break;
+
+                    case CommandSimWindow.GenericCommands.ResetSim:
+                        ResetSim();
+                        break;
+
+                    case CommandSimWindow.GenericCommands.TracePath:
+                        SimModel.TracePath((bool)args[1], (String)args[2]);
+                        break;
+
+                    default:
+                        break;
+                }
+        }
+
         private void TimeCompression(object[] args)
         {
             int compressionRate = (int)args[0];
@@ -344,63 +396,6 @@ namespace OrbitalSimOpenGL
             SimCamera?.Reset(new Vector3d(cX, cY, cZ), new Vector3d(0d, 0d, 0d));
 
             SimModel.ResetScene(EphemerisBodyList);
-        }
-
-        private void GenericCommand(object[] args)
-        {
-            CommandSimWindow.GenericCommands cmd;
-
-            if (SimModel is not null)
-                switch (cmd = (CommandSimWindow.GenericCommands)args[0])
-                {
-                    case CommandSimWindow.GenericCommands.Axis:
-                        SimModel.IncludeAxis = (bool)args[1];
-                        break;
-
-                    case CommandSimWindow.GenericCommands.Wireframe:
-                        SimModel.Wireframe = (bool)args[1];
-                        break;
-
-                    case CommandSimWindow.GenericCommands.Keep:
-                        if (SimModel.SimCamera is not null)
-                            SimModel.SimCamera.KeepKind = (SimCamera.KindOfKeep)args[1];
-                        break;
-
-                    case CommandSimWindow.GenericCommands.Reticle:
-                        if (SimModel.SimCamera is not null)
-                            SimModel.SimCamera.ShowReticle = (bool)args[1];
-                        break;
-
-                    case CommandSimWindow.GenericCommands.GravConstant:
-                        SimModel.GravConstant((int)args[1]);
-                        break;
-
-                    case CommandSimWindow.GenericCommands.ExcludeBody:
-                        SimModel.ExcludeBody((String)args[1]);
-                        break;
-
-                    case CommandSimWindow.GenericCommands.MassMultiplier:
-                        SimModel.SetMassMultiplier((String)args[1], (int)args[2]);
-                        break;
-
-                    case CommandSimWindow.GenericCommands.VelocityMultiplier:
-                        SimModel.SetVelocityMultiplier((String)args[1], (int)args[2]);
-                        break;
-
-                    case CommandSimWindow.GenericCommands.ResetSim:
-                        ResetSim();
-                        break;
-
-                    default:
-                        break;
-                }
-        }
-
-        private void UseWireframe(object[] args)
-        {
-            bool b = (bool)args[0];
-            if (SimModel is not null)
-                SimModel.Wireframe = b;
         }
         #endregion
 

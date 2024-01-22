@@ -56,7 +56,7 @@ void main()
 
             foreach (EphemerisBody eB in ephemerismBodyList.Bodies)
                 //                if (eB.Name.Equals("Sun"))
-                BodyList.Add(new SimBody(eB, AppDataFolder));
+                BodyList.Add(new SimBody(eB));
 
             Shader = new(VertexShader, FragmentShader);
 
@@ -77,8 +77,15 @@ void main()
             SimBody? hitSB = null;
             Double lastHitDist = Double.MaxValue;
 
+            FrustumCuller fC = simCamera.FrustumCuller;
+            
             Shader.Use();
 
+            // Pass A - render any paths
+            foreach (SimBody sB in BodyList)
+                sB.RenderPath(fC);
+
+            // Pass B - render visible bodies
             // Model (Scale * Trans) * View * Projection
 
             // Upload unit sphere
@@ -87,11 +94,9 @@ void main()
             GL.BufferData(BufferTarget.ElementArrayBuffer, SharedSphereIndices.Length * sizeof(UInt16), SharedSphereIndices, BufferUsageHint.StaticDraw);
 
             Vector3d halfNorm = simCamera.UpVector3d * 5e-1f;
-
             const Single minSize = 5;
             const Single minSizeSqared = 5 * 5;
             Vector3d center;
-            FrustumCuller fC = simCamera.FrustumCuller;
 
             foreach (SimBody sB in BodyList)
             {
@@ -107,7 +112,7 @@ void main()
                     // a. Keep its rendering to a minimum size (so something will be visible no matter how far from camera)
                     // b. Render it
                     Double dist = sB.KeepVisible(simCamera, ref halfNorm, minSize, minSizeSqared, ref mousePosition);
-                    sB.Render(SharedSphereIndices.Length, BodyColorUniform, MVP_Uniform, ref simCamera._VP_Matrix, ref LocationMatrix4, ref SizeMatrix4);
+                    sB.RenderBody(SharedSphereIndices.Length, BodyColorUniform, MVP_Uniform, ref simCamera._VP_Matrix, ref LocationMatrix4, ref SizeMatrix4);
                     if (-1D != dist)
                         if (dist < lastHitDist) // Keep only hit closest to camera
                         {

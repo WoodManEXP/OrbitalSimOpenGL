@@ -3,9 +3,9 @@
 https://www.nuget.org/packages/OpenTK.GLWpfControl - Installed OpenGL PKG
 
 Runtime changes
- - Change he constant
- - Remove body(ies)
- - Change mass of body(ies)
+ - Change the constant (done)
+ - Remove body(ies) (done)
+ - Change mass of body(ies) (done)
  - Extra bodies 
 
 SimModel
@@ -64,4 +64,4 @@ SimBody
 	Color Red nd larger for a while after collision
 	Sumultaneous > 2 body collision?
 	Add closest approach, so far, indicator to SimWindows status area (done)
-- Reset sim button/capability
+- Reset sim button/capability (done)

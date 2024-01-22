@@ -38,8 +38,6 @@ namespace OrbitalSimOpenGL
         public SimBodyList? SimBodyList { get; set; }
         private NextPosition? NextPosition { get; set; }
         private Double GravConstantSetting { get; set; } = 0D; // Grav Constant starts unmodified
-
-        private PathTrace PathTrace;
         public Scale Scale { get; set; } = new();
         public String? AppDataFolder { get; set; }
         public int IterationSeconds { get; set; } = 60; // Each frame iteration represents this many seconds of model simulation
@@ -131,7 +129,6 @@ namespace OrbitalSimOpenGL
                 sB.InitBody(Scale);
             }
 
-            PathTrace = new(Scale);
             MassMass = new(SimBodyList);
             CollisionDetector = new(SimBodyList, MassMass);
             NextPosition = new(SimBodyList, MassMass, GravConstantSetting);
@@ -283,6 +280,17 @@ namespace OrbitalSimOpenGL
             int sBI = SimBodyList.GetIndex(bodyName);
             SimBodyList.BodyList[sBI].AlterVelocity(multiplier);
         }
+        internal void TracePath(bool onOff, String bodyName)
+        {
+            if (!SceneReady)
+                return;
+
+            if (SimBodyList is null) // JIC
+                return;
+
+            int sBI = SimBodyList.GetIndex(bodyName);
+            SimBodyList.BodyList[sBI].TracePath(onOff);
+        }
 
         #region Axes
         private Shader AxisShader;
@@ -410,6 +418,5 @@ void main()
             Wireframe = wireframe; //Restore
         }
         #endregion
-
     }
 }

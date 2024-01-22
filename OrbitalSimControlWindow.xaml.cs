@@ -17,14 +17,14 @@ namespace OrbitalSimOpenGL
         #region Properties
         private bool SimHasBeenStarted { get; set; } = false;
         public JPL_BodyList JPL_BodyList { get; set; }
-        public EphemerisBodyList EphemerisBodyList { get; set; }
+        public EphemerisBodyList? EphemerisBodyList { get; set; }
         public OrbitalSimWindow? OrbitalSimWindow { get; set; }
         private Single OrbitCameraDegrees { get; set; } // Current value on OrbitDegreesSlider
         private Single LookTiltCameraDegrees { get; set; } // Current value on LookTiltDegreesSlider
         private String AppDataFolder { get; set; }
         #endregion
 
-        private CommandSimWindow? OrbitalSimCmds { get; set; } // For sending commands to SimWindow
+        private CommandSimWindow? CommandSimWindow { get; set; } // For sending commands to SimWindow
         public CommandControlWindow? OrbitalControlCmds { get; set; }
 
         public OrbitalSimControlWindow()
@@ -79,14 +79,14 @@ namespace OrbitalSimOpenGL
             //var orbitalSimWindow = new OrbitalSimWindow();
             OrbitalSimWindow = new OrbitalSimWindow(OrbitalControlCmds);
 
-            OrbitalSimCmds = OrbitalSimWindow.OrbitalSimCmds;
+            CommandSimWindow = OrbitalSimWindow.OrbitalSimCmds;
 
             // Set move camera scale control initial
             MoveScaleSlider.Minimum = 0;
             MoveScaleSlider.Maximum = (Double)Properties.Settings.Default.MaxCamMoveScale - 1;
             MoveScaleSlider.Value = MoveScaleSlider.Maximum / 2;
             MoveScaleLabel.Content = Math.Exp(MoveScaleSlider.Value).ToString("N0") + " km";
-            OrbitalSimCmds?.ScaleCamera(MoveScaleSlider.Value);
+            CommandSimWindow?.ScaleCamera(MoveScaleSlider.Value);
 
             // Set orbit slider initial
             OrbitDegreesSlider.Minimum = 1D;
@@ -130,35 +130,35 @@ namespace OrbitalSimOpenGL
         private void CameraLookUp(object sender, RoutedEventArgs e)
         {
             KeepOff();
-            OrbitalSimCmds?.LookCamera(SimCamera.CameraLookDirections.LookUp, LookTiltCameraDegrees);
+            CommandSimWindow?.LookCamera(SimCamera.CameraLookDirections.LookUp, LookTiltCameraDegrees);
         }
 
         private void CameraLookLeft(object sender, RoutedEventArgs e)
         {
             KeepOff();
-            OrbitalSimCmds?.LookCamera(SimCamera.CameraLookDirections.LookLeft, LookTiltCameraDegrees);
+            CommandSimWindow?.LookCamera(SimCamera.CameraLookDirections.LookLeft, LookTiltCameraDegrees);
         }
 
         private void CameraLookRight(object sender, RoutedEventArgs e)
         {
             KeepOff();
-            OrbitalSimCmds?.LookCamera(SimCamera.CameraLookDirections.LookRight, LookTiltCameraDegrees);
+            CommandSimWindow?.LookCamera(SimCamera.CameraLookDirections.LookRight, LookTiltCameraDegrees);
         }
 
         private void CameraLookDown(object sender, RoutedEventArgs e)
         {
             KeepOff();
-            OrbitalSimCmds?.LookCamera(SimCamera.CameraLookDirections.LookDown, LookTiltCameraDegrees);
+            CommandSimWindow?.LookCamera(SimCamera.CameraLookDirections.LookDown, LookTiltCameraDegrees);
         }
 
         private void CameraTiltCC(object sender, RoutedEventArgs e)
         {
-            OrbitalSimCmds?.TiltCamera(SimCamera.CameraTiltDirections.TileCounterClockwise, LookTiltCameraDegrees);
+            CommandSimWindow?.TiltCamera(SimCamera.CameraTiltDirections.TileCounterClockwise, LookTiltCameraDegrees);
         }
 
         private void CameraTiltC(object sender, RoutedEventArgs e)
         {
-            OrbitalSimCmds?.TiltCamera(SimCamera.CameraTiltDirections.TiltClockwise, LookTiltCameraDegrees);
+            CommandSimWindow?.TiltCamera(SimCamera.CameraTiltDirections.TiltClockwise, LookTiltCameraDegrees);
         }
 
         private void LookTiltDegreesSliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -176,31 +176,31 @@ namespace OrbitalSimOpenGL
         }
         private void CameraMoveForward(object sender, RoutedEventArgs e)
         {
-            OrbitalSimCmds?.MoveCamera(SimCamera.CameraMoveDirections.MoveForward);
+            CommandSimWindow?.MoveCamera(SimCamera.CameraMoveDirections.MoveForward);
         }
         private void CameraMoveBackward(object sender, RoutedEventArgs e)
         {
-            OrbitalSimCmds?.MoveCamera(SimCamera.CameraMoveDirections.MoveBackward);
+            CommandSimWindow?.MoveCamera(SimCamera.CameraMoveDirections.MoveBackward);
         }
         private void CameraMoveUp(object sender, RoutedEventArgs e)
         {
             KeepOff();
-            OrbitalSimCmds?.MoveCamera(SimCamera.CameraMoveDirections.MoveUp);
+            CommandSimWindow?.MoveCamera(SimCamera.CameraMoveDirections.MoveUp);
         }
         private void CameraMoveLeft(object sender, RoutedEventArgs e)
         {
             KeepOff();
-            OrbitalSimCmds?.MoveCamera(SimCamera.CameraMoveDirections.MoveLeft);
+            CommandSimWindow?.MoveCamera(SimCamera.CameraMoveDirections.MoveLeft);
         }
         private void CameraMoveDown(object sender, RoutedEventArgs e)
         {
             KeepOff();
-            OrbitalSimCmds?.MoveCamera(SimCamera.CameraMoveDirections.MoveDown);
+            CommandSimWindow?.MoveCamera(SimCamera.CameraMoveDirections.MoveDown);
         }
         private void CameraMoveRight(object sender, RoutedEventArgs e)
         {
             KeepOff();
-            OrbitalSimCmds?.MoveCamera(SimCamera.CameraMoveDirections.MoveRight);
+            CommandSimWindow?.MoveCamera(SimCamera.CameraMoveDirections.MoveRight);
         }
         private void FileExitMenu(object sender, RoutedEventArgs e)
         {
@@ -250,7 +250,7 @@ namespace OrbitalSimOpenGL
             pauseButton.IsEnabled = true;
             saveBodiesButton.IsEnabled = false;
 
-            OrbitalSimCmds?.StartSim(EphemerisBodyList);
+            CommandSimWindow?.StartSim(EphemerisBodyList);
 
             SimHasBeenStarted = true;
         }
@@ -263,7 +263,7 @@ namespace OrbitalSimOpenGL
             pauseButton.IsEnabled = false;
             saveBodiesButton.IsEnabled = true;
 
-            OrbitalSimCmds?.PauseSim();
+            CommandSimWindow?.PauseSim();
         }
 
         /// <summary>
@@ -275,13 +275,13 @@ namespace OrbitalSimOpenGL
         {
             // Issue this command prior to OrbitalSimControlWindow reset activities. With OrbitalSimControlWindow
             // and OrbitalSimWindow on separate threads the avtivities will then happen "simultaneously."
-            OrbitalSimCmds?.ResetSim();
+            CommandSimWindow?.ResetSim();
 
             // Reset various elements of OrbitalSimControlWindow
             // Set move camera scale control initial
             MoveScaleSlider.Value = MoveScaleSlider.Maximum / 2;
             MoveScaleLabel.Content = Math.Exp(MoveScaleSlider.Value).ToString("N0") + " km";
-            OrbitalSimCmds?.ScaleCamera(MoveScaleSlider.Value);
+            CommandSimWindow?.ScaleCamera(MoveScaleSlider.Value);
 
             OrbitDegreesSlider.Value = OrbitCameraDegrees = 90F;
             OrbitDegreesLabel.Content = "90";
@@ -291,15 +291,15 @@ namespace OrbitalSimOpenGL
 
             TimeCompressionSlider.Value = TimeCompressionSlider.Minimum;
             TimeCompressionLabel.Content = "1 x";
-            OrbitalSimCmds?.SimTimeCompression((int)TimeCompressionSlider.Value);
+            CommandSimWindow?.SimTimeCompression((int)TimeCompressionSlider.Value);
 
             GravConstantLabel.Content = "Std";
             GravConstantSlider.Value = 0D;
 
             ShowAxis.IsChecked = ShowReticle.IsChecked = ShowWireframe.IsChecked = true;
-            OrbitalSimCmds?.Axis(true);
-            OrbitalSimCmds?.Wireframe(true);
-            OrbitalSimCmds?.Reticle(true);
+            CommandSimWindow?.Axis(true);
+            CommandSimWindow?.Wireframe(true);
+            CommandSimWindow?.Reticle(true);
 
             KeepCombo.SelectedIndex = 0;
             ReticleCombo.SelectedIndex = 0;
@@ -360,7 +360,7 @@ namespace OrbitalSimOpenGL
         private void LookAtSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             if (LookAtComboBox.SelectedItem != null)
-                OrbitalSimCmds?.LookAtCamera((String)LookAtComboBox.SelectedItem);
+                CommandSimWindow?.LookAtCamera((String)LookAtComboBox.SelectedItem);
         }
 
         private void GoNearDropDownOpened(object sender, EventArgs e)
@@ -371,7 +371,7 @@ namespace OrbitalSimOpenGL
         private void GoNearSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (GoNearComboBox.SelectedItem != null)
-                OrbitalSimCmds?.GoNear((String)GoNearComboBox.SelectedItem);
+                CommandSimWindow?.GoNear((String)GoNearComboBox.SelectedItem);
         }
         private void OrbitAboutDownOpened(object sender, EventArgs e)
         {
@@ -380,7 +380,7 @@ namespace OrbitalSimOpenGL
         private void OrbitAboutSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (OrbitAboutComboBox.SelectedItem != null)
-                OrbitalSimCmds?.OrbitAbout((String)OrbitAboutComboBox.SelectedItem);
+                CommandSimWindow?.OrbitAbout((String)OrbitAboutComboBox.SelectedItem);
         }
         private void PopulateComboBoxes()
         {
@@ -426,7 +426,7 @@ namespace OrbitalSimOpenGL
             if (slider is not null)
             {
                 double value = Math.Floor(slider.Value);
-                OrbitalSimCmds?.ScaleCamera(value);
+                CommandSimWindow?.ScaleCamera(value);
                 if (MoveScaleLabel is not null)
                     MoveScaleLabel.Content = Math.Exp(value).ToString("N0") + " km";
             }
@@ -446,19 +446,19 @@ namespace OrbitalSimOpenGL
         }
         private void CameraOrbitUp(object sender, RoutedEventArgs e)
         {
-            OrbitalSimCmds?.OrbitCamera(SimCamera.CameraOrbitDirections.OrbitUp, OrbitCameraDegrees);
+            CommandSimWindow?.OrbitCamera(SimCamera.CameraOrbitDirections.OrbitUp, OrbitCameraDegrees);
         }
         private void CameraOrbitLeft(object sender, RoutedEventArgs e)
         {
-            OrbitalSimCmds?.OrbitCamera(SimCamera.CameraOrbitDirections.OrbitLeft, OrbitCameraDegrees);
+            CommandSimWindow?.OrbitCamera(SimCamera.CameraOrbitDirections.OrbitLeft, OrbitCameraDegrees);
         }
         private void CameraOrbitDown(object sender, RoutedEventArgs e)
         {
-            OrbitalSimCmds?.OrbitCamera(SimCamera.CameraOrbitDirections.OrbitDown, OrbitCameraDegrees);
+            CommandSimWindow?.OrbitCamera(SimCamera.CameraOrbitDirections.OrbitDown, OrbitCameraDegrees);
         }
         private void CameraOrbitRight(object sender, RoutedEventArgs e)
         {
-            OrbitalSimCmds?.OrbitCamera(SimCamera.CameraOrbitDirections.OrbitRight, OrbitCameraDegrees);
+            CommandSimWindow?.OrbitCamera(SimCamera.CameraOrbitDirections.OrbitRight, OrbitCameraDegrees);
         }
         private void IterationUnitsChecked(object sender, RoutedEventArgs e)
         {
@@ -488,7 +488,7 @@ namespace OrbitalSimOpenGL
                     int scale = int.Parse((String)IterationScale.SelectedValue);
 
                     // Num seconds will be a number of minutes or number of hours
-                    OrbitalSimCmds?.SimIterationRate(scale * baseSeconds);
+                    CommandSimWindow?.SimIterationRate(scale * baseSeconds);
                 }
             }
         }
@@ -525,7 +525,7 @@ namespace OrbitalSimOpenGL
             if (slider is not null)
             {
                 int value = (int)slider.Value;
-                OrbitalSimCmds?.SimTimeCompression(value);
+                CommandSimWindow?.SimTimeCompression(value);
             }
         }
 
@@ -538,7 +538,7 @@ namespace OrbitalSimOpenGL
         {
             CheckBox checkBox = (CheckBox)sender;
             if (checkBox is not null)
-                OrbitalSimCmds?.Axis(checkBox.IsChecked.Value);
+                CommandSimWindow?.Axis(checkBox.IsChecked.Value);
         }
 
         /// <summary>
@@ -549,7 +549,7 @@ namespace OrbitalSimOpenGL
         private void WireframeCheckbox(object sender, RoutedEventArgs e)
         {
             CheckBox checkBox = (CheckBox)sender;
-            OrbitalSimCmds.Wireframe(checkBox.IsChecked.Value);
+            CommandSimWindow.Wireframe(checkBox.IsChecked.Value);
         }
 
         /// <summary>
@@ -559,13 +559,13 @@ namespace OrbitalSimOpenGL
         {
             //KeepCheckbox.IsChecked = false;
             KeepCombo.SelectedIndex = 0;
-            OrbitalSimCmds?.Keep(SimCamera.KindOfKeep.None);
+            CommandSimWindow?.Keep(SimCamera.KindOfKeep.None);
         }
 
         private void ReticleCheckbox(object sender, RoutedEventArgs e)
         {
             CheckBox checkBox = (CheckBox)sender;
-            OrbitalSimCmds?.Reticle(checkBox.IsChecked.Value);
+            CommandSimWindow?.Reticle(checkBox.IsChecked.Value);
         }
 
         /// <summary>
@@ -591,7 +591,7 @@ namespace OrbitalSimOpenGL
                     keepKind = SimCamera.KindOfKeep.LookAtAndDistance;
                     break;
             }
-            OrbitalSimCmds?.Keep(keepKind);
+            CommandSimWindow?.Keep(keepKind);
         }
 
         /// <summary>
@@ -640,7 +640,7 @@ namespace OrbitalSimOpenGL
                 else if (0 < value)
                     value += 1;
 
-                OrbitalSimCmds?.GravConstant(value);
+                CommandSimWindow?.GravConstant(value);
             }
         }
 
@@ -710,7 +710,7 @@ namespace OrbitalSimOpenGL
                 return;
 
             // Send over name of body to exclude
-            OrbitalSimCmds?.ExcludeBody(checkBox.Uid);
+            CommandSimWindow?.ExcludeBody(checkBox.Uid);
 
             // Once a body is excluded it is out of the sim. for good.
             // Disable all its controls. In this case disable the containing Parent (StackPanel).
@@ -731,7 +731,8 @@ namespace OrbitalSimOpenGL
                 else if (0 < value)
                     value += 1;
 
-                OrbitalSimCmds?.MassMultiplier(slider.Uid, value);
+                // Send of name of body whose mass to change to value
+                CommandSimWindow?.MassMultiplier(slider.Uid, value);
             }
         }
 
@@ -778,10 +779,16 @@ namespace OrbitalSimOpenGL
                 else if (0 < value)
                     value += 1;
 
-                OrbitalSimCmds?.VelocityMultiplier(slider.Uid, value);
+                // Send of name of body whose velocity to change to value
+                CommandSimWindow?.VelocityMultiplier(slider.Uid, value);
             }
         }
 
+        /// <summary>
+        /// Change body's velocity
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BodyModsVelocitySliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             // ... Get Slider reference.
@@ -806,9 +813,19 @@ namespace OrbitalSimOpenGL
             }
         }
 
+        /// <summary>
+        /// (Dis)able path tracing
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BodyModsTraceCheckbox(object sender, RoutedEventArgs e)
         {
+            CheckBox checkBox = (CheckBox)sender;
+            if (checkBox is null)
+                return;
 
+            // Send over name of body to turn on/off tracing
+            CommandSimWindow?.TracePath(checkBox.Uid, checkBox.IsChecked.Value);
         }
     }
     #endregion

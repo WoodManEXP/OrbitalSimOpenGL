@@ -21,6 +21,7 @@ namespace OrbitalSimOpenGL
           , Keep
           , GravConstant
           , ExcludeBody
+          , TracePath
           , MassMultiplier
           , VelocityMultiplier
           , ResetSim
@@ -36,6 +37,19 @@ namespace OrbitalSimOpenGL
             : base(dispatcher)
         {
         }
+
+        #region TracePath
+        /// <summary>
+        /// Have a body turn on/off retain and trace its travel path
+        /// </summary>
+        /// <param name="show"></param>
+        /// <param name="bodyName"></param>
+        public void TracePath(String bodyName, bool show)
+        {
+            object[] args = { CommandSimWindow.GenericCommands.TracePath, show, bodyName };
+            GenericCommand(args);
+        }
+        #endregion
 
         #region Reset
         /// <summary>
@@ -53,10 +67,10 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="body"></param>
-        public void ExcludeBody(String body)
+        /// <param name="bodyName"></param>
+        public void ExcludeBody(String bodyName)
         {
-            object[] args = { CommandSimWindow.GenericCommands.ExcludeBody, body };
+            object[] args = { CommandSimWindow.GenericCommands.ExcludeBody, bodyName };
             GenericCommand(args);
         }
         #endregion
