@@ -19,20 +19,33 @@ namespace OrbitalSimOpenGL
         // unnecessary frustum recalculations.
         Vector3d CameraPosition { get; set; }
         Vector3d LookVector3d { get; set; }
-        float FieldOfView { get; set; } = 0f; // Initial condition to detect first time
-        float AspectRatio { get; set; }
+        Single FieldOfView { get; set; } = 0f; // Initial condition to detect first time
+        Single AspectRatio { get; set; }
         Double DepthNear { get; set; }
         Double DepthFar { get; set; }
 
-        Vector3d TopFaceNormal;
-        Vector3d BottomFaceNormal;
-        Vector3d RightFaceNormal;
-        Vector3d LeftFaceNormal;
-        Vector3d NearFaceNormal;
-        Vector3d FarFaceNormal;
+        // For double precision usage
+        Vector3d TopFaceNormalD;
+        Vector3d BottomFaceNormalD;
+        Vector3d RightFaceNormalD;
+        Vector3d LeftFaceNormalD;
+        Vector3d NearFaceNormalD;
+        Vector3d FarFaceNormalD;
 
-        Vector3d CenterPointNear;   // Serves also as point on near plane
-        Vector3d CenterPointFar;    // Serves also as point on far plane
+        Vector3d CenterPointNearD;   // Serves also as point on near plane
+        Vector3d CenterPointFarD;    // Serves also as point on far plane
+
+        // For single precision usage
+        Vector3 TopFaceNormal;
+        Vector3 BottomFaceNormal;
+        Vector3 RightFaceNormal;
+        Vector3 LeftFaceNormal;
+        Vector3 NearFaceNormal;
+        Vector3 FarFaceNormal;
+
+        Vector3 CenterPointNear;   // Serves also as point on near plane
+        Vector3 CenterPointFar;    // Serves also as point on far plane
+
         #endregion
 
         public FrustumCuller(SimCamera simCamera)
@@ -61,35 +74,42 @@ namespace OrbitalSimOpenGL
                 DepthNear = SimCamera.DepthNear;
                 DepthFar = SimCamera.DepthFar;
 
-                NearFaceNormal = -LookVector3d;
-                FarFaceNormal = LookVector3d;
+                NearFaceNormalD = -LookVector3d;
+                FarFaceNormalD = LookVector3d;
 
                 // Centerpoint on near and far planes
-                CenterPointFar = CameraPosition + FarFaceNormal * DepthFar;
-                CenterPointNear = CameraPosition + NearFaceNormal * DepthNear;
+                CenterPointFarD = CameraPosition + FarFaceNormalD * DepthFar;
+                CenterPointNearD = CameraPosition + NearFaceNormalD * DepthNear;
+
+                CenterPointFar = (Vector3)CenterPointFarD;
+                CenterPointNear = (Vector3)CenterPointNearD;
 
                 Double halfVSide = DepthFar * MathHelper.Tan(FieldOfView * .5f);
                 Double halfHSide = halfVSide * AspectRatio;
 
                 // Normal vector along right face
-                Vector3d v = (CenterPointFar + halfHSide * SimCamera.NormalVector3d) - CameraPosition;
-                RightFaceNormal = Vector3d.Cross(v, SimCamera.UpVector3d);
-                RightFaceNormal.Normalize();
+                Vector3d v = (CenterPointFarD + halfHSide * SimCamera.NormalVector3d) - CameraPosition;
+                RightFaceNormalD = Vector3d.Cross(v, SimCamera.UpVector3d);
+                RightFaceNormalD.Normalize();
+                RightFaceNormal = (Vector3)RightFaceNormalD;
 
                 // Normal vector along left face
-                v = (CenterPointFar - halfHSide * SimCamera.NormalVector3d) - CameraPosition;
-                LeftFaceNormal = Vector3d.Cross(SimCamera.UpVector3d, v);
-                LeftFaceNormal.Normalize();
+                v = (CenterPointFarD - halfHSide * SimCamera.NormalVector3d) - CameraPosition;
+                LeftFaceNormalD = Vector3d.Cross(SimCamera.UpVector3d, v);
+                LeftFaceNormalD.Normalize();
+                LeftFaceNormal = (Vector3)LeftFaceNormalD;
 
                 // Normal vector along face
-                v = (CenterPointFar + halfVSide * SimCamera.UpVector3d) - CameraPosition;
-                TopFaceNormal = Vector3d.Cross(SimCamera.NormalVector3d, v);
-                TopFaceNormal.Normalize();
+                v = (CenterPointFarD + halfVSide * SimCamera.UpVector3d) - CameraPosition;
+                TopFaceNormalD = Vector3d.Cross(SimCamera.NormalVector3d, v);
+                TopFaceNormalD.Normalize();
+                TopFaceNormal = (Vector3)TopFaceNormalD;
 
                 // Normal vector along face
-                v = (CenterPointFar - halfVSide * SimCamera.UpVector3d) - CameraPosition;
-                BottomFaceNormal = Vector3d.Cross(v, SimCamera.NormalVector3d);
-                BottomFaceNormal.Normalize();
+                v = (CenterPointFarD - halfVSide * SimCamera.UpVector3d) - CameraPosition;
+                BottomFaceNormalD = Vector3d.Cross(v, SimCamera.NormalVector3d);
+                BottomFaceNormalD.Normalize();
+                BottomFaceNormal = (Vector3)BottomFaceNormalD;
             }
         }
 
@@ -132,30 +152,37 @@ namespace OrbitalSimOpenGL
             Vector3d v = center - SimCamera.CameraPosition;
 
             // Right face
-            if (diameter < Vector3d.Dot(v, RightFaceNormal))
+            if (diameter < Vector3d.Dot(v, RightFaceNormalD))
                 return true;
 
             // Left face
-            if (diameter < Vector3d.Dot(v, LeftFaceNormal))
+            if (diameter < Vector3d.Dot(v, LeftFaceNormalD))
                 return true;
 
             // Top face
-            if (diameter < Vector3d.Dot(v, TopFaceNormal))
+            if (diameter < Vector3d.Dot(v, TopFaceNormalD))
                 return true;
 
             // Bottom face
-            if (diameter < Vector3d.Dot(v, BottomFaceNormal))
+            if (diameter < Vector3d.Dot(v, BottomFaceNormalD))
                 return true;
 
             // Near face
-            v = center - CenterPointNear;
-            if (diameter < Vector3d.Dot(v, NearFaceNormal))
+            v = center - CenterPointNearD;
+            if (diameter < Vector3d.Dot(v, NearFaceNormalD))
                 return true;
 
             // Far face
-            v = center - CenterPointFar;
-            if (diameter < Vector3d.Dot(v, FarFaceNormal))
+            v = center - CenterPointFarD;
+            if (diameter < Vector3d.Dot(v, FarFaceNormalD))
                 return true;
+
+            return false;
+        }
+
+
+        public Boolean PointCulls(ref Vector3 center)
+        {
 
             return false;
         }

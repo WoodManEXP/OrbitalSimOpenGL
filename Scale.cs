@@ -61,7 +61,7 @@ namespace OrbitalSimOpenGL
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <returns></returns>
-        public void ScaleU_ToW(ref Vector3 sPoint3D, Double x, Double y, Double z)
+        public void ScaleU_ToW(out Vector3 sPoint3D, Double x, Double y, Double z)
         {
             sPoint3D.X = (float)(x * ScaleVal);
             sPoint3D.Y = (float)(y * ScaleVal);

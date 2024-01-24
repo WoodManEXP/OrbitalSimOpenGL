@@ -100,28 +100,19 @@ namespace OrbitalSimOpenGL
                 // Calculate new velocity VZ, VY, VZ
                 // As derrived from F = ma: dV = (f * dT) / mass-of-body
                 // dX, dY, and dZ calculated as average velocity over interval * interval length (seconds)
-                // New X, Y, Z placed in SimBody elements after calculation are complete.
+                // Note the new X, Y, Z are placed in the SimBody after force vector calculation are complete.
 
                 // New velocity vectors
-                simBody.VX += (forceVector.X * seconds) / simBody.Mass;
-                simBody.VY += (forceVector.Y * seconds) / simBody.Mass;
-                simBody.VZ += (forceVector.Z * seconds) / simBody.Mass;
+                Double vX = simBody.VX + (forceVector.X * seconds) / simBody.Mass;
+                Double vY = simBody.VY + (forceVector.Y * seconds) / simBody.Mass;
+                Double vZ = simBody.VZ + (forceVector.Z * seconds) / simBody.Mass;
 
                 Double newX = simBody.X + seconds * ((simBody.VX + simBody.VX) / 2D);
                 Double newY = simBody.Y + seconds * ((simBody.VY + simBody.VY) / 2D);
                 Double newZ = simBody.Z + seconds * ((simBody.VZ + simBody.VZ) / 2D);
 
-                if (simBody.LastTraceVector3D.X == 0) // Set first RecentVector into the SimBody
-                {
-                    simBody.LastTraceVector3D.X = newX - simBody.X;
-                    simBody.LastTraceVector3D.Y = newY - simBody.Y;
-                    simBody.LastTraceVector3D.Z = newZ - simBody.Z;
-                }
-
-                // Update body with its new position
-                simBody.X = newX;
-                simBody.Y = newY;
-                simBody.Z = newZ;
+                // Update body to its new position and velocity vectors
+                simBody.SetPosAndVel(seconds, newX, newY, newZ, vX, vY, vZ );
             }
         }
 

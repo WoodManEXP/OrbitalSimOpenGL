@@ -18,12 +18,12 @@ namespace OrbitalSimOpenGL
         Scale Scale { get; set; }
 
         // Current settings, U coords
-        public Double X { get; set; } // km
-        public Double Y { get; set; } // km
-        public Double Z { get; set; } // km
-        public Double VX { get; set; } // km/s
-        public Double VY { get; set; } // km/s
-        public Double VZ { get; set; } // km/s
+        public Double X { get; private set; } // km
+        public Double Y { get; private set; } // km
+        public Double Z { get; private set; } // km
+        public Double VX { get; private set; } // km/s
+        public Double VY { get; private set; } // km/s
+        public Double VZ { get; private set; } // km/s
 
         // Other settings from Ephemeris reading
         public Double LT { get; set; }
@@ -38,8 +38,8 @@ namespace OrbitalSimOpenGL
         public string Name { get; private set; }
 
         // For trace path drawing
-        public Vector3D LastTraceVector3D;      // Watching curvature rate for drawing path "lines"
-        public Point3D LastTracePoint3D;        // U coords
+//        public Vector3D LastTraceVector3D;      // Watching curvature rate for drawing path "lines"
+//        public Point3D LastTracePoint3D;        // U coords
         Color4 BodyColor { get; set; }
         public bool ExcludeFromSim { get; set; } = false; // Body is to be or not be excluded from the sim
         private PathTracer? PathTracer { get; set; } = null;
@@ -83,10 +83,6 @@ namespace OrbitalSimOpenGL
             // ID and Name are also useful
             ID = ephemerisBody.ID;
             Name = ephemerisBody.Name;
-
-            LastTracePoint3D.X = X;
-            LastTracePoint3D.Y = Y;
-            LastTracePoint3D.Z = Z;
         }
 
         public void InitBody(Scale scale)
@@ -158,6 +154,23 @@ namespace OrbitalSimOpenGL
             position.X = X;
             position.Y = Y;
             position.Z = Z;
+        }
+
+        /// <summary>
+        /// Update body's position and velocity vectors
+        /// </summary>
+        /// <param name="seconds">At this velocity</param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="vX"></param>
+        /// <param name="vY"></param>
+        /// <param name="vZ"></param>
+        public void SetPosAndVel(int seconds, Double x, Double y, Double z, Double vX, Double vY, Double vZ)
+        {
+            X = x; Y = y; Z = z;
+            VX = vX; VY = vY; VZ = vZ;
+            PathTracer?.AddLoc(seconds, x, y, z, vX, vY, vZ); // If there is a PathTracer
         }
 
         //        int iCtr = 0;
