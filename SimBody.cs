@@ -140,9 +140,13 @@ namespace OrbitalSimOpenGL
             GL.DrawElements(PrimitiveType.Triangles, indicesLength, DrawElementsType.UnsignedShort, 0);
         }
 
-        internal void RenderPath(FrustumCuller fC)
+        /// <summary>
+        /// Render body path
+        /// </summary>
+        /// <param name="fC"></param>
+        internal void RenderPath(FrustumCuller fC, int bodyColorUniform, int mvp_Uniform, ref Matrix4 vp)
         {
-
+            PathTracer?.Render(fC, BodyColor, bodyColorUniform, mvp_Uniform, ref vp); // If PathTracer is available...
         }
 
         /// <summary>

@@ -1,31 +1,33 @@
-﻿using OpenTK.Mathematics;
+﻿using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 namespace OrbitalSimOpenGL
 {
-    class PathPoints
+    internal class PathPoints
     {
         /// <summary>
-        /// Points along the path are held in chunks of these
+        /// Points along the path are held in circular buffer
         /// </summary>
-        private int _NumPoints;
-        public int NumPoints { get { return _NumPoints; } }
-        public int MaxNumPoints { get; }
-        public Vector3[] Point; // UCoords converted to OpenGL range
+        /// <remarks>
+        /// Circular list. If list is full newest replaces oldest
+        /// </remarks>
+        public Int16 NumPoints { get; private set; } = 0;
+        private Int16 NextPosn { get; set; } = 0;
+        public Int16 MaxNumPoints { get; set; }
 
-        private readonly Scale Scale;
+        public Vector3d[] Points; // The path points
+        private Scale Scale { get; set; }
 
-        public PathPoints(Scale scale, int chunkSize)
+        public PathPoints(Scale scale, Int16 numPoints = 500)
         {
-            _NumPoints = 0;
-            MaxNumPoints = chunkSize;
-            Point = new Vector3[chunkSize];    // This illustrates a short coming of C#. Seems like withn a class/struct it
-                                               // should be possible to place the number of array elements directly in the
-                                               // definition rather than requiring a separate heap allocation.
+            MaxNumPoints = numPoints;
+            Points = new Vector3d[numPoints];
             Scale = scale;
         }
 
@@ -36,13 +38,16 @@ namespace OrbitalSimOpenGL
         /// <param name="Y"></param>
         /// <param name="Z"></param>
         /// <remarks>
-        /// Trace points are stored as Single (preconverted to OpenGL coords), saving
-        /// on both space and calcuations.
         /// </remarks>
         public void AddOne(Double X, Double Y, Double Z)
         {
-            if (_NumPoints < MaxNumPoints) // JIC
-                Scale.ScaleU_ToW(out Point[_NumPoints++], X, Y, Z);
+            Points[NextPosn].X = X; Points[NextPosn].Y = Y; Points[NextPosn].Z = Z;
+
+            if (NumPoints < MaxNumPoints)
+                NumPoints++;
+
+            NextPosn++;
+            NextPosn %= MaxNumPoints; // Wrap
         }
     }
 
@@ -63,30 +68,25 @@ namespace OrbitalSimOpenGL
         private static Double DistIncrement { get; } = OneAU / 6D;
 
         // Through what angle should the path traverse in order to place another path trace visual
-        private /*static*/ Double CosThreshold { get; } = Math.Cos(MathHelper.DegreesToRadians(5D)); // 5 degrees
+        private static Double CosThreshold { get; } = Math.Cos(MathHelper.DegreesToRadians(5D)); // 5 degrees
 
         private Vector3d LastPos;       // Last tracept position
         private Vector3d LastPosVelVec; // Velocity vec at last travept position
         private Vector3d LastVelVec;    // Last velocity vec passed to :AddLoc
         private Double DistSoFar { get; set; } = 0D;
         private bool FirstTime = true;
+        private PathPoints PathPoints { get; set; }
         private Scale Scale { get; set; } // For universe to WPF coords
-
-        // Path points chunks held in this List
-        static readonly int PathPointsChunkSize = 200;
-        public List<PathPoints> PointsList { get; } = new(PathPointsChunkSize);
         #endregion
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="pathTraceModelVisual3D">The SimModelVisual3D into which to place the path elements</param>
+        /// <param name="scale"></param>
         public PathTracer(Scale scale)
         {
             Scale = scale;
-
-            // Add first points chunk to the list
-            PointsList.Add(new(Scale, PathPointsChunkSize));
+            PathPoints = new(scale);
         }
 
         /// <summary>
@@ -126,29 +126,15 @@ namespace OrbitalSimOpenGL
             if (DistIncrement <= DistSoFar || ArcThresholdCrossed(vX, vY, vZ))
             {
                 // Add to PathPoints
-                int count = PointsList.Count;
-                PathPoints p = PointsList[count - 1];
-                if (p.NumPoints >= p.MaxNumPoints)
-                {
-                    // Start a new chunk
-                    PointsList.Add(p = new(Scale, PathPointsChunkSize));
-                }
-
-                p.AddOne(x, y, z);
+                PathPoints.AddOne(x, y, z);
 
                 // Prep for next
                 LastPos.X = x; LastPos.Y = y; LastPos.Z = z;
                 LastPosVelVec.X = vX; LastPosVelVec.Y = vY; LastPosVelVec.Z = vZ;
                 LastPosVelVec.Normalize();
                 DistSoFar = 0D;
-
-//                System.Diagnostics.Debug.WriteLine("PathTracer:AddLoc: "
-//                            + " Crossed threshold " + crossedThreshold.ToString()
-//                            );
             }
         }
-
-//        long iCtr = -1L;
 
         /// <summary>
         /// Does the velVec sent in cross the cos threshold relative to the velVec recorded with the
@@ -157,7 +143,7 @@ namespace OrbitalSimOpenGL
         /// <param name="vX"></param>
         /// <param name="vY"></param>
         /// <param name="vZ"></param>
-        /// <returns></returns>
+        /// <returns>True or False</returns>
         /// <remarks>
         /// Expensive calculation
         /// </remarks>
@@ -165,21 +151,10 @@ namespace OrbitalSimOpenGL
         {
             // Through what angle has the velocity vector traversed since last pathpoint?
             Vector3d cVec = new(vX, vY, vZ);
-            cVec.Normalize();
+            cVec.Normalize(); // NormalizeFast not accurate enough...
+
+            // Dot product yields cos. Same calculation as Vector3d.Dot()
             Double cos = Math.Abs(LastPosVelVec.X * cVec.X + LastPosVelVec.Y * cVec.Y + LastPosVelVec.Z * cVec.Z);
-
-//            Double lRadians = Math.Acos(cos);
-//            Double lDegrees = MathHelper.RadiansToDegrees(lRadians);
-
-//            if (0 == ++iCtr % 200)
-//                System.Diagnostics.Debug.WriteLine("PathTracer:CosThresholdCrossed: "
-//                    + iCtr.ToString()
-//                    + " DistIncrement " + DistIncrement.ToString("N0")
-//                    + " DistSoFar " + DistSoFar.ToString("N0")
-//                    + " my cos " + cos.ToString()
-//                    + " my radians " + lRadians.ToString()
-//                    + " my degrees " + lDegrees.ToString()
-//                );
 
             return (CosThreshold >= cos);  // cos <= CosThreshold
         }
@@ -189,10 +164,40 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <remarks>
         /// https://docs.gl/gl4/glDrawElements
+        /// https://stackoverflow.com/questions/44687061/how-to-draw-points-efficiently
+        /// https://stackoverflow.com/questions/11821336/what-are-vertex-array-objects
+        /// Use the Frustum culler to remove/include tracepoints visible in the current frustum prior to OpenGL load.
+        /// A point is a sphere of 0 diameter, so FrustumCiller:SphereCulls can be used.
         /// </remarks>
-        public void Render()
+        public void Render(FrustumCuller fC, Color4 bodyColor, int bodyColorUniform, int mvp_Uniform, ref Matrix4 vp)
         {
 
+            if (0 < PathPoints.NumPoints)
+            {
+                // Any/all visible path points will be copies to this Single precision vertex array
+                Vector3[] worldPoints = new Vector3[PathPoints.MaxNumPoints]; // Stack space
+                Int16 numWorldPoints = 0;
+
+                int vector3Size = Marshal.SizeOf(typeof(Vector3));
+
+                // Pull in points to worldPoints array that are visible in current frustum
+                // Also scle from UCoords to WCoords (OpenGL coords)
+                for (Int16 i = 0; i < PathPoints.NumPoints; i++)
+                    if (!fC.SphereCulls(ref PathPoints.Points[i], 0D))
+                        Scale.ScaleU_ToW(out worldPoints[numWorldPoints++], PathPoints.Points[i].X, PathPoints.Points[i].Y, PathPoints.Points[i].Z);
+
+                GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, vector3Size, 0 /*GL.GetAttribLocation(Shader.ShaderHandle, "aPosition")*/);
+                GL.BufferData(BufferTarget.ArrayBuffer, numWorldPoints * vector3Size, worldPoints, BufferUsageHint.StaticDraw);
+
+                GL.Uniform4(bodyColorUniform, bodyColor);
+                GL.UniformMatrix4(mvp_Uniform, false, ref vp);
+
+                Single ptSize = GL.GetFloat(GetPName.PointSize);
+                GL.PointSize(2F);
+                GL.DrawArrays(PrimitiveType.Points, 0, numWorldPoints);
+                GL.PointSize(ptSize);
+            }
         }
+
     }
 }

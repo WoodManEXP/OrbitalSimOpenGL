@@ -83,7 +83,7 @@ void main()
 
             // Pass A - render any paths
             foreach (SimBody sB in BodyList)
-                sB.RenderPath(fC);
+                sB.RenderPath(fC, BodyColorUniform, MVP_Uniform, ref simCamera._VP_Matrix);
 
             // Pass B - render visible bodies
             // Model (Scale * Trans) * View * Projection

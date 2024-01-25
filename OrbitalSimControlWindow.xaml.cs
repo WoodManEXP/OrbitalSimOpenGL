@@ -267,7 +267,7 @@ namespace OrbitalSimOpenGL
         }
 
         /// <summary>
-        /// REset the sim and controls to initial state
+        /// Reset the sim and controls to initial state
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -292,9 +292,12 @@ namespace OrbitalSimOpenGL
             TimeCompressionSlider.Value = TimeCompressionSlider.Minimum;
             TimeCompressionLabel.Content = "1 x";
             CommandSimWindow?.SimTimeCompression((int)TimeCompressionSlider.Value);
+            IterateMinutes.IsChecked = true;
+            IterateHours.IsChecked = false;
 
             GravConstantLabel.Content = "Std";
             GravConstantSlider.Value = 0D;
+            CommandSimWindow?.GravConstant(0);
 
             ShowAxis.IsChecked = ShowReticle.IsChecked = ShowWireframe.IsChecked = true;
             CommandSimWindow?.Axis(true);

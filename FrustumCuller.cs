@@ -36,16 +36,15 @@ namespace OrbitalSimOpenGL
         Vector3d CenterPointFarD;    // Serves also as point on far plane
 
         // For single precision usage
-        Vector3 TopFaceNormal;
-        Vector3 BottomFaceNormal;
-        Vector3 RightFaceNormal;
-        Vector3 LeftFaceNormal;
-        Vector3 NearFaceNormal;
-        Vector3 FarFaceNormal;
+//        Vector3 TopFaceNormal;
+//        Vector3 BottomFaceNormal;
+//        Vector3 RightFaceNormal;
+//        Vector3 LeftFaceNormal;
+//        Vector3 NearFaceNormal;
+//        Vector3 FarFaceNormal;
 
-        Vector3 CenterPointNear;   // Serves also as point on near plane
-        Vector3 CenterPointFar;    // Serves also as point on far plane
-
+//        Vector3 CenterPointNear;   // Serves also as point on near plane
+//        Vector3 CenterPointFar;    // Serves also as point on far plane
         #endregion
 
         public FrustumCuller(SimCamera simCamera)
@@ -81,8 +80,8 @@ namespace OrbitalSimOpenGL
                 CenterPointFarD = CameraPosition + FarFaceNormalD * DepthFar;
                 CenterPointNearD = CameraPosition + NearFaceNormalD * DepthNear;
 
-                CenterPointFar = (Vector3)CenterPointFarD;
-                CenterPointNear = (Vector3)CenterPointNearD;
+//                CenterPointFar = (Vector3)CenterPointFarD;
+//                CenterPointNear = (Vector3)CenterPointNearD;
 
                 Double halfVSide = DepthFar * MathHelper.Tan(FieldOfView * .5f);
                 Double halfHSide = halfVSide * AspectRatio;
@@ -91,25 +90,25 @@ namespace OrbitalSimOpenGL
                 Vector3d v = (CenterPointFarD + halfHSide * SimCamera.NormalVector3d) - CameraPosition;
                 RightFaceNormalD = Vector3d.Cross(v, SimCamera.UpVector3d);
                 RightFaceNormalD.Normalize();
-                RightFaceNormal = (Vector3)RightFaceNormalD;
+//                RightFaceNormal = (Vector3)RightFaceNormalD;
 
                 // Normal vector along left face
                 v = (CenterPointFarD - halfHSide * SimCamera.NormalVector3d) - CameraPosition;
                 LeftFaceNormalD = Vector3d.Cross(SimCamera.UpVector3d, v);
                 LeftFaceNormalD.Normalize();
-                LeftFaceNormal = (Vector3)LeftFaceNormalD;
+//                LeftFaceNormal = (Vector3)LeftFaceNormalD;
 
-                // Normal vector along face
+                // Normal vector along top face
                 v = (CenterPointFarD + halfVSide * SimCamera.UpVector3d) - CameraPosition;
                 TopFaceNormalD = Vector3d.Cross(SimCamera.NormalVector3d, v);
                 TopFaceNormalD.Normalize();
-                TopFaceNormal = (Vector3)TopFaceNormalD;
+//                TopFaceNormal = (Vector3)TopFaceNormalD;
 
-                // Normal vector along face
+                // Normal vector along bottom face
                 v = (CenterPointFarD - halfVSide * SimCamera.UpVector3d) - CameraPosition;
                 BottomFaceNormalD = Vector3d.Cross(v, SimCamera.NormalVector3d);
                 BottomFaceNormalD.Normalize();
-                BottomFaceNormal = (Vector3)BottomFaceNormalD;
+//                BottomFaceNormal = (Vector3)BottomFaceNormalD;
             }
         }
 
@@ -181,7 +180,7 @@ namespace OrbitalSimOpenGL
         }
 
 
-        public Boolean PointCulls(ref Vector3 center)
+        public Boolean PointCulls(ref Vector3 point)
         {
 
             return false;

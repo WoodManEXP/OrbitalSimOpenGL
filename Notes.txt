@@ -48,6 +48,8 @@ SimBody
 - Wireframe on/off (done)
 - Reticle on/off (done)
 - Implement Trace
+	Each body selected individually (done)
+	Keep only last N trace points
 - Barrycenter not adjusting. Either cause it to adjust or remove it as target in bodies selections
 - Implement generic command entry point in OrbitalSimCmds (done)
 - Reticle as X or + or somesuch
