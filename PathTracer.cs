@@ -22,13 +22,11 @@ namespace OrbitalSimOpenGL
         public Int16 MaxNumPoints { get; set; }
 
         public Vector3d[] Points; // The path points
-        private Scale Scale { get; set; }
 
-        public PathPoints(Scale scale, Int16 numPoints = 500)
+        public PathPoints(Int16 numPoints = 500)
         {
             MaxNumPoints = numPoints;
             Points = new Vector3d[numPoints];
-            Scale = scale;
         }
 
         /// <summary>
@@ -66,6 +64,7 @@ namespace OrbitalSimOpenGL
         #region Properties
         static Double OneAU { get; } = 1.49668992E8D; // KM (93M miles);
         private static Double DistIncrement { get; } = OneAU / 6D;
+        private static Single TracePointSize { get; } = 1.5F;
 
         // Through what angle should the path traverse in order to place another path trace visual
         private static Double CosThreshold { get; } = Math.Cos(MathHelper.DegreesToRadians(5D)); // 5 degrees
@@ -86,7 +85,7 @@ namespace OrbitalSimOpenGL
         public PathTracer(Scale scale)
         {
             Scale = scale;
-            PathPoints = new(scale);
+            PathPoints = new();
         }
 
         /// <summary>
@@ -193,11 +192,10 @@ namespace OrbitalSimOpenGL
                 GL.UniformMatrix4(mvp_Uniform, false, ref vp);
 
                 Single ptSize = GL.GetFloat(GetPName.PointSize);
-                GL.PointSize(2F);
+                GL.PointSize(TracePointSize);
                 GL.DrawArrays(PrimitiveType.Points, 0, numWorldPoints);
                 GL.PointSize(ptSize);
             }
         }
-
     }
 }
