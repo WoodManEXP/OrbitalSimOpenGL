@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="OrbitalSim Control - OpenGL" Height="580" Width="612"
         ResizeMode="NoResize"
-        Topmost="True"
+        Topmost="False"
         Loaded="Window_Loaded"
         >
     <Canvas RenderTransformOrigin="0.857,0.49" Height="580" VerticalAlignment="Top" Margin="0,0,-29,0">
