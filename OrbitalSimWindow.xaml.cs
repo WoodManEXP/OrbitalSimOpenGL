@@ -368,8 +368,8 @@ namespace OrbitalSimOpenGL
                 // Let model know about AppDataFolder
                 SimModel.AppDataFolder = AppDataFolder;
 
-                // Instantiate model elements
-                SimModel.InitScene(EphemerisBodyList);
+                // Prep scene
+                SimModel.ResetScene(EphemerisBodyList);
             }
 
             SimModel.SimRunning = true;

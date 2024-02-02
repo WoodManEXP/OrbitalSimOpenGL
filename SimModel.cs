@@ -86,12 +86,8 @@ namespace OrbitalSimOpenGL
             // Maximum number of vertex attributes supported
             //int nrAttributes = 0;
             //GL.GetInteger(GetPName.MaxVertexAttribs, out nrAttributes);
-        }
 
-        public void InitScene(EphemerisBodyList ephemerismBodyList)
-        {
             InitAxes();
-            InitBodies(ephemerismBodyList);
 
             VertexBufferObject = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, VertexBufferObject);
@@ -108,9 +104,6 @@ namespace OrbitalSimOpenGL
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
             GL.FrontFace(FrontFaceDirection.Cw);  // Tringles are wound CW
-
-            Wireframe = true;
-            SceneReady = true;
         }
 
         /// <summary>
@@ -147,6 +140,7 @@ namespace OrbitalSimOpenGL
 
             InitBodies(ephemerismBodyList);
 
+            Wireframe = true;
             SceneReady = true;
         }
 
@@ -295,7 +289,7 @@ namespace OrbitalSimOpenGL
         #region Axes
         private Shader AxisShader;
         public static String AxisVertexShader = @"
-#version 330 core
+# version 330 core
 layout (location = 0) in vec3 aPosition;
 uniform mat4 MVP;
 uniform vec4 objColor; // we set this variable in the OpenGL code.
@@ -307,7 +301,7 @@ void main(void)
 }
 ";
         public static String AxisFragmentShader = @"
-#version 330 core
+# version 330 core
 in vec4 vertexColor;  // the input variable from the vertex shader (same name and same type)
 out vec4 FragColor;
 void main()

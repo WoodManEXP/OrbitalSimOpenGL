@@ -37,7 +37,7 @@ SimBody
 
 
 - Mars moons draw strangely/flicker and Pluto (done)
-- Control windows not so "on-top"
+- Control windows not so "on-top" (done)
 - GoNear draws strangely when sim running (Done)
 	- Reimplement GoNear deceleration phase (maybe later, not so great with bodies in motion)
 - Add point-at and ID (hit testing)
@@ -50,7 +50,7 @@ SimBody
 - Implement Trace
 	Each body selected individually (done)
 	Keep only last N trace points
-- Barrycenter not adjusting. Either cause it to adjust or remove it as target in bodies selections
+- Barycenter (center of mass) not adjusting. Either cause it to adjust or remove it as target in bodies selections
 - Implement generic command entry point in OrbitalSimCmds (done)
 - Reticle as X or + or somesuch
 - Orbit about work with moving bodies (done)
@@ -67,3 +67,4 @@ SimBody
 	Sumultaneous > 2 body collision?
 	Add closest approach, so far, indicator to SimWindows status area (done)
 - Reset sim button/capability (done)
+- Get JPJ body color from Bodies file

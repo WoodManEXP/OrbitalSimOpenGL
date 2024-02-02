@@ -1,0 +1,44 @@
+Use,InitSel,ID#,Name,Designation,IAU/aliases/other,Diameter,Mass,GM
+y,y,10,Sun,,Sol,1.3927E+06,1.9885E+30,1.32712E+11
+y,y,199,Mercury,,,4.8794E+03,3.3020E+23,22031.86855
+y,y,299,Venus,,,1.2104E+04,4.8685E+24,22031.86855
+y,y,301,Moon,,Luna,3.4748E+03,7.3490E+22,4902.800066
+y,y,399,Earth,,Geocenter,1.2742E+04,5.9722E+24,398600.4354
+y,y,401,Phobos,,MI,2.2533E+01,1.0800E+16,
+y,y,402,Deimos,,MII,1.2400E+01,1.8000E+15,
+y,y,499,Mars,,,6.7790E+03,6.4171E+23,42828.37521
+y,n,501,Io,,JI,3.6432E+03,8.9319E+22,5959.9155
+y,n,502,Europa,,JII,3.1216E+03,4.8000E+22,3202.7121
+y,n,503,Ganymede,,JIII,5.2682E+03,1.4819E+23,9887.8328
+y,n,504,Callisto,,JIV,4.8206E+03,1.0759E+23,7179.2834
+y,n,505,Amalthea,,JV,1.6700E+02,7.1700E+18,0.1646
+y,n,506,Himalia,,JVI,1.7000E+02,4.2000E+18,0.151552
+y,n,514,Thebe,,JXIV,9.8600E+01,4.3000E+17,0.0301
+y,n,515,Adrastea,,JXV,1.6400E+01,1.9100E+16,0.0001
+y,y,599,Jupiter,,,1.3982E+05,1.89813E+27,126686531.9
+y,n,610,Janus,,SX,8.9500E+01,1.9800E+18,
+y,n,611,Epimetheus,,SXI,5.8000E+01,5.5000E+17,
+y,n,616,Prometheus,,SXVI,9.0000E+01,1.4000E+17,
+y,n,617,Pandora,,SXVII,9.0000E+01,1.3000E+17,
+y,y,699,Saturn,,,1.1646E+05,5.6834E+26,37931206.16
+y,n,701,Ariel,,UI,1.1000E+03,1.3530E+21,
+y,n,702,Umbriel,,UII,1.1694E+03,1.1720E+21,
+y,n,703,Titania,,UIII,1.5780E+03,3.5270E+21,
+y,n,704,Oberon,,UIV,3.7500E+02,3.0140E+21,
+y,n,705,Miranda,,UV,4.7000E+02,6.5900E+19,
+y,y,799,Uranus,,,5.0724E+04,8.6813E+25,5793951.322
+y,y,899,Neptune,,,3.0599E+04,1.0241E+26,6835099.97
+y,n,901,Charon,,PI,1.2100E+02,1.5300E+21,102.271
+y,y,999,Pluto,134340,,2.3766E+03,1.3070E+22,869.339078
+y,n,-6,Pioneer 6 (spacecraft),,,1.0000E+02,6.2300E+01,
+y,n,-20,Pioneer 8 (spacecraft),,,1.0000E+02,6.5500E+01,
+y,n,-37,Hayabusa 2 (spacecraft),,,1.0000E+02,5.9000E+02,
+y,n,-78,DSCOVR (spacecraft),,Triana,1.0000E+02,5.7000E+02,
+y,n,-111,ICE (spacecraft),,ISEE-3,1.0000E+02,3.9000E+02,
+y,n,-163,WISE (spacecraft),,,1.0000E+02,7.5000E+02,
+y,n,-168,Mars2020 (spacecraft),,Perserverance Ingenu,1.0000E+02,2.0150E+03,
+y,n,-226,Rosetta (spacecraft),,,1.0000E+02,3.0000E+03,
+y,n,-234,STEREO-A (spacecraft),,AHEAD,1.0000E+02,6.2000E+02,
+y,n,-235,STEREO-B (spacecraft),,BEHIND,1.0000E+02,6.2000E+02,
+y,n,-486,Herschel Space Observatory (spacec,,,1.0000E+02,3.3000E+03,
+y,n,-489,Planck Space Observatory (spacecra,,,1.0000E+02,1.8000E+03,
