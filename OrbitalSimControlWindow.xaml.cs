@@ -393,15 +393,15 @@ namespace OrbitalSimOpenGL
             // Populate the LookAt, GoNear, and OribitAbout Combobox
             LookAtComboBox.Items.Clear();
             LookAtComboBox.Items.Add(Properties.Settings.Default.Origin);
-            LookAtComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
+            //LookAtComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
 
             GoNearComboBox.Items.Clear();
             GoNearComboBox.Items.Add(Properties.Settings.Default.Origin);
-            GoNearComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
+            //GoNearComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
 
             OrbitAboutComboBox.Items.Clear();
             OrbitAboutComboBox.Items.Add(Properties.Settings.Default.Origin);
-            OrbitAboutComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
+            //OrbitAboutComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
 
             // Add an entry for each body in the sim
             foreach (EphemerisBody b in EphemerisBodyList.Bodies)
