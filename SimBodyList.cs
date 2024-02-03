@@ -36,8 +36,8 @@ void main()
     FragColor = vertexColor;
 }
 ";
-        int BodyColorUniform { get; set; }
-        int MVP_Uniform { get; set; }
+        public int BodyColorUniform { get; set; }
+        public int MVP_Uniform { get; set; }
 
         // Keep these here so they are allocated but once and reused
         Matrix4 SizeMatrix4 = Matrix4.Identity;

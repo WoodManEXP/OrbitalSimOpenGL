@@ -32,14 +32,15 @@ namespace OrbitalSimOpenGL
         public Double EphemerisDiameter { get; set; } // U coords
         public Double UseDiameter { get; set; } // U coords, gets adjusted for visability
         public Double HalfEphemerisDiameter { get; set; }
-        public Double Mass { get; set; }
+
+        private Double _Mass;
+        public Double Mass { 
+            get { return _Mass * MassMultiplier; }
+            set { _Mass = value; }
+        }
         public Double GM { get; set; }
         public string ID { get; private set; }
         public string Name { get; private set; }
-
-        // For trace path drawing
-//        public Vector3D LastTraceVector3D;      // Watching curvature rate for drawing path "lines"
-//        public Point3D LastTracePoint3D;        // U coords
         Color4 BodyColor { get; set; }
         public bool ExcludeFromSim { get; set; } = false; // Body is to be or not be excluded from the sim
         private PathTracer? PathTracer { get; set; } = null;

@@ -112,9 +112,10 @@
         <ComboBox x:Name="LookAtComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.475,0" Canvas.Left="121" Canvas.Top="228" SelectionChanged="LookAtSelectionChanged" DropDownOpened="LookAtDropDownOpened"/>
         <GroupBox Height="61" Header="Go near" Width="146" Canvas.Left="255" Canvas.Top="202" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <ComboBox x:Name="GoNearComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="126" RenderTransformOrigin="0.475,0" Canvas.Left="263" Canvas.Top="228" DropDownOpened="GoNearDropDownOpened" SelectionChanged="GoNearSelectionChanged"/>
-        <CheckBox x:Name="ShowAxis" Content="Axis" Canvas.Left="14" Canvas.Top="221" HorizontalAlignment="Left" VerticalAlignment="Top" Width="49" Click="AxisCheckbox" IsChecked="True"/>
-        <CheckBox x:Name="ShowReticle" Content="Reticle" Canvas.Left="14" Canvas.Top="261" HorizontalAlignment="Left" VerticalAlignment="Top" Width="57" IsChecked="True" Click="ReticleCheckbox"/>
-        <CheckBox x:Name="ShowWireframe" Content="Wireframe" Canvas.Left="14" Canvas.Top="241" HorizontalAlignment="Left" VerticalAlignment="Top" Width="82" Click="WireframeCheckbox" IsChecked="True"/>
+        <CheckBox x:Name="ShowAxis" Content="Axis" Canvas.Left="14" Canvas.Top="217" HorizontalAlignment="Center" VerticalAlignment="Top" Width="49" Click="AxisCheckbox" IsChecked="True" ToolTip="Show axis"/>
+        <CheckBox x:Name="ShowWireframe" Content="Wireframe" Canvas.Left="14" Canvas.Top="237" HorizontalAlignment="Center" VerticalAlignment="Top" Width="82" Click="WireframeCheckbox" IsChecked="True" ToolTip="Use wireframe or solid rendering"/>
+        <CheckBox x:Name="ShowReticle" Content="Reticle" Canvas.Left="14" Canvas.Top="257" HorizontalAlignment="Center" VerticalAlignment="Top" Width="57" IsChecked="True" Click="ReticleCheckbox" ToolTip="Show reticle"/>
+        <CheckBox x:Name="ShowBaryCenter" Content="Barycenter" Canvas.Left="14" Canvas.Top="276" HorizontalAlignment="Center" VerticalAlignment="Top" Width="82" IsChecked="True" Click="BaryCenterCheckbox" ToolTip="Show system barycenter"/>
         <ComboBox x:Name="KeepCombo" Canvas.Left="232" Canvas.Top="266" Width="92" RenderTransformOrigin="0.833,4.829" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="KeepChanged">
             <ComboBoxItem Content = "None" IsSelected="True" />
             <ComboBoxItem Content = "Look" />

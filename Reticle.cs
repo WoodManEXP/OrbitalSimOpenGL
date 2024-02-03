@@ -17,10 +17,6 @@ namespace OrbitalSimOpenGL
         /// Whenver window aspect ratio changes be sure to set Reticle's AspectRatio property.
         /// </remarks>
         #region Properties
-        public bool DrawReticle { get; set; } = true;
-        public Double DistFromCamera { get; set; } = 100D; // meters from camera, U coords
-        public Double ReticleSize { get; set; } = 25D; // recticle sphere diameter in meters, U coords
-
         // Shared sphere
         Single[]? ReticleSphereMesh;
         UInt16[]? ReticleSphereIndices;
@@ -87,28 +83,25 @@ void main()
             ViewMatrix = Matrix4.LookAt(eye, target, up);
 
             LocationMatrix.M41 = LocationMatrix.M42 = LocationMatrix.M43 = 0f;
-            SizeMatrix.M11 =  SizeMatrix.M22 =  SizeMatrix.M33 = .01f;
+            SizeMatrix.M11 = SizeMatrix.M22 = SizeMatrix.M33 = .01f;
 
             MVP = SizeMatrix * LocationMatrix * ViewMatrix * ProjectionMatrix;
         }
 
-        internal void Render(SimCamera simCamera)
+        internal void Render()
         {
-            if (DrawReticle)
-            {
-                ReticleShader.Use();
+            ReticleShader.Use();
 
-                GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0 /*GL.GetAttribLocation(Shader.ShaderHandle, "aPosition")*/);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0 /*GL.GetAttribLocation(Shader.ShaderHandle, "aPosition")*/);
 
-                // Upload ReticleSphereMesh
-                GL.BufferData(BufferTarget.ArrayBuffer, ReticleSphereMesh.Length * sizeof(Single), ReticleSphereMesh, BufferUsageHint.StaticDraw);
-                GL.BufferData(BufferTarget.ElementArrayBuffer, ReticleSphereIndices.Length * sizeof(UInt16), ReticleSphereIndices, BufferUsageHint.StaticDraw);
+            // Upload ReticleSphereMesh
+            GL.BufferData(BufferTarget.ArrayBuffer, ReticleSphereMesh.Length * sizeof(Single), ReticleSphereMesh, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, ReticleSphereIndices.Length * sizeof(UInt16), ReticleSphereIndices, BufferUsageHint.StaticDraw);
 
-                // Render
-                GL.Uniform4(ReticleColorUniform, ReticleColor);
-                GL.UniformMatrix4(MVP_Uniform, false, ref MVP);
-                GL.DrawElements(PrimitiveType.Triangles, ReticleSphereIndices.Length, DrawElementsType.UnsignedShort, 0);
-            }
+            // Render
+            GL.Uniform4(ReticleColorUniform, ReticleColor);
+            GL.UniformMatrix4(MVP_Uniform, false, ref MVP);
+            GL.DrawElements(PrimitiveType.Triangles, ReticleSphereIndices.Length, DrawElementsType.UnsignedShort, 0);
         }
     }
 }

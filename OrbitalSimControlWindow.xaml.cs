@@ -552,7 +552,18 @@ namespace OrbitalSimOpenGL
         private void WireframeCheckbox(object sender, RoutedEventArgs e)
         {
             CheckBox checkBox = (CheckBox)sender;
-            CommandSimWindow.Wireframe(checkBox.IsChecked.Value);
+            CommandSimWindow?.Wireframe(checkBox.IsChecked.Value);
+        }
+
+        /// <summary>
+        /// (Dis)able calcuation and showing of system barycenter
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BaryCenterCheckbox(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            CommandSimWindow?.Barycenter(checkBox.IsChecked.Value);
         }
 
         /// <summary>

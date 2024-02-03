@@ -18,6 +18,7 @@ namespace OrbitalSimOpenGL
             Axis
           , Wireframe
           , Reticle
+          , Barycenter
           , Keep
           , GravConstant
           , ExcludeBody
@@ -124,6 +125,14 @@ namespace OrbitalSimOpenGL
         public void Wireframe(bool show)
         {
             object[] args = { CommandSimWindow.GenericCommands.Wireframe, show };
+            GenericCommand(args);
+        }
+        #endregion
+
+        #region Barycenter
+        public void Barycenter(bool show)
+        {
+            object[] args = { CommandSimWindow.GenericCommands.Barycenter, show };
             GenericCommand(args);
         }
         #endregion

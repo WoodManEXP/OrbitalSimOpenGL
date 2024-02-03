@@ -221,7 +221,7 @@ namespace OrbitalSimOpenGL
         internal void Render()
         {
             if (ShowReticle)
-                Reticle.Render(this);
+                Reticle.Render();
         }
         public void SetCameraPosition(Vector3d position)
         {

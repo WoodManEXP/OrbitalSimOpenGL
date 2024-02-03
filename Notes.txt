@@ -47,7 +47,7 @@ SimBody
 - Axis on/off (done)
 - Wireframe on/off (done)
 - Reticle on/off (done)
-- Implement Trace
+- Implement PAthTrace (done)
 	Each body selected individually (done)
 	Keep only last N trace points
 - Barycenter (center of mass) not adjusting. Either cause it to adjust or remove it as target in bodies selections
@@ -57,6 +57,7 @@ SimBody
 - More efficiently update VP_Matrix4d in SimCamera:UpdateViewMatrix (rather than doing "new") (done)
 - Suspend frame redraw if nothing happening
 - Move Axis from SimModel to a separate class
+	Draw as GL_LINES rather than triangles
 - Collision detection
 	See CollisionDetection class
 	remove smaller body from list & update MassMass

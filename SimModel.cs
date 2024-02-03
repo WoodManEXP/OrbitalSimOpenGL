@@ -71,6 +71,8 @@ namespace OrbitalSimOpenGL
                 _Wireframe = value;
             }
         }
+        private Barycenter? Barycenter { get; set; }
+        public bool ShowBarycenter { get; set; }
         int VertexBufferObject { get; set; }
         int VertexArrayObject { get; set; }
         int ElementBufferObject { get; set; }
@@ -107,6 +109,24 @@ namespace OrbitalSimOpenGL
         }
 
         /// <summary>
+        /// Reset sim to initial state
+        /// </summary>
+        /// <param name="ephemerismBodyList"></param>
+        public void ResetScene(EphemerisBodyList ephemerismBodyList)
+        {
+            // Stop the sim, to avoid any timing and indetrerminate-state issues relative to
+            // OpenTK's calling OrbitalSimWindow:OnRender during reset.
+            SceneReady = false;
+            ElapsedSeconds = 0;
+
+            InitBodies(ephemerismBodyList);
+
+            Wireframe = true;
+            SceneReady = true;
+            ShowBarycenter = true;
+        }
+
+        /// <summary>
         /// Initialize geometry for the indiviual bodies
         /// </summary>
         /// <param name="bodyList"></param>
@@ -125,23 +145,7 @@ namespace OrbitalSimOpenGL
             MassMass = new(SimBodyList);
             CollisionDetector = new(SimBodyList, MassMass);
             NextPosition = new(SimBodyList, MassMass, GravConstantSetting);
-        }
-
-        /// <summary>
-        /// Reset sim to initial state
-        /// </summary>
-        /// <param name="ephemerismBodyList"></param>
-        public void ResetScene(EphemerisBodyList ephemerismBodyList)
-        {
-            // Stop the sim, to avoid any timing and indetrerminate-state issues relative to
-            // OpenTK's calling OrbitalSimWindow:OnRender during reset.
-            SceneReady = false;
-            ElapsedSeconds = 0;
-
-            InitBodies(ephemerismBodyList);
-
-            Wireframe = true;
-            SceneReady = true;
+            Barycenter = new(Scale, SimBodyList);
         }
 
         /// <summary>
@@ -172,6 +176,13 @@ namespace OrbitalSimOpenGL
             SimBody sB;
             if (null != (sB = SimBodyList.Render(SimCamera, mousePosition)))
                 LastMouseOverSB = sB;
+
+            if (ShowBarycenter)
+            {
+                Barycenter?.Calc();
+                // Render can use same shaders as available in SimBodyList
+                Barycenter?.Render(ms, SimCamera, SimBodyList.BodyColorUniform, SimBodyList.MVP_Uniform);
+            }
         }
 
         /// <summary>
@@ -192,9 +203,6 @@ namespace OrbitalSimOpenGL
 
                     ElapsedSeconds += IterationSeconds;
                 }
-
-                // Process path traces (lines showing where bodies have been)
-                //PathTrace.UpdateTracePaths(SimBodyList, NextPosition.IterationNumber);
             }
         }
 
@@ -230,6 +238,7 @@ namespace OrbitalSimOpenGL
                 SimBody sB = SimBodyList.BodyList[sBI];
                 sB.ExcludeFromSim = true;
             }
+            Barycenter?.SystemMassChanged();
         }
 
         /// <summary>
@@ -253,6 +262,7 @@ namespace OrbitalSimOpenGL
             SimBodyList.BodyList[sBI].MassMultiplier = (Double)multiplier;
 
             MassMass?.CalcMassMass(SimBodyList);
+            Barycenter?.SystemMassChanged();
         }
 
         /// <summary>

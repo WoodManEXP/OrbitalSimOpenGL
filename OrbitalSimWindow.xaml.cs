@@ -177,6 +177,10 @@ namespace OrbitalSimOpenGL
                         SimModel.Wireframe = (bool)args[1];
                         break;
 
+                    case CommandSimWindow.GenericCommands.Barycenter:
+                        SimModel.ShowBarycenter = (bool)args[1];
+                        break;
+
                     case CommandSimWindow.GenericCommands.Keep:
                         if (SimModel.SimCamera is not null)
                             SimModel.SimCamera.KeepKind = (SimCamera.KindOfKeep)args[1];

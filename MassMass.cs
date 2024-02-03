@@ -65,8 +65,8 @@ namespace OrbitalSimOpenGL
                     SimBody lSB = simBodyList.BodyList[bL];
                     SimBody hSB = simBodyList.BodyList[bH];
 
-                    Double lBodyMass = lSB.Mass * lSB.MassMultiplier;
-                    Double hBodyMass = hSB.Mass * hSB.MassMultiplier;
+                    Double lBodyMass = lSB.Mass;
+                    Double hBodyMass = hSB.Mass;
 
                     MassMassValues[i] = lBodyMass * hBodyMass;
                 }

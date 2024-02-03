@@ -66,6 +66,8 @@ namespace OrbitalSimOpenGL
         private static Double DistIncrement { get; } = OneAU / 6D;
         private static Single TracePointSize { get; } = 1.5F;
 
+        private int Vector3Size = Marshal.SizeOf(typeof(Vector3));
+
         // Through what angle should the path traverse in order to place another path trace visual
         private static Double CosThreshold { get; } = Math.Cos(MathHelper.DegreesToRadians(5D)); // 5 degrees
 
@@ -173,11 +175,9 @@ namespace OrbitalSimOpenGL
 
             if (0 < PathPoints.NumPoints)
             {
-                // Any/all visible path points will be copies to this Single precision vertex array
+                // Any/all visible path points will be copied to this Single precision vertex array
                 Vector3[] worldPoints = new Vector3[PathPoints.MaxNumPoints]; // Stack space
                 Int16 numWorldPoints = 0;
-
-                int vector3Size = Marshal.SizeOf(typeof(Vector3));
 
                 // Pull in points to worldPoints array that are visible in current frustum
                 // Also scle from UCoords to WCoords (OpenGL coords)
@@ -185,8 +185,8 @@ namespace OrbitalSimOpenGL
                     if (!fC.SphereCulls(ref PathPoints.Points[i], 0D))
                         Scale.ScaleU_ToW(out worldPoints[numWorldPoints++], PathPoints.Points[i].X, PathPoints.Points[i].Y, PathPoints.Points[i].Z);
 
-                GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, vector3Size, 0 /*GL.GetAttribLocation(Shader.ShaderHandle, "aPosition")*/);
-                GL.BufferData(BufferTarget.ArrayBuffer, numWorldPoints * vector3Size, worldPoints, BufferUsageHint.StaticDraw);
+                GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3Size, 0 /*GL.GetAttribLocation(Shader.ShaderHandle, "aPosition")*/);
+                GL.BufferData(BufferTarget.ArrayBuffer, numWorldPoints * Vector3Size, worldPoints, BufferUsageHint.StaticDraw);
 
                 GL.Uniform4(bodyColorUniform, bodyColor);
                 GL.UniformMatrix4(mvp_Uniform, false, ref vp);
