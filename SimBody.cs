@@ -15,7 +15,7 @@ namespace OrbitalSimOpenGL
     public class SimBody
     {
         #region Properties
-        Scale Scale { get; set; }
+        private Scale? Scale { get; set; }
 
         // Current settings, U coords
         public Double X { get; private set; } // km
@@ -63,23 +63,23 @@ namespace OrbitalSimOpenGL
 
         public SimBody(EphemerisBody ephemerisBody)
         {
-            double dVal;
+            Double dVal;
 
             // Save ephemeris values into current settings (universe coords)
-            X = double.TryParse(ephemerisBody.X_Str, out dVal) ? dVal : -1D;
-            Y = double.TryParse(ephemerisBody.Y_Str, out dVal) ? dVal : -1D;
-            Z = double.TryParse(ephemerisBody.Z_Str, out dVal) ? dVal : -1D;
-            VX = double.TryParse(ephemerisBody.VX_Str, out dVal) ? dVal : -1D;
-            VY = double.TryParse(ephemerisBody.VY_Str, out dVal) ? dVal : -1D;
-            VZ = double.TryParse(ephemerisBody.VZ_Str, out dVal) ? dVal : -1D;
-            LT = double.TryParse(ephemerisBody.LT_Str, out dVal) ? dVal : -1D;
+            X = Double.TryParse(ephemerisBody.X_Str, out dVal) ? dVal : -1D;
+            Y = Double.TryParse(ephemerisBody.Y_Str, out dVal) ? dVal : -1D;
+            Z = Double.TryParse(ephemerisBody.Z_Str, out dVal) ? dVal : -1D;
+            VX = Double.TryParse(ephemerisBody.VX_Str, out dVal) ? dVal : -1D;
+            VY = Double.TryParse(ephemerisBody.VY_Str, out dVal) ? dVal : -1D;
+            VZ = Double.TryParse(ephemerisBody.VZ_Str, out dVal) ? dVal : -1D;
+            LT = Double.TryParse(ephemerisBody.LT_Str, out dVal) ? dVal : -1D;
             //LT = double.TryParse(ephemerisBody.LT_Str, out dVal) ? dVal : -1D;
-            RG = double.TryParse(ephemerisBody.RG_Str, out dVal) ? dVal : -1D;
-            RR = double.TryParse(ephemerisBody.RR_Str, out dVal) ? dVal : -1D;
-            EphemerisDiameter = double.TryParse(ephemerisBody.DiameterStr, out dVal) ? dVal : -1D;
+            RG = Double.TryParse(ephemerisBody.RG_Str, out dVal) ? dVal : -1D;
+            RR = Double.TryParse(ephemerisBody.RR_Str, out dVal) ? dVal : -1D;
+            EphemerisDiameter = Double.TryParse(ephemerisBody.DiameterStr, out dVal) ? dVal : -1D;
             HalfEphemerisDiameter = EphemerisDiameter / 2D;
-            Mass = double.TryParse(ephemerisBody.MassStr, out dVal) ? dVal : -1D;
-            GM = double.TryParse(ephemerisBody.GM_Str, out dVal) ? dVal : -1D;
+            Mass = Double.TryParse(ephemerisBody.MassStr, out dVal) ? dVal : -1D;
+            GM = Double.TryParse(ephemerisBody.GM_Str, out dVal) ? dVal : -1D;
 
             // ID and Name are also useful
             ID = ephemerisBody.ID;

@@ -70,7 +70,7 @@ namespace OrbitalSimOpenGL
                 String[] col = row.Split(',');
 
                 if ("y".Equals(col[0])) // Entries with "y" here are available for sim (Has the effect of ignoring the header line)
-                    BodyList.Add(new JPL_Body("y".Equals(col[1]), col[2], col[3], col[4], col[5], col[6], col[7], col[8]));
+                    BodyList.Add(new JPL_Body("y".Equals(col[1]), col[2], col[3], col[4], col[5], col[6], col[7], col[8], col[9]));
             }
         }
 

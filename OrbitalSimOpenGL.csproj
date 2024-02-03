@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="C:\Users\Robert\AppData\Local\OrbitalSimOpenGL\InitJPL_Bodies.csv" Link="InitJPL_Bodies.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="OpenTK.GLWpfControl" Version="4.2.3" />
   </ItemGroup>
 

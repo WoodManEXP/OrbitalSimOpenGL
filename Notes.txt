@@ -69,3 +69,5 @@ SimBody
 	Add closest approach, so far, indicator to SimWindows status area (done)
 - Reset sim button/capability (done)
 - Get JPJ body color from Bodies file
+- Three body example
+	https://en.wikipedia.org/wiki/Three-body_problem
