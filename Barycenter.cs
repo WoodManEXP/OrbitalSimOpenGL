@@ -102,17 +102,18 @@ namespace OrbitalSimOpenGL
 
             int colorStep = (MS_SoFar % ColorCycleTime) / MS_PerStep;
 
-            if (colorStep < LastColorStep)
-                ColorGoingUp = !ColorGoingUp;
-
             // Does color change?
             if (LastColorStep != colorStep)
             {
+                if (colorStep < LastColorStep)
+                    ColorGoingUp = !ColorGoingUp;
+                LastColorStep = colorStep;
+
                 // Color is changing, interpolate between the colors
                 // Color moves back and forth between the two, pendulum style.
-                LastColorStep = colorStep;
                 if (!ColorGoingUp)
                     colorStep = NumColorSteps - colorStep;
+
                 Vector3 sCVec = StartCVec + colorStep * CVec;
                 LastColor.R = sCVec.X; LastColor.G = sCVec.Y; LastColor.B = sCVec.Z;
             }
