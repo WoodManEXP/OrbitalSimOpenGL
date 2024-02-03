@@ -20,7 +20,7 @@ namespace OrbitalSimOpenGL
 
         private Vector3[] WorldPoint;
         private readonly int Vector3Size = Marshal.SizeOf(typeof(Vector3));
-        private static readonly Single BaryPointSize = 6F;
+        private static readonly Single BaryPointSize = 8F;
 
         // Color cycling for barycenter symbol
         private Color4 StartC = Color4.Yellow;
@@ -34,6 +34,7 @@ namespace OrbitalSimOpenGL
         private static int ColorCycleTime { get; set; } = 3000; // MS
         private static int MS_PerStep { get; set; } = ColorCycleTime / NumColorSteps;
         private int LastColorStep { get; set; } = -1;
+        private bool ColorGoingUp { get; set; } = true;
         #endregion
 
         public Barycenter(Scale scale, SimBodyList simBodyList)
@@ -51,6 +52,7 @@ namespace OrbitalSimOpenGL
             CVec = eC - StartCVec;
             CDist = CVec.Length / (Single)NumColorSteps;
             CVec.Normalize();
+            CVec *= CDist;
 
             LastColor.A = 1F; // Always 1F
         }
@@ -94,25 +96,29 @@ namespace OrbitalSimOpenGL
         /// </summary>
         internal void Render(int ms, SimCamera simCamera, int bodyColorUniform, int mvp_Uniform)
         {
-
             FrustumCuller fC = simCamera.FrustumCuller;
 
             MS_SoFar += ms;
 
             int colorStep = (MS_SoFar % ColorCycleTime) / MS_PerStep;
 
+            if (colorStep < LastColorStep)
+                ColorGoingUp = !ColorGoingUp;
+
             // Does color change?
             if (LastColorStep != colorStep)
             {
                 // Color is changing, interpolate between the colors
-                Vector3 sCVec = StartCVec + colorStep * CDist * CVec;
+                // Color moves back and forth between the two, pendulum style.
                 LastColorStep = colorStep;
+                if (!ColorGoingUp)
+                    colorStep = NumColorSteps - colorStep;
+                Vector3 sCVec = StartCVec + colorStep * CVec;
                 LastColor.R = sCVec.X; LastColor.G = sCVec.Y; LastColor.B = sCVec.Z;
             }
 
             //System.Diagnostics.Debug.WriteLine("Barycenter:Render:"
             //        + " colorStep:" + colorStep.ToString()
-            //        + " LastColor:" + LastColor.ToString()
             //        );
 
             if (!fC.SphereCulls(ref R, 0D))
