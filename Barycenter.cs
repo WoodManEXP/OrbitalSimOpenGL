@@ -19,8 +19,8 @@ namespace OrbitalSimOpenGL
         private Vector3d R; // location of barycenter after last Calc
 
         private Vector3[] WorldPoint;
-        private int Vector3Size = Marshal.SizeOf(typeof(Vector3));
-        private static Single BaryPointSize = 6F;
+        private readonly int Vector3Size = Marshal.SizeOf(typeof(Vector3));
+        private static readonly Single BaryPointSize = 6F;
 
         // Color cycling for barycenter symbol
         private Color4 StartC = Color4.Yellow;
@@ -52,7 +52,7 @@ namespace OrbitalSimOpenGL
             CDist = CVec.Length / (Single)NumColorSteps;
             CVec.Normalize();
 
-            LastColor.A = 1F;
+            LastColor.A = 1F; // Always 1F
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace OrbitalSimOpenGL
             // Total system mass, non-excluded bodies
             foreach (SimBody sB in SimBodyList.BodyList)
                 if (!sB.ExcludeFromSim)
-                    SystemMass += sB.Mass * sB.MassMultiplier;
+                    SystemMass += sB.Mass;
         }
 
         /// <summary>
