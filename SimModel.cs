@@ -112,40 +112,23 @@ namespace OrbitalSimOpenGL
         /// Reset sim to initial state
         /// </summary>
         /// <param name="ephemerismBodyList"></param>
-        public void ResetScene(EphemerisBodyList ephemerismBodyList)
+        public void ResetScene(EphemerisBodyList ephemerisBodyList)
         {
             // Stop the sim, to avoid any timing and indetrerminate-state issues relative to
             // OpenTK's calling OrbitalSimWindow:OnRender during reset.
             SceneReady = false;
             ElapsedSeconds = 0;
 
-            InitBodies(ephemerismBodyList);
-
-            Wireframe = true;
-            SceneReady = true;
-            ShowBarycenter = true;
-        }
-
-        /// <summary>
-        /// Initialize geometry for the indiviual bodies
-        /// </summary>
-        /// <param name="bodyList"></param>
-        private void InitBodies(EphemerisBodyList ephemerisBodyList)
-        {
-            SimBodyList = new SimBodyList(ephemerisBodyList, AppDataFolder);
-
-            // Process each body
-            foreach (SimBody sB in SimBodyList.BodyList)
-            {
-                //                if (!sB.Name.Equals("Sun")) // Only Sol for now
-                //                    continue;
-                sB.InitBody(Scale);
-            }
+            SimBodyList = new SimBodyList(Scale, ephemerisBodyList, AppDataFolder);
 
             MassMass = new(SimBodyList);
             CollisionDetector = new(SimBodyList, MassMass);
             NextPosition = new(SimBodyList, MassMass, GravConstantSetting);
             Barycenter = new(Scale, SimBodyList);
+
+            Wireframe = true;
+            SceneReady = true;
+            ShowBarycenter = true;
         }
 
         /// <summary>

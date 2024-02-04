@@ -46,7 +46,7 @@ void main()
         private String AppDataFolder { get; set; }
         #endregion 
 
-        public SimBodyList(EphemerisBodyList ephemerismBodyList, String appDataFolder)
+        public SimBodyList(Scale scale, EphemerisBodyList ephemerismBodyList, String appDataFolder)
         {
             AppDataFolder = appDataFolder;
 
@@ -56,7 +56,7 @@ void main()
 
             foreach (EphemerisBody eB in ephemerismBodyList.Bodies)
                 //                if (eB.Name.Equals("Sun"))
-                BodyList.Add(new SimBody(eB));
+                BodyList.Add(new SimBody(scale, eB));
 
             Shader = new(VertexShader, FragmentShader);
 

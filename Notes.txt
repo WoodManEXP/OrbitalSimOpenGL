@@ -47,7 +47,7 @@ SimBody
 - Axis on/off (done)
 - Wireframe on/off (done)
 - Reticle on/off (done)
-- Implement PAthTrace (done)
+- Implement PathTrace (done)
 	Each body selected individually (done)
 	Keep only last N trace points
 - Barycenter (center of mass) not adjusting. Either cause it to adjust or remove it as target in bodies selections
@@ -64,10 +64,11 @@ SimBody
 	add smaller body's mass to larger, retain larger's color
 	change name to larger-smaller
 	add vel/mass vectors, change vectors on retained body to match
-	Color Red nd larger for a while after collision
+	Color Red and larger for a while after collision
 	Sumultaneous > 2 body collision?
 	Add closest approach, so far, indicator to SimWindows status area (done)
 - Reset sim button/capability (done)
 - Get JPJ body color from Bodies file
+- Move body color into the .csv and .json files
 - Three body example
 	https://en.wikipedia.org/wiki/Three-body_problem

@@ -11,7 +11,6 @@ namespace OrbitalSimOpenGL
     /// </summary>
     public class Scale
     {
-
         #region Properties
         public Double ScaleVal { get; set;} // For scaling from universe to WPF coords
 

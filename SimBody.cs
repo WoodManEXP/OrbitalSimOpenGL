@@ -41,7 +41,9 @@ namespace OrbitalSimOpenGL
         public Double GM { get; set; }
         public string ID { get; private set; }
         public string Name { get; private set; }
-        Color4 BodyColor { get; set; }
+
+        private Color4 _BodyColor;
+        Color4 BodyColor { get { return _BodyColor; } set { _BodyColor = value; } }
         public bool ExcludeFromSim { get; set; } = false; // Body is to be or not be excluded from the sim
         private PathTracer? PathTracer { get; set; } = null;
 
@@ -61,9 +63,11 @@ namespace OrbitalSimOpenGL
         }
         #endregion
 
-        public SimBody(EphemerisBody ephemerisBody)
+        public SimBody(Scale scale, EphemerisBody ephemerisBody)
         {
             Double dVal;
+
+            Scale = scale;;
 
             // Save ephemeris values into current settings (universe coords)
             X = Double.TryParse(ephemerisBody.X_Str, out dVal) ? dVal : -1D;
@@ -73,7 +77,6 @@ namespace OrbitalSimOpenGL
             VY = Double.TryParse(ephemerisBody.VY_Str, out dVal) ? dVal : -1D;
             VZ = Double.TryParse(ephemerisBody.VZ_Str, out dVal) ? dVal : -1D;
             LT = Double.TryParse(ephemerisBody.LT_Str, out dVal) ? dVal : -1D;
-            //LT = double.TryParse(ephemerisBody.LT_Str, out dVal) ? dVal : -1D;
             RG = Double.TryParse(ephemerisBody.RG_Str, out dVal) ? dVal : -1D;
             RR = Double.TryParse(ephemerisBody.RR_Str, out dVal) ? dVal : -1D;
             EphemerisDiameter = Double.TryParse(ephemerisBody.DiameterStr, out dVal) ? dVal : -1D;
@@ -84,29 +87,9 @@ namespace OrbitalSimOpenGL
             // ID and Name are also useful
             ID = ephemerisBody.ID;
             Name = ephemerisBody.Name;
-        }
 
-        public void InitBody(Scale scale)
-        {
-            Scale = scale;
-
-            BodyColor = Name switch
-            {
-                "Sun" => Color4.Yellow,
-                "Mercury" => Color4.SlateGray,
-                "Venus" => Color4.White,
-                "Moon" => Color4.SlateGray,
-                "Earth" => Color4.Blue,
-                "Phobos" => Color4.Green,
-                "Deimos" => Color4.Green,
-                "Mars" => Color4.DarkRed,
-                "Jupiter" => Color4.Beige,
-                "Saturn" => Color4.Beige,
-                "Uranus" => Color4.LightGreen,
-                "Neptune" => Color4.SlateBlue,
-                "Pluto" => Color4.Tan,
-                _ => Color4.DarkOrange
-            };
+            // Body color
+            Colors.GetColor4(ephemerisBody.ColorStr, out _BodyColor);
         }
 
         /// <summary>

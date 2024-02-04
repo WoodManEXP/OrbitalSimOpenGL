@@ -176,18 +176,21 @@ namespace OrbitalSimOpenGL
                 if (0 == inputLine.IndexOf("$$SOE")) // If found
                     if ((inputLine = stringReader.ReadLine()) != null)
                     {
-
-                        String[] values = inputLine.Split(",");
-
-                        EphemerisBody ephemerisBody = new EphemerisBody(jplBody.ID            /* 1 */
+                        // Start EphemerisBody with values from csv file
+                        EphemerisBody ephemerisBody = new EphemerisBody(
+                                                      jplBody.ID            /* 1 */
                                                     , jplBody.Name          /* 2 */
                                                     , jplBody.Designation   /* 3 */
                                                     , jplBody.IAU_Alias     /* 4 */
                                                     , jplBody.DiameterStr   /* 5 */
                                                     , jplBody.MassStr       /* 6 */
-                                                    , jplBody.GM_Str);      /* 7 */
+                                                    , jplBody.GM_Str        /* 7 */
+                                                    , jplBody.ColorStr      /* 8 */
+                                                    );
 
-                        // Save ephemeris values
+                        String[] values = inputLine.Split(",");
+
+                        // Add ephemeris values from JPL
                         try
                         {
                             ephemerisBody.X_Str = values[2];

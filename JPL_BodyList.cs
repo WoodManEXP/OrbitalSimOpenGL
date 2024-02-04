@@ -57,7 +57,7 @@ namespace OrbitalSimOpenGL
 
             String csvFileName = initialLoad ? InitJPL_BodiesFile : SavedJPLBodiesFile;
 
-            // Use,InitSel,ID#,Name,Designation,IAU/aliases/other,Diameter,Mass,GM
+            // Use,InitSel,ID#,Name,Designation,IAU/aliases/other,Diameter,Mass,GM,Color
 
             BodyList.Clear();
 
@@ -69,7 +69,7 @@ namespace OrbitalSimOpenGL
             {
                 String[] col = row.Split(',');
 
-                if ("y".Equals(col[0])) // Entries with "y" here are available for sim (Has the effect of ignoring the header line)
+                if ("y".Equals(col[0])) // Entries with "y" here are available for sim (has the effect of ignoring the header line)
                     BodyList.Add(new JPL_Body("y".Equals(col[1]), col[2], col[3], col[4], col[5], col[6], col[7], col[8], col[9]));
             }
         }
@@ -94,7 +94,7 @@ namespace OrbitalSimOpenGL
             {
                 var writer = new StreamWriter(saveCSV_Path);
 
-                writer.WriteLine("Use,InitSel,ID#,Name,Designation,IAU/aliases/other,Diameter,Mass,GM");
+                writer.WriteLine("Use,InitSel,ID#,Name,Designation,IAU/aliases/other,Diameter,Mass,GM,Color");
 
                 foreach (JPL_Body b in BodyList)
                 {

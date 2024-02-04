@@ -14,6 +14,7 @@ namespace OrbitalSimOpenGL
         public String MassStr { get; set; }
         public String DiameterStr { get; set; }
         public String GM_Str { get; set; }
+        public String ColorStr { get; set; }
 
         public String? X_Str { get; set; }
         public String? Y_Str { get; set; }
@@ -32,7 +33,9 @@ namespace OrbitalSimOpenGL
                     , String iAU_Alias     /* 4 */
                     , String diameteStr    /* 5 */
                     , String massStr       /* 6 kg */
-                    , String gM_Str)       /* 7 */
+                    , String gM_Str        /* 7 */
+                    , String colorStr
+            )
         {
             ID = id;
             Name = name;
@@ -41,6 +44,7 @@ namespace OrbitalSimOpenGL
             DiameterStr = diameteStr;
             MassStr = massStr;
             GM_Str = gM_Str;
+            ColorStr = colorStr;
         }
 
         [JsonConstructor]
@@ -54,6 +58,7 @@ namespace OrbitalSimOpenGL
                     , String x_Str, String y_Str, String z_Str
                     , String vX_Str, String vY_Str, String vZ_Str
                     , String lT_Str, String rG_Str, String rR_Str
+                    , String colorStr
                     )
         {
             ID = id;
@@ -66,6 +71,7 @@ namespace OrbitalSimOpenGL
             X_Str = x_Str; Y_Str = y_Str; Z_Str = z_Str;
             VX_Str = vX_Str; VY_Str = vY_Str; VZ_Str = vZ_Str;
             LT_Str = lT_Str; RG_Str = rG_Str; RR_Str = rR_Str;
+            ColorStr = colorStr;
         }
     }
 }

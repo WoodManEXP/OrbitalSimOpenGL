@@ -9,18 +9,18 @@ n,n,6,Saturn Barycenter,,,,,,none
 n,n,7,Uranus Barycenter,,,,,,none
 n,n,8,Neptune Barycenter,,,,,,none
 n,n,9,Pluto Barycenter,,,,,,none
-y,y,10,Sun,,Sol,1.3927E+06,1.9885E+30,1.32712E+11,none
+y,y,10,Sun,,Sol,1.3927E+06,1.9885E+30,1.32712E+11,Yellow
 n,n,31,SEMB-L1,,Lagrange,,,,none
 n,n,32,SEMB-L2,,Lagrange,,,,none
 n,n,34,SEMB-L4,,Lagrange,,,,none
 n,n,35,SEMB-L5,,Lagrange,,,,none
-y,y,199,Mercury,,,4.8794E+03,3.3020E+23,22031.86855,none
-y,y,299,Venus,,,1.2104E+04,4.8685E+24,22031.86855,none
-y,y,301,Moon,,Luna,3.4748E+03,7.3490E+22,4902.800066,none
-y,y,399,Earth,,Geocenter,1.2742E+04,5.9722E+24,398600.4354,none
-y,y,401,Phobos,,MI,2.2533E+01,1.0800E+16,,none
-y,y,402,Deimos,,MII,1.2400E+01,1.8000E+15,,none
-y,y,499,Mars,,,6.7790E+03,6.4171E+23,42828.37521,none
+y,y,199,Mercury,,,4.8794E+03,3.3020E+23,22031.86855,SlateGray
+y,y,299,Venus,,,1.2104E+04,4.8685E+24,22031.86855,White
+y,y,301,Moon,,Luna,3.4748E+03,7.3490E+22,4902.800066,SlateGray
+y,y,399,Earth,,Geocenter,1.2742E+04,5.9722E+24,398600.4354,Blue
+y,y,401,Phobos,,MI,2.2533E+01,1.0800E+16,,Green
+y,y,402,Deimos,,MII,1.2400E+01,1.8000E+15,,Green
+y,y,499,Mars,,,6.7790E+03,6.4171E+23,42828.37521,DarkRed
 y,n,501,Io,,JI,3.6432E+03,8.9319E+22,5959.9155,none
 y,n,502,Europa,,JII,3.1216E+03,4.8000E+22,3202.7121,none
 y,n,503,Ganymede,,JIII,5.2682E+03,1.4819E+23,9887.8328,none
@@ -100,7 +100,7 @@ n,n,55504,,2003J10,55065,,,,none
 n,n,55505,,2003J12,55066,,,,none
 n,n,55506,,2003J16,55068,,,,none
 n,n,55507,,2003J23,55071,,,,none
-y,y,599,Jupiter,,,1.3982E+05,1.8982E+30,126686531.9,none
+y,y,599,Jupiter,,,1.3982E+05,1.8982E+30,126686531.9,Beige
 n,n,601,Mimas,,SI,3.9640E+02,,2.503617,none
 n,n,602,Enceladus,,SII,5.0420E+02,,7.210497,none
 n,n,603,Tethys,,SIII,1.0620E+03,,41.21,none
@@ -182,7 +182,7 @@ n,n,65081,,2004S36,,,,,none
 n,n,65082,,2004S37,,,,,none
 n,n,65083,,2004S38,,,,,none
 n,n,65084,,2004S39,,,,,none
-y,y,699,Saturn,,,1.1646E+05,5.6834E+26,37931206.16,none
+y,y,699,Saturn,,,1.1646E+05,5.6834E+26,37931206.16,Beige
 y,n,701,Ariel,,UI,1.1000E+03,1.3530E+21,,none
 y,n,702,Umbriel,,UII,1.1694E+03,1.1720E+21,,none
 y,n,703,Titania,,UIII,1.5780E+03,3.5270E+21,,none
@@ -210,7 +210,7 @@ n,n,724,Ferdinand,2001U2,UXXIV,,,,none
 n,n,725,Perdita,1986U10,UXXV,,,,none
 n,n,726,Mab,2003U1,UXXVI,,,,none
 n,n,727,Cupid,2003U2,UXXVII,,,,none
-y,y,799,Uranus,,,5.0724E+04,8.6813E+25,5793951.322,none
+y,y,799,Uranus,,,5.0724E+04,8.6813E+25,5793951.322,LightGreen
 n,n,801,Triton,,NI,,,1428.495,none
 n,n,802,Nereid,,NII,,,,none
 n,n,803,Naiad,,NIII,,,0.00853028,none
@@ -225,13 +225,13 @@ n,n,811,Sao,2002N2,,,,,none
 n,n,812,Laomedeia,2002N,,,,,none
 n,n,813,Neso,2002N4,,,,,none
 n,n,814,Hippocamp,2004N1,,,,,none
-y,y,899,Neptune,,,3.0599E+04,1.0241E+26,6835099.97,none
+y,y,899,Neptune,,,3.0599E+04,1.0241E+26,6835099.97,SlateBlue
 y,n,901,Charon,,PI,1.2100E+02,1.5300E+21,102.271,none
 n,n,902,Nix,,PII,,,,none
 n,n,903,Hydra,,PIII,,,,none
 n,n,904,Kerberos,2011P1,,,,,none
 n,n,905,Styx,2012P1,,,,,none
-y,y,999,Pluto,134340,,2.3766E+03,1.3070E+22,869.339078,none
+y,y,999,Pluto,134340,,2.3766E+03,1.3070E+22,869.339078,Tan
 n,n,3011,EM-L1,,Lagrange,,,,none
 n,n,3012,EM-L2,,Lagrange,,,,none
 n,n,3014,EM-L4,,Lagrange,,,,none
