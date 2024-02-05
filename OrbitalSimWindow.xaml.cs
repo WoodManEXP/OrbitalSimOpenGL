@@ -430,7 +430,7 @@ namespace OrbitalSimOpenGL
         const int WM_EXITSIZEMOVE = 0x232;
         const int WM_ENTERSIZEMOVE = 0x0231;
 
-        private static bool WindowWasResized = false;
+        private static bool WindowWasResized = false; // static ?
 
         private static IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {

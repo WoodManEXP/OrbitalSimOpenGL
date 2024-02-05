@@ -42,20 +42,20 @@ namespace OrbitalSimOpenGL
         public Double DepthFar { get; set; } = 12E9D; // U coords
         public float FieldOfView { get; set; } = 60.0f * (MathHelper.Pi / 180f); // Radians
 
-        private float _aspectRatio = 1.0f;
+        private float _AspectRatio = 1.0f;
         public float AspectRatio
         {
-            get { return _aspectRatio; }
+            get { return _AspectRatio; }
             set
             {
-                _aspectRatio = value;
+                _AspectRatio = value;
                 // Projection matrix changes when aspect ratio changes
                 // On average, Pluto is 3.7 billion miles (5.9 billion kilometers) away from the Sun
                 // (hence depth of field of view)
-                ProjectionMatrixD = Matrix4d.CreatePerspectiveFieldOfView(FieldOfView, _aspectRatio,
+                ProjectionMatrixD = Matrix4d.CreatePerspectiveFieldOfView(FieldOfView, _AspectRatio,
                                            Scale.ScaleU_ToW(DepthNear), Scale.ScaleU_ToW(DepthFar));
                 Matrix4D_toS(ref _ProjectionMatrixD, ref _ProjectionMatrix);
-                Reticle.AspectRatio = _aspectRatio; // Tell the Reticle
+                Reticle.AspectRatio = _AspectRatio; // Tell the Reticle
             }
         }
 
@@ -99,7 +99,15 @@ namespace OrbitalSimOpenGL
 
         // Double precision version of ViewMatrix, ProjectionMatrix, and VP_Matrix
         private Matrix4d _ProjectionMatrixD = Matrix4d.Identity, _ViewMatrixD = Matrix4d.Identity, _VP_MatrixD = Matrix4d.Identity;
-        public Matrix4d ProjectionMatrixD { get { return _ProjectionMatrixD; } private set { _ProjectionMatrixD = value; } }
+        public Matrix4d ProjectionMatrixD 
+        { 
+            get { return _ProjectionMatrixD; } 
+            private set 
+            { 
+                _ProjectionMatrixD = value;
+                UpdateViewMatrix();
+            }
+        }
         public Matrix4d ViewMatrixD { get { return _ViewMatrixD; } private set { _ViewMatrixD = value; } }
         public Matrix4d VP_MatrixD { get { return _VP_MatrixD; } private set { _VP_MatrixD = value; } } // View * Projection (Double precision version)
 
@@ -108,7 +116,7 @@ namespace OrbitalSimOpenGL
         public Vector3d UpVector3d;
         public Vector3d NormalVector3d; // Normal to LookDirection and UpDirection
 
-        public FrustumCuller FrustumCuller { get; set; }
+        public FrustumCuller? FrustumCuller { get; set; }
 
         private int FramerateMS { get; set; } // Current framerate, ms/frame
         private bool AnimatingLook { get; set; } = false; // Look Dir or LookAt
@@ -309,7 +317,7 @@ namespace OrbitalSimOpenGL
             Matrix4D_toS(ref _ViewMatrixD, ref _ViewMatrix);
             Matrix4D_toS(ref _VP_MatrixD, ref _VP_Matrix);
 
-            FrustumCuller.GenerateFrustum();
+            FrustumCuller?.GenerateFrustum();
 
             // Test Frustrum culling
             //bool culled = SimCamera.FrustumCuller.SphereCulls(new Vector3d(0D, 0D, -3D), 2D);
