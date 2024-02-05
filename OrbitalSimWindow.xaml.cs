@@ -21,6 +21,7 @@ namespace OrbitalSimOpenGL
         public SimBodyList? SimBodyList { get; set; }
         public SimCamera? SimCamera { get; set; }
         private SimModel SimModel { get; set; }
+        private Scale Scale { get; set; } = new(); // Scales U coords to OpenGL coords
         private ToolTipHelper ToolTipHelper { get; set; } = new();
         private bool SimHasBeenStarted { get; set; } = false;
         private String AppDataFolder { get; set; }
@@ -78,10 +79,6 @@ namespace OrbitalSimOpenGL
             OrbitalSimCmds.SimTimeCompressionRegister(TimeCompression);
 
             OrbitalSimCmds.GenericRegister(GenericCommand);
-
-            SimModel = new();
-
-            Stats = new(this, SimModel);
         }
 
         /// <summary>
@@ -100,10 +97,11 @@ namespace OrbitalSimOpenGL
 
             // Camera
             Double cX = -1 * 6.0E06D, cY = 3 * 6.0E06D, cZ = 3 * 6.0E06D;
-            SimCamera = SimModel.SimCamera = Stats.SimCamera =
-                    new(SimModel,
-                        new Vector3d(cX, cY, cZ), new Vector3d(0d, 0d, 0d),
+            SimCamera = new(Scale, new Vector3d(cX, cY, cZ), new Vector3d(0d, 0d, 0d),
                         OpenTkControl.ActualWidth, OpenTkControl.ActualHeight);
+
+            SimModel = SimCamera.SimModel = new(SimCamera, Scale);
+            Stats = new(this, SimModel, SimCamera);
         }
 
         #region Frame rendering
@@ -170,7 +168,7 @@ namespace OrbitalSimOpenGL
                 switch ((CommandSimWindow.GenericCommands)args[0])
                 {
                     case CommandSimWindow.GenericCommands.Axis:
-                        SimModel.IncludeAxis = (bool)args[1];
+                        SimModel.ShowAxis = (bool)args[1];
                         break;
 
                     case CommandSimWindow.GenericCommands.Wireframe:

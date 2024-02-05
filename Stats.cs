@@ -18,7 +18,7 @@ namespace OrbitalSimOpenGL
         #region Properties
         OrbitalSimWindow OrbitalSimWindow { get; set; }
         public SimModel SimModel { get; set; }
-        public SimCamera? SimCamera { get; set; }
+        public SimCamera SimCamera { get; set; }
         private int ElapsedMS_A { get; set; } = 0;
         private int ElapsedMS_B { get; set; } = 0;
         private System.Windows.Point LastMousePosition { get; set; }
@@ -31,10 +31,11 @@ namespace OrbitalSimOpenGL
         private int ApproachBodyB { get; set; }
         #endregion
 
-        public Stats(OrbitalSimWindow orbitalSimWindow, SimModel simModel)
+        public Stats(OrbitalSimWindow orbitalSimWindow, SimModel simModel, SimCamera simCamera)
         {
             OrbitalSimWindow = orbitalSimWindow;
             SimModel = simModel;
+            SimCamera = simCamera;
         }
 
         /// <summary>

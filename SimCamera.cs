@@ -38,7 +38,6 @@ namespace OrbitalSimOpenGL
 
         // Amount camera moves increses exponentially as the scale increases (0 .. N)
         public Double[] CamMoveKMs { get; }
-        private Scale Scale { get; set; } // For universe to W coords
         public Double DepthNear { get; set; } = 1E3D; // U coords
         public Double DepthFar { get; set; } = 12E9D; // U coords
         public float FieldOfView { get; set; } = 60.0f * (MathHelper.Pi / 180f); // Radians
@@ -124,14 +123,13 @@ namespace OrbitalSimOpenGL
         }
         private Reticle Reticle { get; set; }
         public bool ShowReticle { get; set; } = true;
-        public SimModel SimModel { get; set; }
+        public SimModel? SimModel { get; set; }
+        private Scale Scale { get; set; } // For universe to W coords
         #endregion
 
-        public SimCamera(SimModel simModel, Vector3d positionPt, Vector3d lookAtPt, Double width, Double height)
+        public SimCamera(Scale scale, Vector3d positionPt, Vector3d lookAtPt, Double width, Double height)
         {
-            SimModel = simModel;
-            Scale = simModel.Scale;
-
+            Scale = scale;
             Reticle = new();
 
             SetAspectRatio(width, height); // Causes Perspective matrix to be generated

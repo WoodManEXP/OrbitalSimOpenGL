@@ -69,6 +69,6 @@ SimBody
 	Add closest approach, so far, indicator to SimWindows status area (done)
 - Reset sim button/capability (done)
 - Get JPJ body color from Bodies file
-- Move body color into the .csv and .json files
+- Move body color into the .csv and .json files (done)
 - Three body example
 	https://en.wikipedia.org/wiki/Three-body_problem
