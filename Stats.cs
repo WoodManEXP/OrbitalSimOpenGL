@@ -62,26 +62,32 @@ namespace OrbitalSimOpenGL
                 // Distance to ShowStatsForSB
                 if (ShowStatsForSB is not null && SimCamera is not null)
                 {
-                    Vector3d vector3D;
-                    vector3D.X = ShowStatsForSB.X - SimCamera.CameraPosition.X;
-                    vector3D.Y = ShowStatsForSB.Y - SimCamera.CameraPosition.Y;
-                    vector3D.Z = ShowStatsForSB.Z - SimCamera.CameraPosition.Z;
+                    Vector3d position3D = new(ShowStatsForSB.X, ShowStatsForSB.X, ShowStatsForSB.X);
+
+                    Vector3d cameraVector3D = new(position3D.X - SimCamera.CameraPosition.X
+                                        , position3D.Y - SimCamera.CameraPosition.Y
+                                        , position3D.Z - SimCamera.CameraPosition.Z);
 
                     // Dist from camera position to point on sphere where ray cast would intersect
-                    Double len = vector3D.Length - (ShowStatsForSB.EphemerisDiameter / 2);
+                    Double cameraDist = cameraVector3D.Length - ShowStatsForSB.HalfEphemerisDiameter;
+
+                    // Dist from surface of sphere to coordinate system origin.
+                    Double originDist = position3D.Length - ShowStatsForSB.HalfEphemerisDiameter;
 
                     // Velocity
-                    vector3D.X = ShowStatsForSB.VX;
-                    vector3D.Y = ShowStatsForSB.VY;
-                    vector3D.Z = ShowStatsForSB.VZ;
-                    Double vel = vector3D.Length;
+                    cameraVector3D.X = ShowStatsForSB.VX;
+                    cameraVector3D.Y = ShowStatsForSB.VY;
+                    cameraVector3D.Z = ShowStatsForSB.VZ;
+                    Double vel = cameraVector3D.Length;
 
                     // 1 k
                     // m/s = 2236.94 mph
                     String mphStr = "(" + (2236.94D * vel).ToString("#,##0") + " mph)";
 
-                    OrbitalSimWindow.MouseOverBodyDistAndVel.Content = len.ToString("#,##0") + " km, "
-                            + ((vel < 1D) ? vel.ToString("#0.###") : vel.ToString("#,##0")) + " km/s "
+                    OrbitalSimWindow.BodyStats.Content = 
+                            "Cam dist " + cameraDist.ToString("#,##0") + " km,"
+                            + " orig dist " + originDist.ToString("#,##0") + " km,"
+                            + " " + ((vel < 1D) ? vel.ToString("#0.###") : vel.ToString("#,##0")) + " km/s "
                             + mphStr;
                 }
             }

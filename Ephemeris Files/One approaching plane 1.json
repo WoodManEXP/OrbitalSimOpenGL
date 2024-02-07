@@ -1,5 +1,5 @@
 {
-	"_comment": "A single body 10x Sol's mass approching from above orbital plane",
+	"_comment": "A single body 2x Sol's mass approching from 70 deg to orbital plane from 1e10 km @ 5km/s",
 	
     "Bodies": [
         {
@@ -14,12 +14,12 @@
             "Name": "BH1",
             "RG_Str": "0",
             "RR_Str": "0",
-            "VX_Str": "-4.4136908773787E+00",
+            "VX_Str": "1.8011072965070E+00",
             "VY_Str": "0.00E+00",
-            "VZ_Str": "2.548245616E+00",
-            "X_Str": "-8.4409282866646E+10",
+            "VZ_Str": "-4.948501627E+00",
+            "X_Str": "-1.4464448308641E+09",
             "Y_Str": "0.00E+00",
-            "Z_Str": "5.00E+10"
+            "Z_Str": "1.00E+10"
         }
     ]
 }

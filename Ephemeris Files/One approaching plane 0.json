@@ -1,0 +1,25 @@
+{
+	"_comment": "A single body 10x Sol's mass approching from 30 deg to orbital plane from 5e10 km @ 5km/s",
+	
+    "Bodies": [
+        {
+            "ColorStr": "Black",
+            "Designation": "",
+            "DiameterStr": "0",
+            "GM_Str": "0",
+            "IAU_Alias": "BH",
+            "ID": "0",
+            "LT_Str": "0",
+            "MassStr": "1.9885E+31",
+            "Name": "BH1",
+            "RG_Str": "0",
+            "RR_Str": "0",
+            "VX_Str": "4.4136908773787E+00",
+            "VY_Str": "0.00E+00",
+            "VZ_Str": "-2.548245616E+00",
+            "X_Str": "-8.4409282866646E+10",
+            "Y_Str": "0.00E+00",
+            "Z_Str": "5.00E+10"
+        }
+    ]
+}
