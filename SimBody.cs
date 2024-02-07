@@ -79,8 +79,6 @@ namespace OrbitalSimOpenGL
             LT = Double.TryParse(ephemerisBody.LT_Str, out dVal) ? dVal : -1D;
             RG = Double.TryParse(ephemerisBody.RG_Str, out dVal) ? dVal : -1D;
             RR = Double.TryParse(ephemerisBody.RR_Str, out dVal) ? dVal : -1D;
-            EphemerisDiameter = Double.TryParse(ephemerisBody.DiameterStr, out dVal) ? dVal : -1D;
-            HalfEphemerisDiameter = EphemerisDiameter / 2D;
             Mass = Double.TryParse(ephemerisBody.MassStr, out dVal) ? dVal : -1D;
             GM = Double.TryParse(ephemerisBody.GM_Str, out dVal) ? dVal : -1D;
 
@@ -90,6 +88,14 @@ namespace OrbitalSimOpenGL
 
             // Body color
             Colors.GetColor4(ephemerisBody.ColorStr, out _BodyColor);
+
+            if (0D == (EphemerisDiameter = Double.TryParse(ephemerisBody.DiameterStr, out dVal) ? dVal : -1D))
+            {
+                // For bodies with 0 diameter instead calculate the Schwarzschild radius (https://en.wikipedia.org/wiki/Schwarzschild_radius)
+                HalfEphemerisDiameter = ((2D * Util.G_M * Mass) / Util.CSquared_M) / 1E3D;
+                EphemerisDiameter = 2D * HalfEphemerisDiameter;
+            }
+
         }
 
         /// <summary>

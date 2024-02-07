@@ -30,7 +30,7 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="jplBodyList">List of bodies for which to gather ephemerides</param>
         /// <param name="ephemerisBodyList">resulting EphemerisBodyList</param>
-        public EphemerisReader(JPL_BodyList jplBodyList, ref EphemerisBodyList ephemerisBodyList)
+        public EphemerisReader(JPL_BodyList jplBodyList, out EphemerisBodyList ephemerisBodyList)
         {
 
             var assembly = System.Reflection.Assembly.GetAssembly(this.GetType());//Get the assembly object
@@ -105,14 +105,14 @@ namespace OrbitalSimOpenGL
 
                 JPL_Body body = JPL_BodyList.BodyList[BodiesSelectedFromJPL[i]];
 
-                getHorizonsEphemeris(Properties.Settings.Default.HorizonsEphemerisURL, body, sDT_Str, eDT_Str);
+                GetHorizonsEphemeris(Properties.Settings.Default.HorizonsEphemerisURL, body, sDT_Str, eDT_Str);
 
                 (sender as BackgroundWorker).ReportProgress(1 + i, body.Name);
                 Thread.Sleep(100);
             }
         }
 
-        private void getHorizonsEphemeris(String horizonsEphemerisURL, JPL_Body jplBody, String sDT_Str, String eDT_Str)
+        private void GetHorizonsEphemeris(String horizonsEphemerisURL, JPL_Body jplBody, String sDT_Str, String eDT_Str)
         {
 
             horizonsEphemerisURL = horizonsEphemerisURL.Replace("{Command}", jplBody.ID)

@@ -21,7 +21,7 @@
         <Button x:Name="xtraBodsButton" RenderTransformOrigin="2.572,3.459" Canvas.Left="14" Canvas.Top="95"
                 Content="Xtra Bods"
                 HorizontalAlignment="Center" VerticalAlignment="Top" Width="73"
-                ToolTipService.ToolTip="Select JSON model file" Click="XtraBodsButton" ToolTip="Select extra bodies file" IsEnabled="False"/>
+                ToolTipService.ToolTip="Select .json model file" Click="XtraBodsButton" ToolTip="Select extra bodies file" IsEnabled="True"/>
         <Button x:Name="bodiesButton"  RenderTransformOrigin="2.572,3.459" Canvas.Left="14" Canvas.Top="40" 
                 Content="Bodies" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75"
                 ToolTipService.ToolTip="Load/select bodies" Click="BodiesButton" ToolTip="Load/select bodies to read from JPL"/>
@@ -105,9 +105,8 @@
             </Canvas>
         </GroupBox>
         <Button x:Name="ephemerisButton" Content="Ephemeris" Canvas.Left="14" Canvas.Top="68" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="EphemerisButton" ToolTip="Update ephemeris from JPL"/>
-        <Button x:Name="editBodies" Content="Edit Bodies" Canvas.Left="14" Canvas.Top="134" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="EditBodiesButton" IsEnabled="False"/>
-        <Button x:Name="saveBodiesButton" Content="Save Ephem" Canvas.Left="14" Canvas.Top="159" RenderTransformOrigin="0.379,0.403" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="SaveBodiesButton"/>
-        <Button x:Name="readBodiesButton" Content="Read Bodies" Canvas.Left="14" Canvas.Top="184" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="ReadBodiesButton" IsEnabled="False"/>
+        <Button x:Name="saveBodiesButton" Content="Save Ephem" Canvas.Left="14" Canvas.Top="124" RenderTransformOrigin="0.379,0.403" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="SaveBodiesButton" ToolTip="Save current ephemeris"/>
+        <Button x:Name="readBodiesButton" Content="Read Bodies" Canvas.Left="14" Canvas.Top="160" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="ReadBodiesButton" IsEnabled="False"/>
         <GroupBox Height="61" Header="Look at" Width="136" Canvas.Left="111" Canvas.Top="202" HorizontalAlignment="Center" VerticalAlignment="Top"/>
         <ComboBox x:Name="LookAtComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.475,0" Canvas.Left="121" Canvas.Top="228" SelectionChanged="LookAtSelectionChanged" DropDownOpened="LookAtDropDownOpened"/>
         <GroupBox Height="61" Header="Go near" Width="146" Canvas.Left="255" Canvas.Top="202" HorizontalAlignment="Left" VerticalAlignment="Center"/>

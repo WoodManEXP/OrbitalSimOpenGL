@@ -24,24 +24,21 @@ namespace OrbitalSimOpenGL
         private int NumBodies { get; set; }
         private SimBodyList SimBodyList { get; set; }
         private MassMass MassMass { get; set; }
-        private static Double Reg_G { get; } = 1E-3 * 6.6743E-11;   // Gravitational constant is kg m / sec-squared
-                                                                    // The 1E-3 converts from kg*m/s-squared to kg*km/s-squared
-                                                                    // (sim distancs are in km rather than m)
-        private Double _UseReg_G = Reg_G;
+
+        private Double _UseReg_G = Util.G_KM;
         public Double UseReg_G
         {
             get { return _UseReg_G; }
             set
             {   // <0 divides GC by that value, >0 multiplies GC by that value, 0 sets to std value
                 if (0D == value)
-                    _UseReg_G = Reg_G;
+                    _UseReg_G = Util.G_KM;
                 else if (0D > value)
-                    _UseReg_G = Reg_G / value;
+                    _UseReg_G = Util.G_KM / value;
                 else
-                    _UseReg_G = Reg_G * value;
+                    _UseReg_G = Util.G_KM * value;
             }
         }
-
         public int IterationNumber { get; set; } = -1;
         #endregion
 

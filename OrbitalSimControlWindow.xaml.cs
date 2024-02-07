@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 
 namespace OrbitalSimOpenGL
 {
@@ -17,7 +18,12 @@ namespace OrbitalSimOpenGL
         #region Properties
         private bool SimHasBeenStarted { get; set; } = false;
         public JPL_BodyList JPL_BodyList { get; set; }
-        public EphemerisBodyList? EphemerisBodyList { get; set; }
+
+        private EphemerisBodyList? _EphemerisBodyList = null;
+        public EphemerisBodyList EphemerisBodyList { get => _EphemerisBodyList; set { _EphemerisBodyList = value; } }
+
+        private EphemerisBodyList? _XtraEphemerisBodyList = null;
+        public EphemerisBodyList XtraEphemerisBodyList { get => _XtraEphemerisBodyList; set { _XtraEphemerisBodyList = value; } }
         public OrbitalSimWindow? OrbitalSimWindow { get; set; }
         private Single OrbitCameraDegrees { get; set; } // Current value on OrbitDegreesSlider
         private Single LookTiltCameraDegrees { get; set; } // Current value on LookTiltDegreesSlider
@@ -206,16 +212,7 @@ namespace OrbitalSimOpenGL
         {
             Environment.Exit(0);
         }
-        /// <summary>
-        /// XtraBodsFileButton
-        /// Select JSON file with bodies to add to ephemeris bodies list
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void XtraBodsButton(object sender, RoutedEventArgs e)
-        {
 
-        }
         /// <summary>
         /// BodiesButton
         /// Select bodies from JPL ephemeris to be included in model
@@ -229,18 +226,55 @@ namespace OrbitalSimOpenGL
             bool? result = dialog.ShowDialog();
         }
 
+        private String XtraBodiesGetDirectoryName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        private String? XtraBodiesFileName = null;
+
+        /// <summary>
+        /// XtraBodsFileButton
+        /// Select JSON file with bodies to add to ephemeris bodies list
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void XtraBodsButton(object sender, RoutedEventArgs e)
+        {
+            // Get the file path and read with EphemerisBodyList.ReadSavedSimBodies(String pathStr)            
+            // Configure open file dialog box
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Open Ephemeris JSON file",
+                FileName = "Ephemeris", // Default file name
+                DefaultExt = ".json", // Default file extension
+                Filter = "JSON documents (.json)|*.json", // Filter files by extension
+                InitialDirectory = XtraBodiesGetDirectoryName
+            };
+
+            // Show open file dialog box
+            bool? result = dialog.ShowDialog();
+
+            // Process open file dialog box results
+            if (result == true)
+            {              
+                // Remember this for next time
+                XtraBodiesGetDirectoryName = Path.GetDirectoryName(XtraBodiesFileName = dialog.FileName);
+
+                // If EphemerisBodyList is started add extra bodies to it.
+                // Will exclude any added bodies already named in EphemerisBodyList.
+                XtraEphemerisBodyList = EphemerisReader.ReadSavedSimBodies(dialog.FileName);
+            }
+        }
+
         private void StartButton(object sender, RoutedEventArgs e)
         {
-            EphemerisBodyList ephemerisBodyList = EphemerisBodyList;
-
             // If no EphemerisBodyList then read the ephemerides from JPL
             if (EphemerisBodyList is null)
             {
-                _ = new EphemerisReader(JPL_BodyList, ref ephemerisBodyList);
-                EphemerisBodyList = ephemerisBodyList;
-
-                // Here add in any bodies from the Extra Bodies List to EphemerisBodyList
+                _ = new EphemerisReader(JPL_BodyList, out _EphemerisBodyList);
             }
+
+            // Add in any extra bodies
+            // Will exclude any added bodies already named in EphemerisBodyList.
+            if (XtraEphemerisBodyList is not null)
+                EphemerisBodyList?.Append(XtraEphemerisBodyList);
 
             PopulateComboBoxes();
 
@@ -322,18 +356,10 @@ namespace OrbitalSimOpenGL
         /// <param name="e"></param>
         private void EphemerisButton(object sender, RoutedEventArgs e)
         {
-
             // EphemerisReader.ReadSerialized.Serialized will create new BodyList
             // FromJPL uses the passed-in BodyList
-            EphemerisBodyList ephemerisBodyList = EphemerisBodyList;
-
             // Read the ephemerides from JPL
-            _ = new EphemerisReader(JPL_BodyList, ref ephemerisBodyList);
-
-            EphemerisBodyList = ephemerisBodyList; // In case it was changed
-
-            //OrbitalSimWindow.BodyList = BodyList;
-
+            _ = new EphemerisReader(JPL_BodyList, out _EphemerisBodyList);
         }
 
         private void EditBodiesButton(object sender, RoutedEventArgs e)

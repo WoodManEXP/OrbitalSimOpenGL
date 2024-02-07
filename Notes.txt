@@ -49,15 +49,15 @@ SimBody
 - Reticle on/off (done)
 - Implement PathTrace (done)
 	Each body selected individually (done)
-	Keep only last N trace points
+	Keep only last N trace points (done)
 - Barycenter (center of mass) not adjusting. Either cause it to adjust or remove it as target in bodies selections
 - Implement generic command entry point in OrbitalSimCmds (done)
 - Reticle as X or + or somesuch
 - Orbit about work with moving bodies (done)
 - More efficiently update VP_Matrix4d in SimCamera:UpdateViewMatrix (rather than doing "new") (done)
 - Suspend frame redraw if nothing happening
-- Move Axis from SimModel to a separate class
-	Draw as GL_LINES rather than triangles
+- Move Axis from SimModel to a separate class (done)
+	Draw as GL_LINES rather than triangles (done)
 - Collision detection
 	See CollisionDetection class
 	remove smaller body from list & update MassMass
@@ -68,7 +68,8 @@ SimBody
 	Sumultaneous > 2 body collision?
 	Add closest approach, so far, indicator to SimWindows status area (done)
 - Reset sim button/capability (done)
-- Get JPJ body color from Bodies file
+- Get JPJ body color from Bodies file (done_)
 - Move body color into the .csv and .json files (done)
 - Three body example
 	https://en.wikipedia.org/wiki/Three-body_problem
+- MAss change range from 1/100 to 100X ?
