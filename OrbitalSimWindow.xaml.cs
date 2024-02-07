@@ -206,7 +206,7 @@ namespace OrbitalSimOpenGL
                         break;
 
                     case CommandSimWindow.GenericCommands.ResetSim:
-                        ResetSim();
+                        ResetSim((bool)args[1]);
                         break;
 
                     case CommandSimWindow.GenericCommands.TracePath:
@@ -393,14 +393,17 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Perform reset of Sim to initial state
         /// </summary>
-        private void ResetSim()
+        private void ResetSim(bool resetCamera)
         {
             if (EphemerisBodyList is null)
                 return;
 
-            // Camera to starting position and startying lookVector
-            Double cX = -1 * 6.0E06D, cY = 3 * 6.0E06D, cZ = 3 * 6.0E06D;
-            SimCamera?.Reset(new Vector3d(cX, cY, cZ), new Vector3d(0d, 0d, 0d));
+            // Camera to starting position and starting lookVector
+            if (resetCamera)
+            {
+                Double cX = -1 * 6.0E06D, cY = 3 * 6.0E06D, cZ = 3 * 6.0E06D;
+                SimCamera?.Reset(new Vector3d(cX, cY, cZ), new Vector3d(0d, 0d, 0d));
+            }
 
             SimModel.ResetScene(EphemerisBodyList);
         }

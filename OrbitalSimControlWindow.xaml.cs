@@ -307,9 +307,12 @@ namespace OrbitalSimOpenGL
         /// <param name="e"></param>
         private void ResetButton(object sender, RoutedEventArgs e)
         {
+
+            bool resetCamera = !NotCamCheckbox.IsChecked.Value;
+
             // Issue this command prior to OrbitalSimControlWindow reset activities. With OrbitalSimControlWindow
             // and OrbitalSimWindow on separate threads the avtivities will then happen "simultaneously."
-            CommandSimWindow?.ResetSim();
+            CommandSimWindow?.ResetSim(resetCamera);
 
             // Reset various elements of OrbitalSimControlWindow
             // Set move camera scale control initial
@@ -339,7 +342,6 @@ namespace OrbitalSimOpenGL
             CommandSimWindow?.Reticle(true);
 
             KeepCombo.SelectedIndex = 0;
-            ReticleCombo.SelectedIndex = 0;
             LookAtComboBox.SelectedIndex = -1;
             LookAtComboBox.SelectedIndex = 0;       // Origin
             OrbitAboutComboBox.SelectedIndex = 0;   // Origin

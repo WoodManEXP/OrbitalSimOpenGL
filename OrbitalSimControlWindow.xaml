@@ -31,6 +31,7 @@
                 ToolTipService.ToolTip="Pause sim" Click="PauseButton"/>
         <Button x:Name="resetButton" Content="Reset" Canvas.Left="284" Canvas.Top="41" HorizontalAlignment="Left" VerticalAlignment="Center" Width="75"
                 ToolTipService.ToolTip="Reset sim" Click="ResetButton"/>
+        <CheckBox x:Name="NotCamCheckbox" Content="Not cam" Canvas.Left="367" Canvas.Top="45" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" ToolTip="Check to not change camera position and orientation during reset"/>
         <GroupBox Height="222" Header="Camera" Width="464" Canvas.Left="111" Canvas.Top="71" HorizontalAlignment="Center" VerticalAlignment="Top">
             <Canvas>
                 <Button x:Name="LookLeftButton" Content="LL" Canvas.Left="10" Canvas.Top="29" RenderTransformOrigin="-0.328,-0.399" HorizontalAlignment="Center" VerticalAlignment="Top"
@@ -81,12 +82,6 @@
                 <ComboBox x:Name="OrbitAboutComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="135" RenderTransformOrigin="0.475,0" Canvas.Left="307" Canvas.Top="139" DropDownOpened="OrbitAboutDownOpened" SelectionChanged="OrbitAboutSelectionChanged"/>
                 <Slider x:Name="OrbitDegreesSlider" HorizontalAlignment="Left" Width="27" Orientation="Vertical" Height="75" Canvas.Left="421" Canvas.Top="1" VerticalAlignment="Center" Minimum="1" Maximum="180" ValueChanged="OrbitSiderChanged" ToolTip="Orbit response, 1 to 180" />
                 <Label x:Name="LookTiltDegreesLabel" Content="" Canvas.Left="112" Canvas.Top="83" HorizontalAlignment="Left" VerticalAlignment="Center" Width="40" ToolTip="Look-Tilt amount (degrees)" HorizontalContentAlignment="Center"/>
-                <ComboBox x:Name="ReticleCombo" Canvas.Left="351" Canvas.Top="-50" Width="92" RenderTransformOrigin="0.833,4.829" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <ComboBoxItem Content = "None" IsSelected="True" />
-                    <ComboBoxItem Content = "Sphere" />
-                    <ComboBoxItem Content = "X" />
-                </ComboBox>
-                <Label Content="Reticle" Canvas.Left="307" Canvas.Top="-52" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             </Canvas>
         </GroupBox>
         <GroupBox Height="54" Header="Time Compression" Width="190" HorizontalAlignment="Left" Canvas.Top="299" VerticalAlignment="Center" Canvas.Left="174">

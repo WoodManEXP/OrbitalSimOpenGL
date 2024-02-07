@@ -57,9 +57,9 @@ namespace OrbitalSimOpenGL
         /// 
         /// </summary>
         /// <param name="body"></param>
-        public void ResetSim()
+        public void ResetSim(bool resetCamera)
         {
-            object[] args = { CommandSimWindow.GenericCommands.ResetSim };
+            object[] args = { CommandSimWindow.GenericCommands.ResetSim, resetCamera };
             GenericCommand(args);
         }
         #endregion
