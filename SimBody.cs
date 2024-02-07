@@ -89,13 +89,15 @@ namespace OrbitalSimOpenGL
             // Body color
             Colors.GetColor4(ephemerisBody.ColorStr, out _BodyColor);
 
-            if (0D == (EphemerisDiameter = Double.TryParse(ephemerisBody.DiameterStr, out dVal) ? dVal : -1D))
+            EphemerisDiameter = Double.TryParse(ephemerisBody.DiameterStr, out dVal) ? dVal : -1D;
+            if (0D == EphemerisDiameter)
             {
                 // For bodies with 0 diameter instead calculate the Schwarzschild radius (https://en.wikipedia.org/wiki/Schwarzschild_radius)
                 HalfEphemerisDiameter = ((2D * Util.G_M * Mass) / Util.CSquared_M) / 1E3D;
                 EphemerisDiameter = 2D * HalfEphemerisDiameter;
             }
-
+            else
+                HalfEphemerisDiameter = EphemerisDiameter / 2D;
         }
 
         /// <summary>

@@ -24,7 +24,7 @@ namespace OrbitalSimOpenGL
         private System.Windows.Point LastMousePosition { get; set; }
         private static int StatIntervalA { get; } = 1000;
         private static int StatIntervalB { get; } = 30 * 1000;
-        private SimBody? LastMouseOverSB { get; set; } = null;
+        private SimBody? ShowStatsForSB { get; set; } = null;
 
         private Double ClosestApproachDistSquared { get; set; } = Double.MaxValue;
         private int ApproachBodyA { get; set; }
@@ -59,21 +59,21 @@ namespace OrbitalSimOpenGL
                 //                    + ", " + frameRateMS.ToString());
                 ElapsedMS_A = 0;
 
-                // Distance to LastMouseOverSB
-                if (LastMouseOverSB is not null && SimCamera is not null)
+                // Distance to ShowStatsForSB
+                if (ShowStatsForSB is not null && SimCamera is not null)
                 {
                     Vector3d vector3D;
-                    vector3D.X = LastMouseOverSB.X - SimCamera.CameraPosition.X;
-                    vector3D.Y = LastMouseOverSB.Y - SimCamera.CameraPosition.Y;
-                    vector3D.Z = LastMouseOverSB.Z - SimCamera.CameraPosition.Z;
+                    vector3D.X = ShowStatsForSB.X - SimCamera.CameraPosition.X;
+                    vector3D.Y = ShowStatsForSB.Y - SimCamera.CameraPosition.Y;
+                    vector3D.Z = ShowStatsForSB.Z - SimCamera.CameraPosition.Z;
 
                     // Dist from camera position to point on sphere where ray cast would intersect
-                    Double len = vector3D.Length - (LastMouseOverSB.EphemerisDiameter / 2);
+                    Double len = vector3D.Length - (ShowStatsForSB.EphemerisDiameter / 2);
 
                     // Velocity
-                    vector3D.X = LastMouseOverSB.VX;
-                    vector3D.Y = LastMouseOverSB.VY;
-                    vector3D.Z = LastMouseOverSB.VZ;
+                    vector3D.X = ShowStatsForSB.VX;
+                    vector3D.Y = ShowStatsForSB.VY;
+                    vector3D.Z = ShowStatsForSB.VZ;
                     Double vel = vector3D.Length;
 
                     // 1 k
@@ -109,11 +109,11 @@ namespace OrbitalSimOpenGL
             }
 
             // If mouse over a different body?
-            if (LastMouseOverSB != SimModel.LastMouseOverSB)
+            if (ShowStatsForSB != SimModel.ShowStatsForSB)
             {
-                LastMouseOverSB = SimModel.LastMouseOverSB;
-                if (LastMouseOverSB is not null)
-                    OrbitalSimWindow.MouseOverBody.Content = LastMouseOverSB.Name;
+                ShowStatsForSB = SimModel.ShowStatsForSB;
+                if (ShowStatsForSB is not null)
+                    OrbitalSimWindow.MouseOverBody.Content = ShowStatsForSB.Name;
             }
 
             // Mouse position over sim area

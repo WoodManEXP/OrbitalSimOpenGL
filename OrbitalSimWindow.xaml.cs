@@ -352,8 +352,13 @@ namespace OrbitalSimOpenGL
             else
                 SimCamera?.LookAt(SimModel.SimBodyList.GetIndex(lookAtStr));
 
-            // Make Keep settings
-
+            // Set Stats to show stats for the LookAt body
+            if (SimHasBeenStarted)
+            {
+                SimBody sB = SimModel.SimBodyList.GetSB(lookAtStr);
+                if (sB is not null)
+                    SimModel.ShowStatsForSB = sB;
+            }
         }
 
         // Start sim (and continue paused sim)

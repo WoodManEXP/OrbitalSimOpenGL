@@ -154,5 +154,20 @@ void main()
             }
             return -1;
         }
+
+        /// <summary>
+        /// Return SimBody given its name string
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public SimBody GetSB(String name)
+        {
+            foreach (SimBody sB in BodyList)
+            {
+                if (name.Equals(sB.Name))
+                    return sB;
+            }
+            return null;
+        }
     }
 }

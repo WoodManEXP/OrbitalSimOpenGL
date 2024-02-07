@@ -46,7 +46,7 @@ namespace OrbitalSimOpenGL
         { get { return _ApproachBodyB; } }
 
         public bool SimRunning { get; set; } = false;
-        public SimBody? LastMouseOverSB { get; set; } = null;
+        public SimBody? ShowStatsForSB { get; set; } = null;
 
         private bool _Wireframe;
         public bool Wireframe
@@ -149,7 +149,7 @@ namespace OrbitalSimOpenGL
             // If render returns non-null sB then the mouse was over that body.
             SimBody sB;
             if (null != (sB = SimBodyList.Render(SimCamera, mousePosition)))
-                LastMouseOverSB = sB;
+                ShowStatsForSB = sB;
 
             if (ShowBarycenter)
             {
