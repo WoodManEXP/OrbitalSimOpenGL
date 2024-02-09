@@ -21,9 +21,9 @@ namespace OrbitalSimOpenGL
         public Double X { get; private set; } // km
         public Double Y { get; private set; } // km
         public Double Z { get; private set; } // km
-        public Double VX { get; private set; } // km/s
-        public Double VY { get; private set; } // km/s
-        public Double VZ { get; private set; } // km/s
+        public Double VX { get; set; } // km/s
+        public Double VY { get; set; } // km/s
+        public Double VZ { get; set; } // km/s
 
         // Other settings from Ephemeris reading
         public Double LT { get; set; }
@@ -40,7 +40,7 @@ namespace OrbitalSimOpenGL
         }
         public Double GM { get; set; }
         public string ID { get; private set; }
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
         private Color4 _BodyColor;
         Color4 BodyColor { get { return _BodyColor; } set { _BodyColor = value; } }

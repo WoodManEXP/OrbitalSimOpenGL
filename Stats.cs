@@ -27,8 +27,6 @@ namespace OrbitalSimOpenGL
         private SimBody? ShowStatsForSB { get; set; } = null;
 
         private Double ClosestApproachDistSquared { get; set; } = Double.MaxValue;
-        private int ApproachBodyA { get; set; }
-        private int ApproachBodyB { get; set; }
         #endregion
 
         public Stats(OrbitalSimWindow orbitalSimWindow, SimModel simModel, SimCamera simCamera)
@@ -137,14 +135,30 @@ namespace OrbitalSimOpenGL
                     {
                         // A new closest approach is available
                         ClosestApproachDistSquared = SimModel.ClosestApproachDistSquared;
-                        ApproachBodyA = SimModel.ApproachBodyA;
-                        ApproachBodyB = SimModel.ApproachBodyB;
+                        String mStr = new("");
+                        for (int i=0; i<SimModel.ClosestApproachBodiesList.Count; i++)
+                        {
+                            if (i > 0)
+                                mStr += ", ";
+                            mStr += SimModel.SimBodyList.BodyList[SimModel.ClosestApproachBodiesList[i]].Name;
+                        }
+
                         Double dist = Math.Sqrt(ClosestApproachDistSquared);
-                        OrbitalSimWindow.ClosestApproach.Content = dist.ToString("#,##0") + " km, "
-                                + SimModel.SimBodyList.BodyList[ApproachBodyA].Name
-                                + ", "
-                                + SimModel.SimBodyList.BodyList[ApproachBodyB].Name;
+                        OrbitalSimWindow.ClosestApproach.Content = dist.ToString("#,##0") + " km, " + mStr;
                     }
+        }
+
+        public void Reset()
+        {
+            String blank = new("");
+            OrbitalSimWindow.BodyStats.Content = blank;
+            OrbitalSimWindow.MouseOverBody.Content = blank;
+            OrbitalSimWindow.BodyStats.Content = blank;
+            OrbitalSimWindow.ElapsedTime.Content = blank;
+            OrbitalSimWindow.ClosestApproach.Content = blank;
+            OrbitalSimWindow.MouseCoords.Content = blank;
+
+            ClosestApproachDistSquared = Double.MaxValue;
         }
     }
 }

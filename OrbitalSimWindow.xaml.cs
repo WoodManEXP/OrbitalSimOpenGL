@@ -406,6 +406,8 @@ namespace OrbitalSimOpenGL
             }
 
             SimModel.ResetScene(EphemerisBodyList);
+
+            Stats.Reset();
         }
         #endregion
 

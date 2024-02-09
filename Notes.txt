@@ -60,13 +60,14 @@ SimBody
 	Draw as GL_LINES rather than triangles (done)
 - Collision detection
 	See CollisionDetection class
-	remove smaller body from list & update MassMass
-	add smaller body's mass to larger, retain larger's color
+	remove smaller body from list & update MassMass, loss for heat generation, 10%
+	Inelastic - add smaller body's mass xfers to larger, retain larger's color
 	change name to larger-smaller
 	add vel/mass vectors, change vectors on retained body to match
 	Color Red and larger for a while after collision
 	Sumultaneous > 2 body collision?
 	Add closest approach, so far, indicator to SimWindows status area (done)
+	Produce a visual signal of collision
 - Reset sim button/capability (done)
 - Get JPJ body color from Bodies file (done_)
 - Move body color into the .csv and .json files (done)

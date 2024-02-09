@@ -1,0 +1,45 @@
+{
+    "_comment": "2 PBHs 10% Sol's mass approching shallow angle to orbital plane from 1e10km, 3.6e7 km apart @ 10km/s",
+	"_comment2": "Insertion point between orbits of Sol and Mercury",
+	
+    "Bodies": [
+        {
+            "ColorStr": "Black",
+            "Designation": "",
+            "DiameterStr": "0",
+            "GM_Str": "0",
+            "IAU_Alias": "PBH 1",
+            "ID": "0",
+            "LT_Str": "0",
+            "MassStr": "1.988500E+29",
+            "Name": "PBH 1",
+            "RG_Str": "0",
+            "RR_Str": "0",
+            "VX_Str": "9.9505580398379400000E+00",
+            "VY_Str": "0.00E+00",
+            "VZ_Str": "-5.2335956242944000000E-01",
+            "X_Str": "-9.9505580398379400000E+09",
+            "Y_Str": "0.00E+00",
+            "Z_Str": "5.2335956242944000000E+08"
+        },
+        {
+            "ColorStr": "Black",
+            "Designation": "",
+            "DiameterStr": "0",
+            "GM_Str": "0",
+            "IAU_Alias": "PBH 2",
+            "ID": "0",
+            "LT_Str": "0",
+            "MassStr": "1.988500E+29",
+            "Name": "PBH 2",
+            "RG_Str": "0",
+            "RR_Str": "0",
+            "VX_Str": "9.9506770967830300000E+00",
+            "VY_Str": "0.00E+00",
+            "VZ_Str": "-5.2353385608360900000E-01",
+            "X_Str": "-9.9864995343314500000E+09",
+            "Y_Str": "0.00E+00",
+            "Z_Str": "5.2541857796551000000E+08"
+        }
+    ]
+}

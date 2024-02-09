@@ -1,6 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Media3D;
@@ -35,16 +36,16 @@ namespace OrbitalSimOpenGL
         private MassMass? MassMass { get; set; }
         private CollisionDetector? CollisionDetector { get; set; }
 
+        private Double PrevClosestApproachDistSquared { get; set; } = Double.MaxValue;
+
         // Closest approach between any two bodies captured here, for each iteration
         private Double _ClosestApproachDistSquared = -1D; // km-squared
-        private int _ApproachBodyA, _ApproachBodyB;
-        public Double ClosestApproachDistSquared // Distance between body surfaces
+        public Double ClosestApproachDistSquared // Distance between body surfaces on closest approach, last iteration
         { get { return _ClosestApproachDistSquared; } }
-        public int ApproachBodyA
-        { get { return _ApproachBodyA; } }
-        public int ApproachBodyB
-        { get { return _ApproachBodyB; } }
 
+        // From each iteration, the list of closest approach bodies. 
+        private List<int> _ClosestApproachBodiesList = new(5);
+        public List<int> ClosestApproachBodiesList { get { return _ClosestApproachBodiesList; } }
         public bool SimRunning { get; set; } = false;
         public SimBody? ShowStatsForSB { get; set; } = null;
 
@@ -109,6 +110,8 @@ namespace OrbitalSimOpenGL
             SceneReady = false;
             ElapsedSeconds = 0;
 
+            PrevClosestApproachDistSquared = Double.MaxValue;
+
             SimBodyList = new SimBodyList(Scale, ephemerisBodyList, AppDataFolder);
 
             MassMass = new(SimBodyList);
@@ -172,8 +175,11 @@ namespace OrbitalSimOpenGL
                 {
                     NextPosition?.IterateOnce(IterationSeconds);
 
-                    // Collision detection
-                    CollisionDetector?.Detect(out _ClosestApproachDistSquared, out _ApproachBodyA, out _ApproachBodyB);
+                    // Closest approach and collision detection
+                    CollisionDetector?.Detect(PrevClosestApproachDistSquared, out _ClosestApproachDistSquared, ref _ClosestApproachBodiesList);
+
+                    // Keep PrevClosestApproachDistSquared around to supply CollisionDetector. Saves work.
+                    PrevClosestApproachDistSquared = ClosestApproachDistSquared;
 
                     ElapsedSeconds += IterationSeconds;
                 }

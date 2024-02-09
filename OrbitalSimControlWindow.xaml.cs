@@ -331,6 +331,7 @@ namespace OrbitalSimOpenGL
             CommandSimWindow?.SimTimeCompression((int)TimeCompressionSlider.Value);
             IterateMinutes.IsChecked = true;
             IterateHours.IsChecked = false;
+            IterationScale.SelectedItem = IterationScale.Items.GetItemAt(0);
 
             GravConstantLabel.Content = "Std";
             GravConstantSlider.Value = 0D;
