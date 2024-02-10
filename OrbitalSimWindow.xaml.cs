@@ -18,7 +18,6 @@ namespace OrbitalSimOpenGL
         #region Properties
         public CommandSimWindow? OrbitalSimCmds { get; set; }
         private EphemerisBodyList? EphemerisBodyList { get; set; }
-        public SimBodyList? SimBodyList { get; set; }
         public SimCamera? SimCamera { get; set; }
         private SimModel SimModel { get; set; }
         private Scale Scale { get; set; } = new(); // Scales U coords to OpenGL coords
@@ -162,6 +161,11 @@ namespace OrbitalSimOpenGL
         #endregion
 
         #region Commands
+
+        /// <summary>
+        /// Command coming in from somewhere on the message queue
+        /// </summary>
+        /// <param name="args"></param>
         private void GenericCommand(object[] args)
         {
             if (SimModel is not null)
@@ -194,7 +198,9 @@ namespace OrbitalSimOpenGL
                         break;
 
                     case CommandSimWindow.GenericCommands.ExcludeBody:
-                        SimModel.ExcludeBody((String)args[1]);
+                        SimModel.ExcludeBody((String)args[1]);              // Tell the model (sometimes a NOp)
+                        if (SimModel.SimBodyList is not null)
+                            CommandControlWindow.ExcludeBody(SimModel.SimBodyList.GetIndex((String)args[1]));  // Tell CommandControlWindow
                         break;
 
                     case CommandSimWindow.GenericCommands.MassMultiplier:
@@ -223,7 +229,7 @@ namespace OrbitalSimOpenGL
             int compressionRate = (int)args[0];
             SimModel.TimeCompression = compressionRate;
         }
-        
+
         private void IterationRate(object[] args)
         {
             int seconds = (int)args[0];
@@ -245,7 +251,7 @@ namespace OrbitalSimOpenGL
             Single degrees = (Single)args[1];
             SimCamera?.OrbitCamera(orbitDirection, degrees);
         }
-        
+
         /// <summary>
         /// Orbit About
         /// Set which system body,or system origin, about which to orbit camera
@@ -263,7 +269,7 @@ namespace OrbitalSimOpenGL
 
             SimCamera?.OrbitAbout(index);
         }
-        
+
         /// <summary>
         /// Use between 0 and 20
         /// Scaled movement amounts for U, D, L, R, F, B
@@ -275,12 +281,12 @@ namespace OrbitalSimOpenGL
             if (SimModel is not null)
                 SimModel.Scale.CamMoveAmt = (int)scale; // 0 .. 20
         }
-        
+
         // Window loaded
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
         }
-        
+
         // Move camera
         private void MoveCamera(object[] args)
         {
@@ -288,7 +294,7 @@ namespace OrbitalSimOpenGL
             //System.Diagnostics.Debug.WriteLine("MoveCamera " + moveDirection.ToString());
             SimCamera?.Move(moveDirection);
         }
-        
+
         // Go Near
         private void GoNear(object[] args)
         {
@@ -305,7 +311,7 @@ namespace OrbitalSimOpenGL
             // Make Keep settings
 
         }
-        
+
         // Look camera
         private void LookCamera(object[] args)
         {
@@ -329,7 +335,7 @@ namespace OrbitalSimOpenGL
                     break;
             }
         }
-        
+
         private void TiltCamera(object[] args)
         {
             CameraTiltDirections tiltDirection = (CameraTiltDirections)args[0];
@@ -362,7 +368,7 @@ namespace OrbitalSimOpenGL
         }
 
         // Start sim (and continue paused sim)
-        
+
         private void StartSim(object[] args)
         {
             if (!SimHasBeenStarted)
@@ -383,7 +389,7 @@ namespace OrbitalSimOpenGL
             UpdateFrameLastMS = 0; // Reset on each start
             FrameRateMovingAverage.Reset();
         }
-        
+
         // Pause sim
         private void PauseSim(object[] args)
         {
@@ -466,7 +472,7 @@ namespace OrbitalSimOpenGL
 
         private void MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            MousePosition.X =  MousePosition.Y = -1;
+            MousePosition.X = MousePosition.Y = -1;
         }
     }
 }

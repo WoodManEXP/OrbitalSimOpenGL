@@ -31,14 +31,14 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Detect closest approach and process collisions
         /// </summary>
-        /// <param name="onlyIfLessThanOrEqualToDistSquared"> Process closest approach onlyIfLessThanOrEqualTo this value,
+        /// <param name="onlyIfLessThanOrEqualToThisD2"> Process closest approach onlyIfLessThanOrEqualTo this value,
         /// an efficiency check. This is also a distSquared value. No need to gather approaches if none are less than any earlier encountered.
         /// </param>
         /// <param name="approachDistSquared">out, closest approach distance this pass</param>
         /// <param name="closestApproachBodies">ref, to List of bodies involved in closest approach</param>
         /// <remrks>
         /// </remrks>
-        internal void Detect(Double onlyIfLessThanOrEqualToDistSquared, out Double approachDistSquared, ref List<int> closestApproachBodies)
+        internal void Detect(Double onlyIfLessThanOrEqualToThisD2, out Double approachDistSquared, ref List<int> closestApproachBodies)
         {
 
             int numBodies = SimBodyList.BodyList.Count;
@@ -97,7 +97,7 @@ namespace OrbitalSimOpenGL
                     }
 
                     // Collect the 2+ bodies that have lowest (possibly same) closest approach
-                    if (lenSquared <= approachDistSquared && lenSquared <= onlyIfLessThanOrEqualToDistSquared)
+                    if (lenSquared <= approachDistSquared && lenSquared <= onlyIfLessThanOrEqualToThisD2)
                     {
                         if (lenSquared < approachDistSquared)
                         {

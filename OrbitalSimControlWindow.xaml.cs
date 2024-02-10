@@ -128,9 +128,32 @@ namespace OrbitalSimOpenGL
                     KeepCombo.SelectedIndex = 0; // Keep was turned off so set KeepCombo to first entry (None)
                     break;
 
+                case CommandControlWindow.GenericCommands.ExcludeBody:
+                    ExcludeBody((int)args[1]);
+                    break;
+
                 default:
                     break;
             }
+        }
+
+        /// <summary>
+        /// Process a body being excluded from the sim
+        /// </summary>
+        /// <param name="bodyName"></param>
+        private void ExcludeBody(int bodyIndex)
+        {
+
+            // Once a body is excluded it is out of this sim run, for good.
+
+            // Disable it in body list
+            ListBoxItem lbi = (ListBoxItem)(BodyModsListBox.ItemContainerGenerator.ContainerFromIndex(bodyIndex));
+            lbi.IsEnabled = false;
+
+            // Disable in the drop downs
+            ((ComboBoxItem)((ItemCollection)LookAtComboBox.Items).GetItemAt(1 + bodyIndex)).IsEnabled = false;
+            ((ComboBoxItem)((ItemCollection)GoNearComboBox.Items).GetItemAt(1 + bodyIndex)).IsEnabled = false;
+            ((ComboBoxItem)((ItemCollection)OrbitAboutComboBox.Items).GetItemAt(1 + bodyIndex)).IsEnabled = false;
         }
 
         private void CameraLookUp(object sender, RoutedEventArgs e)
@@ -253,7 +276,7 @@ namespace OrbitalSimOpenGL
 
             // Process open file dialog box results
             if (result == true)
-            {              
+            {
                 // Remember this for next time
                 XtraBodiesGetDirectoryName = Path.GetDirectoryName(XtraBodiesFileName = dialog.FileName);
 
@@ -392,7 +415,7 @@ namespace OrbitalSimOpenGL
         private void LookAtSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             if (LookAtComboBox.SelectedItem != null)
-                CommandSimWindow?.LookAtCamera((String)LookAtComboBox.SelectedItem);
+                CommandSimWindow?.LookAtCamera((String)((ComboBoxItem)LookAtComboBox.SelectedItem).Content);
         }
 
         private void GoNearDropDownOpened(object sender, EventArgs e)
@@ -403,7 +426,7 @@ namespace OrbitalSimOpenGL
         private void GoNearSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (GoNearComboBox.SelectedItem != null)
-                CommandSimWindow?.GoNear((String)GoNearComboBox.SelectedItem);
+                CommandSimWindow?.GoNear((String)((ComboBoxItem)GoNearComboBox.SelectedItem).Content);
         }
         private void OrbitAboutDownOpened(object sender, EventArgs e)
         {
@@ -412,7 +435,7 @@ namespace OrbitalSimOpenGL
         private void OrbitAboutSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (OrbitAboutComboBox.SelectedItem != null)
-                CommandSimWindow?.OrbitAbout((String)OrbitAboutComboBox.SelectedItem);
+                CommandSimWindow?.OrbitAbout((String)((ComboBoxItem)OrbitAboutComboBox.SelectedItem).Content);
         }
         private void PopulateComboBoxes()
         {
@@ -421,23 +444,23 @@ namespace OrbitalSimOpenGL
 
             // Populate the LookAt, GoNear, and OribitAbout Combobox
             LookAtComboBox.Items.Clear();
-            LookAtComboBox.Items.Add(Properties.Settings.Default.Origin);
+            LookAtComboBox.Items.Add(new ComboBoxItem() { Content = Properties.Settings.Default.Origin });
             //LookAtComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
 
             GoNearComboBox.Items.Clear();
-            GoNearComboBox.Items.Add(Properties.Settings.Default.Origin);
+            GoNearComboBox.Items.Add(new ComboBoxItem() { Content = Properties.Settings.Default.Origin });
             //GoNearComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
 
             OrbitAboutComboBox.Items.Clear();
-            OrbitAboutComboBox.Items.Add(Properties.Settings.Default.Origin);
+            OrbitAboutComboBox.Items.Add(new ComboBoxItem() { Content = Properties.Settings.Default.Origin });
             //OrbitAboutComboBox.Items.Add(Properties.Settings.Default.SystemBarycenter);
 
             // Add an entry for each body in the sim
             foreach (EphemerisBody b in EphemerisBodyList.Bodies)
             {
-                LookAtComboBox.Items.Add(b.Name);
-                GoNearComboBox.Items.Add(b.Name);
-                OrbitAboutComboBox.Items.Add(b.Name);
+                LookAtComboBox.Items.Add(new ComboBoxItem() { Content = b.Name });
+                GoNearComboBox.Items.Add(new ComboBoxItem() { Content = b.Name });
+                OrbitAboutComboBox.Items.Add(new ComboBoxItem() { Content = b.Name });
             }
 
             LookAtComboBox.SelectedIndex = 0;       // Origin
@@ -693,8 +716,8 @@ namespace OrbitalSimOpenGL
         /// </summary>
         private void PopulateBodyMods()
         {
-//            if (SimHasBeenStarted)
-//                return;
+            //            if (SimHasBeenStarted)
+            //                return;
 
             BodyModsListBox.Items.Clear();
 
@@ -754,10 +777,6 @@ namespace OrbitalSimOpenGL
 
             // Send over name of body to exclude
             CommandSimWindow?.ExcludeBody(checkBox.Uid);
-
-            // Once a body is excluded it is out of the sim. for good.
-            // Disable all its controls. In this case disable the containing Parent (StackPanel).
-            ((FrameworkElement)(checkBox.Parent)).IsEnabled = false;
         }
 
         private void BodyModsMassSliderLostMouseCapture(object sender, System.Windows.Input.MouseEventArgs e)
