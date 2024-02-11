@@ -25,15 +25,16 @@ namespace OrbitalSimOpenGL
         public SimBodyList? SimBodyList { get; set; }
         private NextPosition? NextPosition { get; set; }
         private Double GravConstantSetting { get; set; } = 0D; // Grav Constant starts unmodified
-        public Scale Scale { get; set; }
         public String? AppDataFolder { get; set; }
         public int IterationSeconds { get; set; } = 60; // Each frame iteration represents this many seconds of model simulation
         public int TimeCompression { get; set; } = 1; // Number of times to iterate per frame
         public Int64 ElapsedSeconds { get; set; } = 0;
         private Axis Axis { get; set; }
         public bool ShowAxis { get; set; } = true; // Render the three axis elements (X, Y, Z)
-        public SimCamera SimCamera { get; set; }
-        private MassMass? MassMass { get; set; }
+        public OrbitalSimWindow OrbitalSimWindow { get; set; }
+        public Scale? Scale { get; set; }
+        public SimCamera? SimCamera { get; set; }
+        public MassMass? MassMass { get; set; }
         private CollisionDetector? CollisionDetector { get; set; }
 
         private Double PrevClosestApproachDistSquared { get; set; } = Double.MaxValue;
@@ -66,10 +67,11 @@ namespace OrbitalSimOpenGL
         int ElementBufferObject { get; set; }
         #endregion
 
-        public SimModel(SimCamera simCamera, Scale scale)
+        public SimModel(OrbitalSimWindow orbitalSimWindow)
         {
-            SimCamera = simCamera;
-            Scale = scale;
+            OrbitalSimWindow = orbitalSimWindow;
+            SimCamera = OrbitalSimWindow.SimCamera;
+            Scale = OrbitalSimWindow.Scale;
 
             GL.ClearColor(Color4.LightGray);
 
@@ -115,7 +117,7 @@ namespace OrbitalSimOpenGL
             SimBodyList = new SimBodyList(Scale, ephemerisBodyList, AppDataFolder);
 
             MassMass = new(SimBodyList);
-            CollisionDetector = new(SimBodyList, MassMass);
+            CollisionDetector = new(this);
             NextPosition = new(SimBodyList, MassMass, GravConstantSetting);
             Barycenter = new(Scale, SimBodyList);
 
@@ -217,7 +219,11 @@ namespace OrbitalSimOpenGL
             {
                 SimBody sB = SimBodyList.BodyList[sBI];
                 sB.ExcludeFromSim = true;
+
+                // Tell CommandControlWindow
+                OrbitalSimWindow.CommandControlWindow.ExcludeBody(sBI);
             }
+
             Barycenter?.SystemMassChanged();
         }
 

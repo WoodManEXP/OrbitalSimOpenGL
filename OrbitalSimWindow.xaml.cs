@@ -19,8 +19,8 @@ namespace OrbitalSimOpenGL
         public CommandSimWindow? OrbitalSimCmds { get; set; }
         private EphemerisBodyList? EphemerisBodyList { get; set; }
         public SimCamera? SimCamera { get; set; }
-        private SimModel SimModel { get; set; }
-        private Scale Scale { get; set; } = new(); // Scales U coords to OpenGL coords
+        private SimModel? SimModel { get; set; }
+        public Scale Scale { get; set; } = new(); // Scales U coords to OpenGL coords
         private ToolTipHelper ToolTipHelper { get; set; } = new();
         private bool SimHasBeenStarted { get; set; } = false;
         private String AppDataFolder { get; set; }
@@ -32,8 +32,8 @@ namespace OrbitalSimOpenGL
         /// </summary>
         private static OrbitalSimWindow? ThisOrbitalSimWindow { get; set; }
 
-        private Stats Stats { get; set; }
-        CommandControlWindow CommandControlWindow { get; set; }
+        private Stats? Stats { get; set; }
+        public CommandControlWindow CommandControlWindow { get; set; }
         #endregion
 
         public OrbitalSimWindow(CommandControlWindow commandControlWindow)
@@ -99,7 +99,7 @@ namespace OrbitalSimOpenGL
             SimCamera = new(Scale, new Vector3d(cX, cY, cZ), new Vector3d(0d, 0d, 0d),
                         OpenTkControl.ActualWidth, OpenTkControl.ActualHeight);
 
-            SimModel = SimCamera.SimModel = new(SimCamera, Scale);
+            SimModel = SimCamera.SimModel = new(this);
             Stats = new(this, SimModel, SimCamera);
         }
 

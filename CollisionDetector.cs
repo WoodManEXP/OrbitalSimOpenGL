@@ -13,8 +13,9 @@ namespace OrbitalSimOpenGL
         /// Handles collisions beween bodies
         /// </summary>
         #region Properties
-        private SimBodyList SimBodyList { get; set; }
-        private MassMass MassMass { get; set; }
+        private SimModel SimModel { get; set; }
+        private SimBodyList? SimBodyList { get; set; }
+        private MassMass? MassMass { get; set; }
 
         private List<int> _CollisionList = new(3);
         private List<int> CollisionList { get { return _CollisionList; } }
@@ -22,10 +23,11 @@ namespace OrbitalSimOpenGL
         private static readonly Double CollisionMassLoss = 9e-1D; // Body mass used for collisions, reduction repreents heat loss
         #endregion
 
-        public CollisionDetector(SimBodyList simBodyList, MassMass massMass)
+        public CollisionDetector(SimModel simModel)
         {
-            MassMass = massMass;
-            SimBodyList = simBodyList;
+            SimModel = simModel;
+            MassMass = SimModel.MassMass;
+            SimBodyList = SimModel.SimBodyList;
         }
 
         /// <summary>
@@ -173,7 +175,7 @@ namespace OrbitalSimOpenGL
                 if (largestMassBodyIndex != i)
                 {
                     newBodyName += " - " + sB.Name;
-                    sB.ExcludeFromSim = true;
+                    SimModel.ExcludeBody(sB.Name);
                 }
             }
 
