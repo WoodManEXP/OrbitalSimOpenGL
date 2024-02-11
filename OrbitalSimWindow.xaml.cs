@@ -199,8 +199,8 @@ namespace OrbitalSimOpenGL
 
                     case CommandSimWindow.GenericCommands.ExcludeBody:
                         SimModel.ExcludeBody((String)args[1]);              // Tell the model (sometimes a NOp)
-                        if (SimModel.SimBodyList is not null)
-                            CommandControlWindow.ExcludeBody(SimModel.SimBodyList.GetIndex((String)args[1]));  // Tell CommandControlWindow
+//                        if (SimModel.SimBodyList is not null)
+//                            CommandControlWindow.ExcludeBody(SimModel.SimBodyList.GetIndex((String)args[1]));  // Tell CommandControlWindow
                         break;
 
                     case CommandSimWindow.GenericCommands.MassMultiplier:

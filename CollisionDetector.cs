@@ -80,7 +80,7 @@ namespace OrbitalSimOpenGL
                     Double lRadius = lBody.HalfEphemerisDiameter;
                     Double hRadius = hBody.HalfEphemerisDiameter;
                     lRadius += hRadius;
-                    lRadius *= lRadius;
+                    lRadius *= lRadius; // Squared
 
                     Double lenSquared = lBodyPos.LengthSquared;
 
@@ -96,6 +96,8 @@ namespace OrbitalSimOpenGL
                             CollisionList.Add(bL);
                         if (!CollisionList.Contains(bH))
                             CollisionList.Add(bH);
+
+                        lenSquared = 0D; // This is definitely a closest aproach
                     }
 
                     // Collect the 2+ bodies that have lowest (possibly same) closest approach
@@ -175,6 +177,8 @@ namespace OrbitalSimOpenGL
                 if (indexOfLargestMassBody != bodyIndex)
                 {
                     newBodyName += " - " + sB.Name;
+
+                    // Broadcast the exclusion
                     SimModel.ExcludeBody(sB.Name);
                 }
             }

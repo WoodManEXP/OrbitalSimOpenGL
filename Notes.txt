@@ -75,5 +75,7 @@ SimBody
 	https://en.wikipedia.org/wiki/Three-body_problem
 - Mass change range from 1/100 to 100X ?
 - LookAt sets body tracked in status area (done)
-- Stats show body dist from Origin
-- Reset sets back to Start button enabled (orogonal state)
+- Stats show body dist from Origin (done)
+- Reset sets back to Start button enabled (origonal state)
+- Explosion on collision
+- Use travel vectors to determione closest approach

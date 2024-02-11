@@ -220,8 +220,8 @@ namespace OrbitalSimOpenGL
                 SimBody sB = SimBodyList.BodyList[sBI];
                 sB.ExcludeFromSim = true;
 
-                // Tell CommandControlWindow
-                OrbitalSimWindow.CommandControlWindow.ExcludeBody(sBI);
+                // Tell CommandControlWindow (posts to msg queue and so returns quickly)
+                OrbitalSimWindow.CommandControlWindow.BodyExcluded(sBI);
             }
 
             Barycenter?.SystemMassChanged();

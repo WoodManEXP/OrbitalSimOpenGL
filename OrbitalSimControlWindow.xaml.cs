@@ -128,8 +128,8 @@ namespace OrbitalSimOpenGL
                     KeepCombo.SelectedIndex = 0; // Keep was turned off so set KeepCombo to first entry (None)
                     break;
 
-                case CommandControlWindow.GenericCommands.ExcludeBody:
-                    ExcludeBody((int)args[1]);
+                case CommandControlWindow.GenericCommands.BodyExcluded:
+                    BodyExcluded((int)args[1]);
                     break;
 
                 case CommandControlWindow.GenericCommands.BodyRenamed:
@@ -144,14 +144,16 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Process a body being excluded from the sim
         /// </summary>
-        /// <param name="bodyName"></param>
-        private void ExcludeBody(int bodyIndex)
+        /// <param name="bodyIndex"></param>
+        private void BodyExcluded(int bodyIndex)
         {
 
             // Once a body is excluded it is out of this sim run, for good.
 
-            // Disable it in BodyMods list
-            ListBoxItem lbi = (ListBoxItem)(BodyModsListBox.ItemContainerGenerator.ContainerFromIndex(bodyIndex));
+            // Disable its entry in BodyMods list
+            // ItemContainerGenerator.ContainerFromIndex is recommended technique,m but it behaves unpredictably...
+            //ListBoxItem lbi = (ListBoxItem)(BodyModsListBox.ItemContainerGenerator.ContainerFromIndex(bodyIndex));
+            ListBoxItem lbi = (ListBoxItem)Util.GetByUid(BodyModsListBox, "LBI" + bodyIndex.ToString());
             lbi.IsEnabled = false;
 
             // Disable in the drop downs
@@ -171,9 +173,17 @@ namespace OrbitalSimOpenGL
             // Set the label to show value
             Label label = (Label)Util.GetByUid(BodyModsListBox, "Entry" + bodyIndex.ToString());
             if (label is not null)
+            {
+                String currName = (String)label.Content;
                 label.Content = newName;
 
-            // Disable in the drop downs
+                // Set Uid in the associated Exclude checkBox to the new name.
+                CheckBox checkBox = (CheckBox)Util.GetByUid(BodyModsListBox, currName);
+                if (checkBox is not null)
+                    checkBox.Uid = newName;
+            }
+
+            // Change name in the drop downs
             ((ComboBoxItem)((ItemCollection)LookAtComboBox.Items).GetItemAt(1 + bodyIndex)).Content = newName;
             ((ComboBoxItem)((ItemCollection)GoNearComboBox.Items).GetItemAt(1 + bodyIndex)).Content = newName;
             ((ComboBoxItem)((ItemCollection)OrbitAboutComboBox.Items).GetItemAt(1 + bodyIndex)).Content = newName;
@@ -751,7 +761,7 @@ namespace OrbitalSimOpenGL
             {
                 itemIndex++;
 
-                ListBoxItem listBoxItem = new() { };
+                ListBoxItem listBoxItem = new() { Uid = "LBI" + itemIndex.ToString() };
 
                 StackPanel stackPanel = new() { VerticalAlignment = VerticalAlignment.Center, Orientation = Orientation.Horizontal };
                 Label label0 = new() { Content = b.Name, Uid = "Entry" + itemIndex.ToString(), Width = 102, Margin = new(0, 0, 5, 0) };

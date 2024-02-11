@@ -18,7 +18,7 @@ namespace OrbitalSimOpenGL
         public enum GenericCommands
         {
               KeepTurnedOff
-            , ExcludeBody
+            , BodyExcluded
             , BodyRenamed
         };
 
@@ -43,14 +43,14 @@ namespace OrbitalSimOpenGL
         }
         #endregion
 
-        #region Exclude Body
+        #region Body Excluded
         /// <summary>
-        /// 
+        /// A body has been excluded
         /// </summary>
-        /// <param name="bodyName"></param>
-        public void ExcludeBody(int bodyIndex)
+        /// <param name="bodyIndex"></param>
+        public void BodyExcluded(int bodyIndex)
         {
-            object[] args = { CommandControlWindow.GenericCommands.ExcludeBody, bodyIndex };
+            object[] args = { CommandControlWindow.GenericCommands.BodyExcluded, bodyIndex };
             GenericCommand(args);
         }
         #endregion
