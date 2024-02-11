@@ -228,6 +228,16 @@ namespace OrbitalSimOpenGL
         }
 
         /// <summary>
+        /// Body has been renamed by the sim. Let others know
+        /// </summary>
+        /// <param name="bodyIndex"></param>
+        /// <param name="bodyName"></param>
+        internal void BodyRenamed(int bodyIndex, String bodyName)
+        {
+            OrbitalSimWindow.CommandControlWindow.BodyRenamed(bodyIndex, bodyName);
+        }
+
+        /// <summary>
         /// Alter mass of a specific body
         /// </summary>
         /// <param name="bodyName"></param>

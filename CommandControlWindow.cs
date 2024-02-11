@@ -19,6 +19,7 @@ namespace OrbitalSimOpenGL
         {
               KeepTurnedOff
             , ExcludeBody
+            , BodyRenamed
         };
 
         #endregion
@@ -50,6 +51,14 @@ namespace OrbitalSimOpenGL
         public void ExcludeBody(int bodyIndex)
         {
             object[] args = { CommandControlWindow.GenericCommands.ExcludeBody, bodyIndex };
+            GenericCommand(args);
+        }
+        #endregion
+
+        #region Body Renamed
+        public void BodyRenamed(int bodyIndex, String bodyName)
+        {
+            object[] args = { CommandControlWindow.GenericCommands.BodyRenamed, bodyIndex, bodyName };
             GenericCommand(args);
         }
         #endregion

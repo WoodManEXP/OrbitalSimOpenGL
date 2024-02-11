@@ -132,6 +132,10 @@ namespace OrbitalSimOpenGL
                     ExcludeBody((int)args[1]);
                     break;
 
+                case CommandControlWindow.GenericCommands.BodyRenamed:
+                    BodyRenamed((int)args[1], (String)args[2]);
+                    break;
+
                 default:
                     break;
             }
@@ -146,7 +150,7 @@ namespace OrbitalSimOpenGL
 
             // Once a body is excluded it is out of this sim run, for good.
 
-            // Disable it in body list
+            // Disable it in BodyMods list
             ListBoxItem lbi = (ListBoxItem)(BodyModsListBox.ItemContainerGenerator.ContainerFromIndex(bodyIndex));
             lbi.IsEnabled = false;
 
@@ -154,6 +158,25 @@ namespace OrbitalSimOpenGL
             ((ComboBoxItem)((ItemCollection)LookAtComboBox.Items).GetItemAt(1 + bodyIndex)).IsEnabled = false;
             ((ComboBoxItem)((ItemCollection)GoNearComboBox.Items).GetItemAt(1 + bodyIndex)).IsEnabled = false;
             ((ComboBoxItem)((ItemCollection)OrbitAboutComboBox.Items).GetItemAt(1 + bodyIndex)).IsEnabled = false;
+        }
+
+        /// <summary>
+        /// Process a body being renamed
+        /// </summary>
+        /// <param name="bodyIndex"></param>
+        private void BodyRenamed(int bodyIndex, String newName)
+        {
+            // Rename it in BodyMods list
+
+            // Set the label to show value
+            Label label = (Label)Util.GetByUid(BodyModsListBox, "Entry" + bodyIndex.ToString());
+            if (label is not null)
+                label.Content = newName;
+
+            // Disable in the drop downs
+            ((ComboBoxItem)((ItemCollection)LookAtComboBox.Items).GetItemAt(1 + bodyIndex)).Content = newName;
+            ((ComboBoxItem)((ItemCollection)GoNearComboBox.Items).GetItemAt(1 + bodyIndex)).Content = newName;
+            ((ComboBoxItem)((ItemCollection)OrbitAboutComboBox.Items).GetItemAt(1 + bodyIndex)).Content = newName;
         }
 
         private void CameraLookUp(object sender, RoutedEventArgs e)
@@ -721,13 +744,17 @@ namespace OrbitalSimOpenGL
 
             BodyModsListBox.Items.Clear();
 
+            int itemIndex = -1;
+
             // Add an entry for each body in the sim (dynamic buildup of list box contents)
             foreach (EphemerisBody b in EphemerisBodyList.Bodies)
             {
+                itemIndex++;
+
                 ListBoxItem listBoxItem = new() { };
 
                 StackPanel stackPanel = new() { VerticalAlignment = VerticalAlignment.Center, Orientation = Orientation.Horizontal };
-                Label label0 = new() { Content = b.Name, Width = 102, Margin = new(0, 0, 5, 0) };
+                Label label0 = new() { Content = b.Name, Uid = "Entry" + itemIndex.ToString(), Width = 102, Margin = new(0, 0, 5, 0) };
 
                 CheckBox excludeCheckBox = new() { Uid = b.Name, VerticalAlignment = VerticalAlignment.Center, Width = 33, Margin = new(0, 0, 10, 0), ToolTip = "Exclude " + b.Name + " from sim" };
                 excludeCheckBox.Click += new(BodyModsExcludeCheckbox);

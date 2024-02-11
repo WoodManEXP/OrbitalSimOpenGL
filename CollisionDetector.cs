@@ -140,7 +140,7 @@ namespace OrbitalSimOpenGL
             Vector3d rVec = new(0D, 0d, 0D);
             Vector3d tVec;
             SimBody sB;
-            int largestMassBodyIndex = -1 ;
+            int indexOfLargestMassBody = -1 ;
 
             // Gather parts of the inelastic collision equation 
             for(int i=0; i<CollisionList.Count; i++)
@@ -156,7 +156,7 @@ namespace OrbitalSimOpenGL
 
                 if (sB.Mass > largestMass)
                 {
-                    largestMassBodyIndex = bodyIndex;
+                    indexOfLargestMassBody = bodyIndex;
                     largestMass = sB.Mass;
                 }
             }
@@ -166,13 +166,13 @@ namespace OrbitalSimOpenGL
 
             // Build up new body name
             // Mark others in the collision as excluded
-            String newBodyName = new(SimBodyList.BodyList[largestMassBodyIndex].Name);
+            String newBodyName = new(SimBodyList.BodyList[indexOfLargestMassBody].Name);
             for (int i = 0; i < CollisionList.Count; i++)
             {
                 int bodyIndex = CollisionList[i];
                 sB = SimBodyList.BodyList[bodyIndex];
 
-                if (largestMassBodyIndex != i)
+                if (indexOfLargestMassBody != bodyIndex)
                 {
                     newBodyName += " - " + sB.Name;
                     SimModel.ExcludeBody(sB.Name);
@@ -180,10 +180,13 @@ namespace OrbitalSimOpenGL
             }
 
             // Reset a few things in the remaining body
-            sB = SimBodyList.BodyList[largestMassBodyIndex];
+            sB = SimBodyList.BodyList[indexOfLargestMassBody];
             sB.Name = newBodyName;
             sB.Mass = massTotal;
             sB.VX = rVec.X; sB.VY = rVec.Y; sB.VZ = rVec.Z;
+
+            // Broadcast the rename
+            SimModel.BodyRenamed(indexOfLargestMassBody, newBodyName);
 
             MassMass?.CalcMassMass(SimBodyList);
         }
