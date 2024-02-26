@@ -21,9 +21,20 @@ namespace OrbitalSimOpenGL
         public Double X { get; private set; } // km
         public Double Y { get; private set; } // km
         public Double Z { get; private set; } // km
+        public Double PX { get; set; } // km
+        public Double PY { get; set; } // km
+        public Double PZ { get; set; } // km
         public Double VX { get; set; } // km/s
         public Double VY { get; set; } // km/s
         public Double VZ { get; set; } // km/s
+
+        // Radius-squared of sphere encompassing travel from last iteration. Includes dist traveled + body radius.
+        // Precalculated for collision rule-out.
+        public Double LastPathRadiusSquared { get; set; } // On last iteration
+
+        // Coordinate at middle of last iteration's travel path.
+        // Precalculated for collision rule-out.
+        public Vector3d MiddleOfPath;
 
         // Other settings from Ephemeris reading
         public Double LT { get; set; }
@@ -31,7 +42,8 @@ namespace OrbitalSimOpenGL
         public Double RR { get; set; }
         public Double EphemerisDiameter { get; set; } // U coords
         public Double UseDiameter { get; set; } // U coords, gets adjusted for visability
-        public Double HalfEphemerisDiameter { get; set; }
+        public Double EphemerisRaduis { get; set; }
+        public Double EphemerisRaduisSquared { get; set; }
 
         private Double _Mass;
         public Double Mass { 
@@ -46,6 +58,7 @@ namespace OrbitalSimOpenGL
         Color4 BodyColor { get { return _BodyColor; } set { _BodyColor = value; } }
         public bool ExcludeFromSim { get; set; } = false; // Body is to be or not be excluded from the sim
         private PathTracer? PathTracer { get; set; } = null;
+        private Highlighter? Highlighter { get; set; }
 
         private Double _MassMultiplier = 1D;
         public Double MassMultiplier
@@ -93,11 +106,13 @@ namespace OrbitalSimOpenGL
             if (0D == EphemerisDiameter)
             {
                 // For bodies with 0 diameter instead calculate the Schwarzschild radius (https://en.wikipedia.org/wiki/Schwarzschild_radius)
-                HalfEphemerisDiameter = ((2D * Util.G_M * Mass) / Util.CSquared_M) / 1E3D;
-                EphemerisDiameter = 2D * HalfEphemerisDiameter;
+                EphemerisRaduis = ((2D * Util.G_M * Mass) / Util.CSquared_M) / 1E3D;
+                EphemerisDiameter = 2D * EphemerisRaduis;
             }
             else
-                HalfEphemerisDiameter = EphemerisDiameter / 2D;
+                EphemerisRaduis = EphemerisDiameter / 2D;
+
+            EphemerisRaduisSquared = EphemerisRaduis * EphemerisRaduis;
         }
 
         /// <summary>
@@ -162,8 +177,28 @@ namespace OrbitalSimOpenGL
         /// <param name="vX"></param>
         /// <param name="vY"></param>
         /// <param name="vZ"></param>
+        /// <remarks>
+        /// Called for each iteration
+        /// </remarks>
         public void SetPosAndVel(int seconds, Double x, Double y, Double z, Double vX, Double vY, Double vZ)
         {
+            Double d;
+
+            // Calc radius-squared of sphere encompassing travel from last iteration.
+            LastPathRadiusSquared = EphemerisRaduisSquared;
+            d = X - x; d *= d;
+            LastPathRadiusSquared += d;
+            d = Y - y; d *= d;
+            LastPathRadiusSquared += d;
+            d = Z - z; d *= d;
+            LastPathRadiusSquared += d;
+
+            // Calc position at middle of travel path
+            MiddleOfPath.X = (X + x) / 2D;
+            MiddleOfPath.Y = (Y + y) / 2D;
+            MiddleOfPath.Z = (Z + z) / 2D;
+
+            PX = X; PY = Y; PZ = Z; // Previous position coords
             X = x; Y = y; Z = z;
             VX = vX; VY = vY; VZ = vZ;
             PathTracer?.AddLoc(seconds, x, y, z, vX, vY, vZ); // If there is a PathTracer
@@ -202,7 +237,7 @@ namespace OrbitalSimOpenGL
             // In these cases jump the calculation to Double precision.
 
             Double distSquaredD;
-            DistSquaredD(simCamera, HalfEphemerisDiameter, ref halfNorm, minSize, out distSquaredD, out Vector2 ndcCenter);
+            DistSquaredD(simCamera, EphemerisRaduis, ref halfNorm, minSize, out distSquaredD, out Vector2 ndcCenter);
             distSquared = (Single)distSquaredD;
 
             //                Single distSquared;

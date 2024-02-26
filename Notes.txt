@@ -77,5 +77,11 @@ SimBody
 - LookAt sets body tracked in status area (done)
 - Stats show body dist from Origin (done)
 - Reset sets back to Start button enabled (origonal state)
+- Closest approach can be more than 2 bodies simultaneously
+- Check ephemeris values for Mars moons Demios and Phobos
 - Explosion on collision
 - Use travel vectors to determione closest approach
+  The shortest distance between two lines is the length of projection of any vector between the two lines onto the cross product of the direction of the two lines. – 
+	Yiyuan Lee Dec 1, 2015 at 14:20
+	https://math.stackexchange.com/questions/1554820/shortest-distance-between-two-lines-and-common-perpendicular
+	https://www.cuemath.com/geometry/projection-vector/

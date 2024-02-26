@@ -67,10 +67,10 @@ namespace OrbitalSimOpenGL
                                         , position3D.Z - SimCamera.CameraPosition.Z);
 
                     // Dist from camera position to point on sphere where ray cast would intersect
-                    Double cameraDist = cameraVector3D.Length - ShowStatsForSB.HalfEphemerisDiameter;
+                    Double cameraDist = cameraVector3D.Length - ShowStatsForSB.EphemerisRaduis;
 
                     // Dist from surface of sphere to coordinate system origin.
-                    Double originDist = position3D.Length - ShowStatsForSB.HalfEphemerisDiameter;
+                    Double originDist = position3D.Length - ShowStatsForSB.EphemerisRaduis;
 
                     // Velocity
                     cameraVector3D.X = ShowStatsForSB.VX;
