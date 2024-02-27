@@ -68,7 +68,7 @@ namespace OrbitalSimOpenGL
 
             if (File.Exists(savedSimBodiesPath)) // If the file exists
             {
-                EphemerisBodyList = EphemerisReader.ReadSavedSimBodies(savedSimBodiesPath);
+                EphemerisBodyList = EphemerisReader.ReadEphemerisFile(savedSimBodiesPath);
             }
         }
 
@@ -282,8 +282,7 @@ namespace OrbitalSimOpenGL
             bool? result = dialog.ShowDialog();
         }
 
-        private String XtraBodiesGetDirectoryName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        private String? XtraBodiesFileName = null;
+        private String LastEphDirectoryName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
         /// <summary>
         /// XtraBodsFileButton
@@ -297,11 +296,11 @@ namespace OrbitalSimOpenGL
             // Configure open file dialog box
             var dialog = new Microsoft.Win32.OpenFileDialog
             {
-                Title = "Open Ephemeris JSON file",
+                Title = "Open Xtra Bodies Ephemeris JSON file",
                 FileName = "Ephemeris", // Default file name
                 DefaultExt = ".json", // Default file extension
                 Filter = "JSON documents (.json)|*.json", // Filter files by extension
-                InitialDirectory = XtraBodiesGetDirectoryName
+                InitialDirectory = LastEphDirectoryName
             };
 
             // Show open file dialog box
@@ -311,11 +310,11 @@ namespace OrbitalSimOpenGL
             if (result == true)
             {
                 // Remember this for next time
-                XtraBodiesGetDirectoryName = Path.GetDirectoryName(XtraBodiesFileName = dialog.FileName);
+                LastEphDirectoryName = Path.GetDirectoryName(dialog.FileName);
 
                 // If EphemerisBodyList is started add extra bodies to it.
                 // Will exclude any added bodies already named in EphemerisBodyList.
-                XtraEphemerisBodyList = EphemerisReader.ReadSavedSimBodies(dialog.FileName);
+                XtraEphemerisBodyList = EphemerisReader.ReadEphemerisFile(dialog.FileName);
             }
         }
 
@@ -435,9 +434,39 @@ namespace OrbitalSimOpenGL
             File.WriteAllText(savedBodyList_Path, jsonString);
         }
 
+        /// <summary>
+        /// Select and read an Ephemeris JSON file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// Replaces any EphemerisBodyList that may already be on-board 
+        /// </remarks>
         private void ReadBodiesButton(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+
+            // Get the file path and read with EphemerisBodyList.ReadSavedSimBodies(String pathStr)            
+            // Configure open file dialog box
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Open Ephemeris JSON file",
+                FileName = "Ephemeris", // Default file name
+                DefaultExt = ".json", // Default file extension
+                Filter = "JSON documents (.json)|*.json", // Filter files by extension
+                InitialDirectory = LastEphDirectoryName
+            };
+
+            // Show open file dialog box
+            bool? result = dialog.ShowDialog();
+
+            // Process open file dialog box results
+            if (result == true)
+            {
+                // Remember this for next time
+                LastEphDirectoryName = Path.GetDirectoryName(dialog.FileName);
+
+                EphemerisBodyList = EphemerisReader.ReadEphemerisFile(dialog.FileName);
+            }
         }
 
         private void LookAtDropDownOpened(object sender, EventArgs e)

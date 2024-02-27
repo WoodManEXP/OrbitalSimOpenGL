@@ -22,8 +22,8 @@
             <Canvas>
                 <Label Content="FPS" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="28"/>
                 <Label x:Name="FPSValue" Content="0" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="38" Canvas.Left="28"/>
-                <Label x:Name="MouseOverBody" Content="" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="94" Canvas.Left="72" FontWeight="Bold"/>
-                <Label x:Name="BodyStats" Content="" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="532" Canvas.Left="171"/>
+                <Label x:Name="MouseOverBody" Content="" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="132" Canvas.Left="72" FontWeight="Bold"/>
+                <Label x:Name="BodyStats" Content="" HorizontalAlignment="Left" Height="25" VerticalAlignment="Center" Width="536" Canvas.Left="209"/>
                 <Label x:Name="ElapsedTime" Content="" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="360" Canvas.Top="24"/>
                 <Label x:Name="ClosestApproach" Content="" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="366" Canvas.Left="101" Canvas.Top="50"/>
                 <Label Content="Closest approach" HorizontalAlignment="Center" Height="25" VerticalAlignment="Top" Width="101" Canvas.Top="50"/>

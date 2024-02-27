@@ -101,7 +101,7 @@
         </GroupBox>
         <Button x:Name="ephemerisButton" Content="Ephemeris" Canvas.Left="14" Canvas.Top="68" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="EphemerisButton" ToolTip="Update ephemeris from JPL"/>
         <Button x:Name="saveBodiesButton" Content="Save Ephem" Canvas.Left="14" Canvas.Top="124" RenderTransformOrigin="0.379,0.403" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="SaveBodiesButton" ToolTip="Save current ephemeris"/>
-        <Button x:Name="readBodiesButton" Content="Read Bodies" Canvas.Left="14" Canvas.Top="160" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" Click="ReadBodiesButton" IsEnabled="False"/>
+        <Button x:Name="readBodiesButton" Content="Read Ephem" Canvas.Left="14" Canvas.Top="160" HorizontalAlignment="Center" VerticalAlignment="Top" Width="75" ToolTip="Read and use an ephemeris JSON file" IsEnabled="True" Click="ReadBodiesButton"/>
         <GroupBox Height="61" Header="Look at" Width="136" Canvas.Left="111" Canvas.Top="202" HorizontalAlignment="Center" VerticalAlignment="Top"/>
         <ComboBox x:Name="LookAtComboBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.475,0" Canvas.Left="121" Canvas.Top="228" SelectionChanged="LookAtSelectionChanged" DropDownOpened="LookAtDropDownOpened"/>
         <GroupBox Height="61" Header="Go near" Width="146" Canvas.Left="255" Canvas.Top="202" HorizontalAlignment="Left" VerticalAlignment="Center"/>

@@ -280,6 +280,7 @@ namespace OrbitalSimOpenGL
             int sBI = SimBodyList.GetIndex(bodyName);
             SimBodyList.BodyList[sBI].AlterVelocity(multiplier);
         }
+
         internal void TracePath(bool onOff, String bodyName)
         {
             if (!SceneReady)

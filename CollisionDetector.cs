@@ -102,22 +102,30 @@ namespace OrbitalSimOpenGL
                     DeltaE.X = lBody.X - hBody.X;
                     DeltaE.Y = lBody.Y - hBody.Y;
                     DeltaE.Z = lBody.Z - hBody.Z;
-                    Double k = Math.Max(0D, Math.Min(1D, Vector3d.Dot(DeltaS, DeltaS - DeltaE) / (DeltaS - DeltaE).LengthSquared));
+                    //Double k = Math.Max(0D, Math.Min(1D, Vector3d.Dot(DeltaS, DeltaS - DeltaE) / (DeltaS - DeltaE).LengthSquared));
+                    Double k = Vector3d.Dot(DeltaS, DeltaS - DeltaE) / (DeltaS - DeltaE).LengthSquared;
 
-                    // If (k < 0 or k > 1) the closet approach is beyond the current travel vectors. This test ignores fact that bodies
+#if false
+                    System.Diagnostics.Debug.WriteLine("CollisionDetector:DetectCollision "
+                        + lBody.Name + ", " + hBody.Name
+                        + " k: " + k.ToString("0.0000000E0")
+                    );
+#endif
+
+                    // If (k < 0 or k > 1) the closest approach is beyond the current travel vectors. This test ignores fact that bodies
                     // have a radius > 0, so bodies could have collided. Super low probability event and will be picked up
                     // on next iteration.
                     if (0D > k || 1D < k)
                         continue; // No collision
 
                     // Where were the two bodies at K ?
-                    lBodyPos.X = lBody.X + k * (lBody.X - lBody.PX);
-                    lBodyPos.Y = lBody.Y + k * (lBody.Y - lBody.PY);
-                    lBodyPos.Z = lBody.Z + k * (lBody.Z - lBody.PZ);
+                    lBodyPos.X = lBody.PX + k * (lBody.X - lBody.PX);
+                    lBodyPos.Y = lBody.PY + k * (lBody.Y - lBody.PY);
+                    lBodyPos.Z = lBody.PZ + k * (lBody.Z - lBody.PZ);
 
-                    hBodyPos.X = hBody.X + k * (hBody.X - hBody.PX);
-                    hBodyPos.Y = hBody.Y + k * (hBody.Y - hBody.PY);
-                    hBodyPos.Z = hBody.Z + k * (hBody.Z - hBody.PZ);
+                    hBodyPos.X = hBody.PX + k * (hBody.X - hBody.PX);
+                    hBodyPos.Y = hBody.PY + k * (hBody.Y - hBody.PY);
+                    hBodyPos.Z = hBody.PZ + k * (hBody.Z - hBody.PZ);
 
                     // Vector representing distance between the two centers at k
                     lBodyPos -= hBodyPos;
@@ -128,10 +136,11 @@ namespace OrbitalSimOpenGL
 #if false
                     String name1 = lBody.Name;
                     String name2 = hBody.Name;
-                    if ((name1.Equals("Sun") || name2.Equals("Sun")) && (name1.Equals("PBH 1") || name2.Equals("PBH 1")))
+                    if (true/*(name1.Equals("Sun") || name2.Equals("Sun")) && (name1.Equals("PBH 1") || name2.Equals("PBH 1"))*/)
                     {
                         System.Diagnostics.Debug.WriteLine("CollisionDetector:DetectCollision "
                             + lBody.Name + ", " + hBody.Name
+                            + " k: " + k.ToString("0.0000000E0")
                             + " lBodyPos: " + lBodyPos.X.ToString("N0") + "," + lBodyPos.Y.ToString("N0") + "," + lBodyPos.Z.ToString("N0")
                             + " hBodyPos: " + hBodyPos.X.ToString("N0") + "," + hBodyPos.Y.ToString("N0") + "," + hBodyPos.Z.ToString("N0")
                             + " lenSquared: " + lenSquared.ToString("N0")
@@ -145,7 +154,7 @@ namespace OrbitalSimOpenGL
                     if (lenSquared < radiSquared)
                     {
                         // Collision
-                        System.Diagnostics.Debug.WriteLine("CollisionDetector:DetectCollision, bodies "
+                        System.Diagnostics.Debug.WriteLine("CollisionDetector:DetectCollision, ** Collision ** bodies "
                             + lBody.Name + ", " + hBody.Name
                             );
 

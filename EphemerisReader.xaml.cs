@@ -226,7 +226,7 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="pathStr"></param>
         /// <returns></returns>
-        public static EphemerisBodyList ReadSavedSimBodies(String pathStr)
+        public static EphemerisBodyList ReadEphemerisFile(String pathStr)
         {
 
             // Read the serialized ephemeris
