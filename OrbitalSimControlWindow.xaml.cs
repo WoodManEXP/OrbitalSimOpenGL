@@ -178,9 +178,14 @@ namespace OrbitalSimOpenGL
                 label.Content = newName;
 
                 // Set Uid in the associated Exclude checkBox to the new name.
-                CheckBox checkBox = (CheckBox)Util.GetByUid(BodyModsListBox, currName);
+                CheckBox checkBox = (CheckBox)Util.GetByUid(BodyModsListBox, "Ex" + currName);
                 if (checkBox is not null)
-                    checkBox.Uid = newName;
+                    checkBox.Uid = "Ex" + newName;
+
+                // Set Uid in the associated Trace checkBox to the new name.
+                checkBox = (CheckBox)Util.GetByUid(BodyModsListBox, "Tr" + currName);
+                if (checkBox is not null)
+                    checkBox.Uid = "Tr" + newName;
             }
 
             // Change name in the drop downs
@@ -795,10 +800,10 @@ namespace OrbitalSimOpenGL
                 StackPanel stackPanel = new() { VerticalAlignment = VerticalAlignment.Center, Orientation = Orientation.Horizontal };
                 Label label0 = new() { Content = b.Name, Uid = "Entry" + itemIndex.ToString(), Width = 102, Margin = new(0, 0, 5, 0) };
 
-                CheckBox excludeCheckBox = new() { Uid = b.Name, VerticalAlignment = VerticalAlignment.Center, Width = 33, Margin = new(0, 0, 10, 0), ToolTip = "Exclude " + b.Name + " from sim" };
+                CheckBox excludeCheckBox = new() { Uid = "Ex" +  b.Name, VerticalAlignment = VerticalAlignment.Center, Width = 33, Margin = new(0, 0, 10, 0), ToolTip = "Exclude " + b.Name + " from sim" };
                 excludeCheckBox.Click += new(BodyModsExcludeCheckbox);
 
-                CheckBox traceCheckBox = new() { Uid = b.Name, VerticalAlignment = VerticalAlignment.Center, Width = 31, Margin = new(0, 0, 10, 0), ToolTip = "Trace " + b.Name + "'s path" };
+                CheckBox traceCheckBox = new() { Uid = "Tr" + b.Name, VerticalAlignment = VerticalAlignment.Center, Width = 31, Margin = new(0, 0, 10, 0), ToolTip = "Trace " + b.Name + "'s path" };
                 traceCheckBox.Click += new(BodyModsTraceCheckbox);
 
                 Slider massSlider = new() { Uid = b.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Alter " + b.Name + " +'s mass", Minimum = -9, Maximum = 9, Value = 0, Width = 145 };
@@ -842,7 +847,7 @@ namespace OrbitalSimOpenGL
                 return;
 
             // Send over name of body to exclude
-            CommandSimWindow?.ExcludeBody(checkBox.Uid);
+            CommandSimWindow?.ExcludeBody(checkBox.Uid.Substring(2)); // Substring removes the Ex prefix
         }
 
         private void BodyModsMassSliderLostMouseCapture(object sender, System.Windows.Input.MouseEventArgs e)
@@ -953,7 +958,7 @@ namespace OrbitalSimOpenGL
                 return;
 
             // Send over name of body to turn on/off tracing
-            CommandSimWindow?.TracePath(checkBox.Uid, checkBox.IsChecked.Value);
+            CommandSimWindow?.TracePath(checkBox.Uid.Substring(2), checkBox.IsChecked.Value); // Substring removes the Tr prefix
         }
     }
     #endregion

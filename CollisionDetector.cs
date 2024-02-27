@@ -29,6 +29,7 @@ namespace OrbitalSimOpenGL
         private SimModel SimModel { get; set; }
         private SimBodyList? SimBodyList { get; set; }
         private MassMass? MassMass { get; set; }
+        private Barycenter? Barycenter { get; set; }
 
         private List<int> _CollisionList = new(3);
         private List<int> CollisionList { get { return _CollisionList; } }
@@ -43,6 +44,7 @@ namespace OrbitalSimOpenGL
         {
             SimModel = simModel;
             MassMass = SimModel.MassMass;
+            Barycenter = SimModel.Barycenter;
             SimBodyList = SimModel.SimBodyList;
         }
 
@@ -240,6 +242,9 @@ namespace OrbitalSimOpenGL
 
             // Broadcast the rename
             SimModel.BodyRenamed(indexOfLargestMassBody, newBodyName);
+
+            // Barycenter calculations change
+            Barycenter?.SystemMassChanged();
 
             // MassMass table changes
             MassMass?.CalcMassMass(SimBodyList);

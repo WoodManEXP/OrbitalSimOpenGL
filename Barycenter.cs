@@ -9,7 +9,7 @@ namespace OrbitalSimOpenGL
     /// <summary>
     /// Calculates and renders system barycenter (center of mass)
     /// </summary>
-    internal class Barycenter
+    public class Barycenter
     {
         #region Properties
         private SimBodyList SimBodyList { get; set; }
@@ -85,8 +85,11 @@ namespace OrbitalSimOpenGL
 
             foreach (SimBody sB in SimBodyList.BodyList)
             {
-                iVec.X = sB.X; iVec.Y = sB.Y; iVec.Z = sB.Z;
-                R += iVec * sB.Mass;
+                if (!sB.ExcludeFromSim)
+                {
+                    iVec.X = sB.X; iVec.Y = sB.Y; iVec.Z = sB.Z;
+                    R += iVec * sB.Mass;
+                }
             }
             R /= SystemMass;
         }

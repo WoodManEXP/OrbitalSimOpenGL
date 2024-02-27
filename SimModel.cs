@@ -60,7 +60,7 @@ namespace OrbitalSimOpenGL
                 _Wireframe = value;
             }
         }
-        private Barycenter? Barycenter { get; set; }
+        public Barycenter? Barycenter { get; set; }
         public bool ShowBarycenter { get; set; }
         int VertexBufferObject { get; set; }
         int VertexArrayObject { get; set; }
@@ -116,10 +116,11 @@ namespace OrbitalSimOpenGL
 
             SimBodyList = new SimBodyList(Scale, ephemerisBodyList, AppDataFolder);
 
+            Barycenter = new(Scale, SimBodyList);
             MassMass = new(SimBodyList);
+
             CollisionDetector = new(this);
             NextPosition = new(SimBodyList, MassMass, GravConstantSetting);
-            Barycenter = new(Scale, SimBodyList);
 
             Wireframe = true;
             SceneReady = true;

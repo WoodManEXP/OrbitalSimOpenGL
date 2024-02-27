@@ -1,5 +1,5 @@
 {
-    "_comment": "2 bodies dead-on collision  2*150,000,000 km apart, @ 2 km/s",
+    "_comment": "2 bodies, same mass, dead-on collision  2*150,000,000 km apart, @ 2 km/s",
     "Bodies": [
         {
             "ColorStr": "Blue",

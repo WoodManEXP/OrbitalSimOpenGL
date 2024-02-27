@@ -1,0 +1,43 @@
+{
+    "_comment": "2 bodies, diff mass, dead-on collision  2*150,000,000 km apart, @ 2 km/s",
+    "Bodies": [
+        {
+            "ColorStr": "Blue",
+            "Designation": "",
+            "DiameterStr": "1.2742E+04",
+            "GM_Str": "398600.4354",
+            "IAU_Alias": "Body 1",
+            "ID": "399",
+            "LT_Str": "  4.939782816214290E+02",
+            "MassStr": "5.9722E+24",
+            "Name": "Body 1",
+            "RG_Str": "  1.480909632459044E+08",
+            "RR_Str": "  5.067743966084775E-01",
+            "VX_Str": "-2E0",
+            "VY_Str": "0E0",
+            "VZ_Str": "0E0",
+            "X_Str": "150000000",
+            "Y_Str": "0E0",
+            "Z_Str": "0E0"
+        },
+        {
+            "ColorStr": "White",
+            "Designation": "",
+            "DiameterStr": "0.6742E+04",
+            "GM_Str": "398600.4354",
+            "IAU_Alias": "Body 2",
+            "ID": "399",
+            "LT_Str": "  4.939782816214290E+02",
+            "MassStr": "2.9722E+24",
+            "Name": "Body 2",
+            "RG_Str": "  1.480909632459044E+08",
+            "RR_Str": "  5.067743966084775E-01",
+            "VX_Str": "2E0",
+            "VY_Str": "0E0",
+            "VZ_Str": "0E0",
+            "X_Str": "-150000000",
+            "Y_Str": "0E0",
+            "Z_Str": "0E0"
+        }
+    ]
+}
