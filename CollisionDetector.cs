@@ -91,8 +91,14 @@ namespace OrbitalSimOpenGL
                     d = lBody.MiddleOfPath.Y - hBody.MiddleOfPath.Y; distSquared += d * d;
                     d = lBody.MiddleOfPath.Z - hBody.MiddleOfPath.Z; distSquared += d * d;
 
-                    if (distSquared > (lBody.LastPathRadiusSquared + hBody.LastPathRadiusSquared))
-                        continue; // No possible collision
+                    // Could this possibly be a collision?
+                    bool possibleCollision = (distSquared <= (lBody.LastPathRadiusSquared + hBody.LastPathRadiusSquared));
+
+                    // Could this possibly represent a new closest approach?
+                    bool possibleClosestApproach = (distSquared <= onlyIfLessThanOrEqualToThisD2);
+
+                    if (!possibleCollision && !possibleClosestApproach)
+                        continue; // No possible collision or closest approach, no need to continue calculations
 
                     // Closest approach of the two bodies along their most recent movement vectors.
                     // DeltaS - starting positions, DeltaE - ending positions
@@ -105,18 +111,11 @@ namespace OrbitalSimOpenGL
                     //Double k = Math.Max(0D, Math.Min(1D, Vector3d.Dot(DeltaS, DeltaS - DeltaE) / (DeltaS - DeltaE).LengthSquared));
                     Double k = Vector3d.Dot(DeltaS, DeltaS - DeltaE) / (DeltaS - DeltaE).LengthSquared;
 
-#if false
-                    System.Diagnostics.Debug.WriteLine("CollisionDetector:DetectCollision "
-                        + lBody.Name + ", " + hBody.Name
-                        + " k: " + k.ToString("0.0000000E0")
-                    );
-#endif
-
                     // If (k < 0 or k > 1) the closest approach is beyond the current travel vectors. This test ignores fact that bodies
-                    // have a radius > 0, so bodies could have collided. Super low probability event and will be picked up
-                    // on next iteration.
+                    // have a radius > 0, so bodies could have begun a collision.
+                    // Super low probability event and will anyway be picked up on next iteration.
                     if (0D > k || 1D < k)
-                        continue; // No collision
+                        continue;
 
                     // Where were the two bodies at K ?
                     lBodyPos.X = lBody.PX + k * (lBody.X - lBody.PX);
@@ -133,31 +132,14 @@ namespace OrbitalSimOpenGL
                     Double radiSquared = lBody.EphemerisRaduisSquared + hBody.EphemerisRaduisSquared;
                     Double lenSquared = lBodyPos.LengthSquared;
 
-#if false
-                    String name1 = lBody.Name;
-                    String name2 = hBody.Name;
-                    if (true/*(name1.Equals("Sun") || name2.Equals("Sun")) && (name1.Equals("PBH 1") || name2.Equals("PBH 1"))*/)
-                    {
-                        System.Diagnostics.Debug.WriteLine("CollisionDetector:DetectCollision "
-                            + lBody.Name + ", " + hBody.Name
-                            + " k: " + k.ToString("0.0000000E0")
-                            + " lBodyPos: " + lBodyPos.X.ToString("N0") + "," + lBodyPos.Y.ToString("N0") + "," + lBodyPos.Z.ToString("N0")
-                            + " hBodyPos: " + hBodyPos.X.ToString("N0") + "," + hBodyPos.Y.ToString("N0") + "," + hBodyPos.Z.ToString("N0")
-                            + " lenSquared: " + lenSquared.ToString("N0")
-                            + " len:" + Math.Sqrt(lenSquared).ToString("N0")
-                            + " radiSquared: " + radiSquared.ToString("N0")
-                            + " radi: " + Math.Sqrt(radiSquared).ToString("N0")
-                            );
-                    }
-#endif
-
                     if (lenSquared < radiSquared)
                     {
                         // Collision
+#if false
                         System.Diagnostics.Debug.WriteLine("CollisionDetector:DetectCollision, ** Collision ** bodies "
                             + lBody.Name + ", " + hBody.Name
                             );
-
+#endif
                         // Two colliding
                         if (!CollisionList.Contains(bL))
                             CollisionList.Add(bL);
@@ -179,7 +161,7 @@ namespace OrbitalSimOpenGL
                         }
                         else
                         {
-                            // Beyond 2 bodies at same closest approach
+                            // More than 2 bodies at same closest approach
                             if (!closestApproachBodies.Contains(bL))
                                 closestApproachBodies.Add(bL);
                             if (!closestApproachBodies.Contains(bH))
