@@ -8,7 +8,7 @@ namespace OrbitalSimOpenGL
     /// Nice memory as well as processing/calculation savings - especially as number
     /// of bodies increases.
     /// </summary>
-    public class MassMass
+    internal class MassMass
     {
         #region Properties
         private int[] SumOfIntegers { get; set; } // Lookup table so this is not calculated over and over

@@ -12,10 +12,10 @@ namespace OrbitalSimOpenGL
     /// <summary>
     /// Each SimBody reoresents a body in the simulation
     /// </summary>
-    public class SimBody
+    internal class SimBody
     {
         #region Properties
-        private Scale? Scale { get; set; }
+        internal Scale? Scale { get; set; }
 
         // Current settings, U coords
         public Double X { get; private set; } // km
@@ -74,6 +74,8 @@ namespace OrbitalSimOpenGL
                     _MassMultiplier = 1D; // Std
             }
         }
+        internal CollisionHighlighter? CollisionHighlighter { get; set; }
+
         #endregion
 
         public SimBody(Scale scale, EphemerisBody ephemerisBody)
@@ -118,6 +120,8 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Render body using the shared sphere
         /// </summary>
+        /// ms time of this call as supplied
+        /// <param name="ms">ms time of this call as supplied</param>
         /// <param name="indicesLength"></param>
         /// <param name="bodyColorUniform">OpenGL shader uniforn number for color</param>
         /// <param name="mvp_Uniform">OpenGL shader uniforn number for mvp matrix4</param>
@@ -128,7 +132,7 @@ namespace OrbitalSimOpenGL
         /// Assumes the shared unit sphere is what's currently loaded in OpenGL ArrayBuffer. So this
         /// is applying a set of transformations to that sphere to render this body.
         /// </remarks>
-        internal void RenderBody(int indicesLength, int bodyColorUniform, int mvp_Uniform, ref Matrix4 vp, ref Matrix4 locationMatrix4, ref Matrix4 sizeMatrix4)
+        internal void RenderBody(int ms, int indicesLength, int bodyColorUniform, int mvp_Uniform, ref Matrix4 vp, ref Matrix4 locationMatrix4, ref Matrix4 sizeMatrix4)
         {
             if (ExcludeFromSim)
                 return;
@@ -145,6 +149,9 @@ namespace OrbitalSimOpenGL
             GL.UniformMatrix4(mvp_Uniform, false, ref mvp);
 
             GL.DrawElements(PrimitiveType.Triangles, indicesLength, DrawElementsType.UnsignedShort, 0);
+
+            // Collision highlighting
+            CollisionHighlighter?.Render(ms);
         }
 
         /// <summary>

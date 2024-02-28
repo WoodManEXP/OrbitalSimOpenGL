@@ -23,7 +23,7 @@ namespace OrbitalSimOpenGL
         private Vector3d[] ForceVectors { get; set; }    // Force vectors
         private int NumBodies { get; set; }
         private SimBodyList SimBodyList { get; set; }
-        private MassMass MassMass { get; set; }
+        internal MassMass MassMass { get; set; }
 
         private Double _UseReg_G = Util.G_KM;
         public Double UseReg_G

@@ -9,7 +9,7 @@ namespace OrbitalSimOpenGL
     /// <summary>
     /// Calculates and renders system barycenter (center of mass)
     /// </summary>
-    public class Barycenter
+    internal class Barycenter
     {
         #region Properties
         private SimBodyList SimBodyList { get; set; }
@@ -99,7 +99,7 @@ namespace OrbitalSimOpenGL
         /// </summary>
         internal void Render(int ms, SimCamera simCamera, int bodyColorUniform, int mvp_Uniform)
         {
-            FrustumCuller fC = simCamera.FrustumCuller;
+            FrustumCuller? fC = simCamera.FrustumCuller;
 
             MS_SoFar += ms;
 

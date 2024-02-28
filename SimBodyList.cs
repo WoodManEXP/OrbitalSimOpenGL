@@ -42,7 +42,7 @@ void main()
         // Keep these here so they are allocated but once and reused
         Matrix4 SizeMatrix4 = Matrix4.Identity;
         Matrix4 LocationMatrix4 = Matrix4.Identity;
-        public List<SimBody> BodyList { get; }
+        internal List<SimBody> BodyList { get; }
         private String AppDataFolder { get; set; }
         #endregion 
 
@@ -67,17 +67,18 @@ void main()
         /// <summary>
         /// Render each body in the BodyList
         /// </summary>
+       /// <param name="ms">ms time of this call as supplied</param>
         /// <param name="simCamera"></param>
         /// <param name="mousePosition">Current mouse cursor position, for hit-testing</param>
         /// <returns>
         /// simBody which mouse is over or null if no hit
         /// </returns>
-        public SimBody Render(SimCamera simCamera, System.Windows.Point mousePosition)
+        internal SimBody Render(int ms, SimCamera simCamera, System.Windows.Point mousePosition)
         {
             SimBody? hitSB = null;
             Double lastHitDist = Double.MaxValue;
 
-            FrustumCuller fC = simCamera.FrustumCuller;
+            FrustumCuller? fC = simCamera.FrustumCuller;
             
             Shader.Use();
 
@@ -112,7 +113,7 @@ void main()
                     // a. Keep its rendering to a minimum size (so something will be visible no matter how far from camera)
                     // b. Render it
                     Double dist = sB.KeepVisible(simCamera, ref halfNorm, minSize, minSizeSqared, ref mousePosition);
-                    sB.RenderBody(SharedSphereIndices.Length, BodyColorUniform, MVP_Uniform, ref simCamera._VP_Matrix, ref LocationMatrix4, ref SizeMatrix4);
+                    sB.RenderBody(ms, SharedSphereIndices.Length, BodyColorUniform, MVP_Uniform, ref simCamera._VP_Matrix, ref LocationMatrix4, ref SizeMatrix4);
                     if (-1D != dist)
                         if (dist < lastHitDist) // Keep only hit closest to camera
                         {
@@ -160,7 +161,7 @@ void main()
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public SimBody GetSB(String name)
+        internal SimBody GetSB(String name)
         {
             foreach (SimBody sB in BodyList)
             {

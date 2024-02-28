@@ -34,7 +34,7 @@ namespace OrbitalSimOpenGL
         public OrbitalSimWindow OrbitalSimWindow { get; set; }
         public Scale? Scale { get; set; }
         public SimCamera? SimCamera { get; set; }
-        public MassMass? MassMass { get; set; }
+        internal MassMass? MassMass { get; set; }
         private CollisionDetector? CollisionDetector { get; set; }
 
         private Double PrevClosestApproachDistSquared { get; set; } = Double.MaxValue;
@@ -48,7 +48,7 @@ namespace OrbitalSimOpenGL
         private List<int> _ClosestApproachBodiesList = new(5);
         public List<int> ClosestApproachBodiesList { get { return _ClosestApproachBodiesList; } }
         public bool SimRunning { get; set; } = false;
-        public SimBody? ShowStatsForSB { get; set; } = null;
+        internal SimBody? ShowStatsForSB { get; set; } = null;
 
         private bool _Wireframe;
         public bool Wireframe
@@ -60,7 +60,7 @@ namespace OrbitalSimOpenGL
                 _Wireframe = value;
             }
         }
-        public Barycenter? Barycenter { get; set; }
+        internal Barycenter? Barycenter { get; set; }
         public bool ShowBarycenter { get; set; }
         int VertexBufferObject { get; set; }
         int VertexArrayObject { get; set; }
@@ -130,7 +130,7 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Render current state of the model
         /// </summary>
-        /// <param name="ms"></param>
+        /// <param name="ms">ms time of this call as supplied</param>
         /// <param name="frameRateMS"></param>
         /// <param name="mousePosition">Current mouse cursor position, for hit-testing</param>
         /// <remarks>
@@ -154,7 +154,7 @@ namespace OrbitalSimOpenGL
             // Render bodies
             // If render returns non-null sB then the mouse was over that body.
             SimBody sB;
-            if (null != (sB = SimBodyList.Render(SimCamera, mousePosition)))
+            if (null != (sB = SimBodyList.Render(ms, SimCamera, mousePosition)))
                 ShowStatsForSB = sB;
 
             if (ShowBarycenter)

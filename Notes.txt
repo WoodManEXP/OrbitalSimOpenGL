@@ -68,8 +68,8 @@ SimBody
 	Color Red and larger for a while after collision
 	Sumultaneous > 2 body collision?
 	Add closest approach, so far, indicator to SimWindows status area (done)
-	Produce a visual signal of collision
-	Collision not disable trace for remaining body
+	Produce a visual signal of collision, explosion
+	Collision not disable trace for remaining body (done)
 - Reset sim button/capability (done)
 - Get JPJ body color from Bodies file (done_)
 - Move body color into the .csv and .json files (done)
@@ -82,7 +82,8 @@ SimBody
 - Closest approach can be more than 2 bodies simultaneously
 - Check ephemeris values for Mars moons Demios and Phobos
 - Reset change body names back to original values (noticable after collision when body names changed)
-- Explosion on collision
+- Trace on renamed body throws exception (done)
+- Barycenter after collision calcs wrong (done)
 - Use travel vectors to determione closest approach
   The shortest distance between two lines is the length of projection of any vector between the two lines onto the cross product of the direction of the two lines. – 
 	Yiyuan Lee Dec 1, 2015 at 14:20

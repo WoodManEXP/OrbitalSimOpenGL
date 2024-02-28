@@ -28,8 +28,8 @@ namespace OrbitalSimOpenGL
         #region Properties
         private SimModel SimModel { get; set; }
         private SimBodyList? SimBodyList { get; set; }
-        private MassMass? MassMass { get; set; }
-        private Barycenter? Barycenter { get; set; }
+        internal MassMass? MassMass { get; set; }
+        internal Barycenter? Barycenter { get; set; }
 
         private List<int> _CollisionList = new(3);
         private List<int> CollisionList { get { return _CollisionList; } }
@@ -248,6 +248,10 @@ namespace OrbitalSimOpenGL
 
             // MassMass table changes
             MassMass?.CalcMassMass(SimBodyList);
+
+            // Highlight the collision
+            // These are never freed after collision highlight completes. But this event is most infrequent.
+            sB.CollisionHighlighter = new(sB);
         }
     }
 }

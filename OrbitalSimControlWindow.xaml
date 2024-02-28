@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OrbitalSimOpenGL"
         mc:Ignorable="d"
-        Title="OrbitalSim Control - OpenGL" Height="580" Width="612"
+        Title="OrbitalSim Control" Height="580" Width="612"
         ResizeMode="NoResize"
         Topmost="False"
         Loaded="Window_Loaded"
