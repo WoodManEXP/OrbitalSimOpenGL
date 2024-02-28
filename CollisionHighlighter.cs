@@ -37,6 +37,14 @@ namespace OrbitalSimOpenGL
         private static int MaxParticles { get; } = 50;
         private static Double PathMultiplier { get; } = 60D; // Times radius of body
         private static readonly Single ParticlePointSize = 2F;
+
+        // Color fadeout
+        private static Single FadeoutPct = 7e-1F; // 70%
+        private static Color4 StartC = Color4.Red;
+        private static Color4 EndC = Color4.DarkGray;
+        private Vector3 StartCVec;
+        private Vector3 CVec;
+        private Single CDist;
         #endregion
 
         /// <summary>
@@ -73,6 +81,14 @@ namespace OrbitalSimOpenGL
                 PathLength[i] = twoDiameters + rand.NextDouble() * maxPathLength;   // U Coords
                 NumParticles[i] = MaxParticles * rand.NextDouble();
             }
+
+            // Setup for color fadeout
+            StartCVec.X = StartC.R; StartCVec.Y = StartC.G; StartCVec.Z = StartC.B;
+            CVec.X = StartC.R; CVec.Y = StartC.G; CVec.Z = StartC.B;
+            Vector3 eC = new(EndC.R, EndC.G, EndC.B);
+            CVec = eC - CVec;
+            CDist = CVec.Length;
+            CVec.Normalize();
         }
 
         /// <summary>
@@ -82,10 +98,13 @@ namespace OrbitalSimOpenGL
         /// <param name="simCamera"></param>
         /// <param name="bodyColorUniform"></param>
         /// <param name="mvp_Uniform"></param>
+        /// Color4.DarkGray
         internal void Render(int ms, SimCamera simCamera, int bodyColorUniform, int mvp_Uniform)
         {
             if (!Highlighting)
                 return;
+
+            Color4 color;
 
             MS_SoFar += ms;
 
@@ -93,13 +112,20 @@ namespace OrbitalSimOpenGL
             BodyLocation.X = SimBody.X;
             BodyLocation.Y = SimBody.Y;
             BodyLocation.Z = SimBody.Z;
-#if false
-            System.Diagnostics.Debug.WriteLine("CollisionHighlighter:Render:"
-                    + " ms:" + ms.ToString()
-                    + " MS_SoFar" + MS_SoFar.ToString()
-                    );
-#endif
+
             Single pct = MS_SoFar / HighlightDuration;
+
+            // During last nn% of explosion fade particles to background color
+            if (pct < FadeoutPct)
+                color = StartC;
+            else
+            {
+                // Fadeout
+                Single colorPct = (pct - FadeoutPct) / (1F - FadeoutPct);
+                Vector3 sCVec = StartCVec + (colorPct * CDist * CVec);
+                color.R = sCVec.X; color.G = sCVec.Y; color.B = sCVec.Z;
+                color.A = 1F; // Always 1F
+            }
 
             Single ptSize = GL.GetFloat(GetPName.PointSize);
             GL.PointSize(ParticlePointSize);
@@ -121,7 +147,7 @@ namespace OrbitalSimOpenGL
 
                 GL.BufferData(BufferTarget.ArrayBuffer, Vector3Size, WorldPoints, BufferUsageHint.StaticDraw); // Just one point
 
-                GL.Uniform4(bodyColorUniform, Color4.Red);
+                GL.Uniform4(bodyColorUniform, color);
                 GL.UniformMatrix4(mvp_Uniform, false, ref simCamera._VP_Matrix);
 
                 GL.DrawArrays(PrimitiveType.Points, 0, numParticles);
