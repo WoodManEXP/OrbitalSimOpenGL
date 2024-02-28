@@ -397,10 +397,11 @@ namespace OrbitalSimOpenGL
             GravConstantSlider.Value = 0D;
             CommandSimWindow?.GravConstant(0);
 
-            ShowAxis.IsChecked = ShowReticle.IsChecked = ShowWireframe.IsChecked = true;
+            ShowAxis.IsChecked = ShowReticle.IsChecked = ShowWireframe.IsChecked = ShowBaryCenter.IsChecked = true;
             CommandSimWindow?.Axis(true);
             CommandSimWindow?.Wireframe(true);
             CommandSimWindow?.Reticle(true);
+            CommandSimWindow?.Barycenter(true);
 
             KeepCombo.SelectedIndex = 0;
             LookAtComboBox.SelectedIndex = -1;
