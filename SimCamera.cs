@@ -190,7 +190,7 @@ namespace OrbitalSimOpenGL
         /// so it is implemented here.
         /// This is called as part of the frame calculation process.
         /// </summary>
-        /// <param name="ms">ms time of this call as supplied</param>
+        /// <param name="ms">ms time of this call since last call to render</param>
         /// <param name="framerateMS">Moving average frame rate. A frame is happening on average every framerateMS</param>
         public void AnimateCamera(int ms, int framerateMS)
         {

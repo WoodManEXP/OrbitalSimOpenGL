@@ -1,6 +1,9 @@
-﻿using System;
+﻿using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,29 +16,122 @@ namespace OrbitalSimOpenGL
     {
 
         #region Properties
+
+        private readonly int Vector3Size = Marshal.SizeOf(typeof(Vector3));
         internal SimBody SimBody { get; set; }
         internal Scale? Scale { get; set; }
-        private bool Highlighting { get; set; } = false;
+        private bool Highlighting { get; set; } = true;
         private int MS_SoFar { get; set; } = 0;
+        static private Single HighlightDuration { get; } = 1000F * 0.6E1F; // 3.5 seconds
+
+        private Vector3d[] ParticlePath { get; set; } // Unit vectors representing particle paths
+
+        private Vector3d[] ParticlePosition; // Contains particles on a path, U Coords
+        private Vector3[] WorldPoints;
+
+        private Vector3d BodyLocation;
+
+        private Double[] PathLength {get; set;}
+        private Double[] NumParticles { get; set; }
+        private static int NumPaths { get; } = 50;
+        private static int MaxParticles { get; } = 50;
+        private static Double PathMultiplier { get; } = 60D; // Times radius of body
+        private static readonly Single ParticlePointSize = 2F;
         #endregion
 
         /// <summary>
         /// Renders collision highlights
         /// </summary>
         /// <param name="simBody">To be highlighted</param>
+        /// <remarks>
+        /// https://en.wikipedia.org/wiki/Spherical_coordinate_system
+        /// </remarks>
         internal CollisionHighlighter(SimBody simBody)
         {
             SimBody = simBody;
             Scale = simBody.Scale;
+
+            // Make a series of NumPaths random unit vectors and path lengths, each representing path of projectiles from the explosion
+            ParticlePath = new Vector3d[NumPaths];
+            ParticlePosition = new Vector3d[1 + MaxParticles];
+            WorldPoints = new Vector3[1 + MaxParticles];
+            PathLength = new Double[NumPaths];
+            NumParticles = new Double[NumPaths];
+
+            var rand = new Random();
+            Double twoPi = 2D * Math.PI;
+            Double maxPathLength = PathMultiplier * simBody.UseDiameter;
+            Double twoDiameters = 2D * simBody.UseDiameter;
+
+            for (int i=0;i<NumPaths;i++)
+            {
+                Double polarAngle = rand.NextDouble() * twoPi;
+                Double azimuthAngle = rand.NextDouble() * twoPi;
+                ParticlePath[i].X = Math.Sin(polarAngle) * Math.Cos(azimuthAngle);
+                ParticlePath[i].Y = Math.Sin(polarAngle) * Math.Sin(azimuthAngle);
+                ParticlePath[i].Z = Math.Cos(polarAngle);
+                PathLength[i] = twoDiameters + rand.NextDouble() * maxPathLength;   // U Coords
+                NumParticles[i] = MaxParticles * rand.NextDouble();
+            }
         }
 
-        internal void Render(int ms)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ms">ms time of this call since last call to render</param>
+        /// <param name="simCamera"></param>
+        /// <param name="bodyColorUniform"></param>
+        /// <param name="mvp_Uniform"></param>
+        internal void Render(int ms, SimCamera simCamera, int bodyColorUniform, int mvp_Uniform)
         {
             if (!Highlighting)
                 return;
 
             MS_SoFar += ms;
 
+            // Where is body at this time?
+            BodyLocation.X = SimBody.X;
+            BodyLocation.Y = SimBody.Y;
+            BodyLocation.Z = SimBody.Z;
+#if false
+            System.Diagnostics.Debug.WriteLine("CollisionHighlighter:Render:"
+                    + " ms:" + ms.ToString()
+                    + " MS_SoFar" + MS_SoFar.ToString()
+                    );
+#endif
+            Single pct = MS_SoFar / HighlightDuration;
+
+            Single ptSize = GL.GetFloat(GetPName.PointSize);
+            GL.PointSize(ParticlePointSize);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3Size, 0);
+
+            // Construct and draw each of the projectile paths
+            for (int i = 0; i < NumPaths; i++)
+            {
+                // Number of particles on this path so far
+                int numParticles = 1 + (int)(pct * NumParticles[i]);
+
+                // Distribute the particles evenly along the path, U Coords
+                Double dist = pct * PathLength[i] / numParticles;
+                for(int j=0; j<numParticles; j++) // First particle not drawn at (0,0,0)
+                    ParticlePosition[j] = BodyLocation + ((1 + j) * dist * ParticlePath[i]);
+
+                // Render particles on the path
+                Scale?.ScaleU_ToW(ref WorldPoints, ref ParticlePosition); // Froim U to W coords
+
+                GL.BufferData(BufferTarget.ArrayBuffer, Vector3Size, WorldPoints, BufferUsageHint.StaticDraw); // Just one point
+
+                GL.Uniform4(bodyColorUniform, Color4.Red);
+                GL.UniformMatrix4(mvp_Uniform, false, ref simCamera._VP_Matrix);
+
+                GL.DrawArrays(PrimitiveType.Points, 0, numParticles);
+            }
+
+            GL.PointSize(ptSize);
+
+            // Set Highlighting to false when finished
+            if (MS_SoFar >= HighlightDuration)
+                Highlighting = false;
         }
     }
 }

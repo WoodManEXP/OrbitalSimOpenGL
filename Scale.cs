@@ -12,16 +12,19 @@ namespace OrbitalSimOpenGL
     public class Scale
     {
         #region Properties
-        public Double ScaleVal { get; set;} // For scaling from universe to WPF coords
+        public Double ScaleVal { get; set; } // For scaling from universe to WPF coords
 
         private int _camMoveAmt; // For scaling camera movements
-        public int CamMoveAmt { get { return _camMoveAmt; }
-            set {
+        public int CamMoveAmt
+        {
+            get { return _camMoveAmt; }
+            set
+            {
                 _camMoveAmt = value;
                 if (value >= Properties.Settings.Default.MaxCamMoveScale || value < 0)
                     throw new InvalidOperationException("Scale: Camera out of scale");
             }
-        } 
+        }
         #endregion
 
         public Scale()
@@ -66,6 +69,21 @@ namespace OrbitalSimOpenGL
             sPoint3D.Y = (float)(y * ScaleVal);
             sPoint3D.Z = (float)(z * ScaleVal);
         }
+
+        /// <summary>
+        /// Scale array of UCords to WCoords
+        /// </summary>
+        /// <param name="sPoints3D"></param>
+        public void ScaleU_ToW(ref Vector3[] sPoints, ref Vector3d[] iPoints)
+        {
+            for (int i = 0; i < sPoints.Length; i++)
+            {
+                sPoints[i].X = (float)(iPoints[i].X * ScaleVal);
+                sPoints[i].Y = (float)(iPoints[i].Y * ScaleVal);
+                sPoints[i].Z = (float)(iPoints[i].Z * ScaleVal);
+            }
+        }
+
         public void ScaleU_ToW(ref Vector3 sPoint3D, Vector3d vec)
         {
             sPoint3D.X = (float)(vec.X * ScaleVal);

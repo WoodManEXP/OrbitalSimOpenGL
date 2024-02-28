@@ -67,7 +67,7 @@ void main()
         /// <summary>
         /// Render each body in the BodyList
         /// </summary>
-       /// <param name="ms">ms time of this call as supplied</param>
+        /// <param name="ms">ms time of this call since last call to render</param>
         /// <param name="simCamera"></param>
         /// <param name="mousePosition">Current mouse cursor position, for hit-testing</param>
         /// <returns>
@@ -113,7 +113,7 @@ void main()
                     // a. Keep its rendering to a minimum size (so something will be visible no matter how far from camera)
                     // b. Render it
                     Double dist = sB.KeepVisible(simCamera, ref halfNorm, minSize, minSizeSqared, ref mousePosition);
-                    sB.RenderBody(ms, SharedSphereIndices.Length, BodyColorUniform, MVP_Uniform, ref simCamera._VP_Matrix, ref LocationMatrix4, ref SizeMatrix4);
+                    sB.Render(ms, simCamera, SharedSphereIndices.Length, BodyColorUniform, MVP_Uniform, ref LocationMatrix4, ref SizeMatrix4);
                     if (-1D != dist)
                         if (dist < lastHitDist) // Keep only hit closest to camera
                         {

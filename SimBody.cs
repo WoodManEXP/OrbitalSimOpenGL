@@ -120,8 +120,7 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Render body using the shared sphere
         /// </summary>
-        /// ms time of this call as supplied
-        /// <param name="ms">ms time of this call as supplied</param>
+        /// <param name="ms">ms time of this call since last call to render</param>
         /// <param name="indicesLength"></param>
         /// <param name="bodyColorUniform">OpenGL shader uniforn number for color</param>
         /// <param name="mvp_Uniform">OpenGL shader uniforn number for mvp matrix4</param>
@@ -132,7 +131,7 @@ namespace OrbitalSimOpenGL
         /// Assumes the shared unit sphere is what's currently loaded in OpenGL ArrayBuffer. So this
         /// is applying a set of transformations to that sphere to render this body.
         /// </remarks>
-        internal void RenderBody(int ms, int indicesLength, int bodyColorUniform, int mvp_Uniform, ref Matrix4 vp, ref Matrix4 locationMatrix4, ref Matrix4 sizeMatrix4)
+        internal void Render(int ms, SimCamera simCamera, int indicesLength, int bodyColorUniform, int mvp_Uniform, ref Matrix4 locationMatrix4, ref Matrix4 sizeMatrix4)
         {
             if (ExcludeFromSim)
                 return;
@@ -143,7 +142,7 @@ namespace OrbitalSimOpenGL
 
             sizeMatrix4.M11 = sizeMatrix4.M22 = sizeMatrix4.M33 = Scale.ScaleU_ToW(UseDiameter);
 
-            Matrix4 mvp = sizeMatrix4 * locationMatrix4 * vp;
+            Matrix4 mvp = sizeMatrix4 * locationMatrix4 * simCamera.VP_Matrix;
 
             GL.Uniform4(bodyColorUniform, BodyColor);
             GL.UniformMatrix4(mvp_Uniform, false, ref mvp);
@@ -151,7 +150,7 @@ namespace OrbitalSimOpenGL
             GL.DrawElements(PrimitiveType.Triangles, indicesLength, DrawElementsType.UnsignedShort, 0);
 
             // Collision highlighting
-            CollisionHighlighter?.Render(ms);
+            CollisionHighlighter?.Render(ms, simCamera, bodyColorUniform, mvp_Uniform);
         }
 
         /// <summary>

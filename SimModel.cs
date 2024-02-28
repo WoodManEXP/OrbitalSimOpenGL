@@ -73,7 +73,7 @@ namespace OrbitalSimOpenGL
             SimCamera = OrbitalSimWindow.SimCamera;
             Scale = OrbitalSimWindow.Scale;
 
-            GL.ClearColor(Color4.LightGray);
+            GL.ClearColor(Color4.DarkGray); // LightGray
 
             // enable depth testing to ensure correct z-ordering of fragments
             GL.Enable(EnableCap.DepthTest);
@@ -130,7 +130,7 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Render current state of the model
         /// </summary>
-        /// <param name="ms">ms time of this call as supplied</param>
+        /// <param name="ms">ms time of this call since last call to render</param>
         /// <param name="frameRateMS"></param>
         /// <param name="mousePosition">Current mouse cursor position, for hit-testing</param>
         /// <remarks>
@@ -168,7 +168,7 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Frame iteration
         /// </summary>
-        /// <param name="ms">ms time of this call as supplied</param>
+        /// <param name="ms">ms time of this call since last call to render</param>
         /// <param name="movingAvgMS">Moving average frame rate. A frame is happening on average every movingAvgMS</param>
         public void Iterate(bool simRunning, int ms, int movingAvgMS)
         {
