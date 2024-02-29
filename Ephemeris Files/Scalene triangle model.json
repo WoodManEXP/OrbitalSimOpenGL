@@ -1,0 +1,61 @@
+{
+    "Bodies": [
+        {
+            "ColorStr": "Yellow",
+            "Designation": "",
+            "DiameterStr": "1.3927E+06",
+            "GM_Str": "1.32712E+11",
+            "IAU_Alias": "Body 1",
+            "ID": "10",
+            "LT_Str": "  4.192641483923587E+00",
+            "MassStr": "1.9885E+30",
+            "Name": "Body 1",
+            "RG_Str": "  1.256922295978220E+06",
+            "RR_Str": " -3.821897409553394E-03",
+            "VX_Str": "0",
+            "VY_Str": "0",
+            "VZ_Str": "0",
+            "X_Str": "149700000",
+            "Y_Str": "0",
+            "Z_Str": "0"
+        },
+        {
+            "ColorStr": "Yellow",
+            "Designation": "",
+            "DiameterStr": "1.3927E+06",
+            "GM_Str": "1.32712E+11",
+            "IAU_Alias": "Body 2",
+            "ID": "10",
+            "LT_Str": "  4.192641483923587E+00",
+            "MassStr": "1.9885E+30",
+            "Name": "Body 2",
+            "RG_Str": "  1.256922295978220E+06",
+            "RR_Str": " -3.821897409553394E-03",
+            "VX_Str": "0",
+            "VY_Str": "0",
+            "VZ_Str": "0",
+            "X_Str": "-2.1170777E+08",
+            "Y_Str": "2.1170777E+08",
+            "Z_Str": "0"
+        },
+        {
+            "ColorStr": "Yellow",
+            "Designation": "",
+            "DiameterStr": "1.3927E+06",
+            "GM_Str": "1.32712E+11",
+            "IAU_Alias": "Body 2",
+            "ID": "10",
+            "LT_Str": "  4.192641483923587E+00",
+            "MassStr": "1.9885E+30",
+            "Name": "Body 2",
+            "RG_Str": "  1.256922295978220E+06",
+            "RR_Str": " -3.821897409553394E-03",
+            "VX_Str": "0",
+            "VY_Str": "0",
+            "VZ_Str": "0",
+            "X_Str": "-1.4142135623E+08",
+            "Y_Str": "-1.4142135623E+08",
+            "Z_Str": "0"
+        }
+    ]
+}

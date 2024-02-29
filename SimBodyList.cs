@@ -85,8 +85,11 @@ void main()
             // Pass A - render any paths and hgighlighting (collisions)
             foreach (SimBody sB in BodyList)
             {
-                sB.RenderPath(fC, BodyColorUniform, MVP_Uniform, ref simCamera._VP_Matrix);
-                sB.RenderHighlight(ms, simCamera, BodyColorUniform, MVP_Uniform);
+                if (!sB.ExcludeFromSim)
+                {
+                    sB.RenderPath(fC, BodyColorUniform, MVP_Uniform, ref simCamera._VP_Matrix);
+                    sB.RenderHighlight(ms, simCamera, BodyColorUniform, MVP_Uniform);
+                }
             }
 
             // Pass B - render visible bodies
