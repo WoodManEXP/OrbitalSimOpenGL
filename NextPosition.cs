@@ -93,7 +93,7 @@ namespace OrbitalSimOpenGL
 
                 SumForceVectors(bodyNum, ref forceVector); // Acting upon this body
 
-                // This force is an acceleration the velocity vectors over the time interval.
+                // This force is an acceleration along the velocity vectors over the time interval.
                 // Calculate new velocity VZ, VY, VZ
                 // As derrived from F = ma: dV = (f * dT) / mass-of-body
                 // dX, dY, and dZ calculated as average velocity over interval * interval length (seconds)
@@ -178,11 +178,20 @@ namespace OrbitalSimOpenGL
                     ForceVectors[i].X = hBody.X - lBody.X;
                     ForceVectors[i].Y = hBody.Y - lBody.Y;
                     ForceVectors[i].Z = hBody.Z - lBody.Z;
-                    Double d = 1E3 * ForceVectors[i].Length; // From km to m
+                    Double dSquared = 1E6 * ForceVectors[i].LengthSquared; // From km to m
                     ForceVectors[i].Normalize();
 
                     // Newton's gravational attraction/force calculation
-                    Double newtons = UseReg_G * MassMass.GetMassMass(bL, bH) / (d * d);
+                    Double newtons = UseReg_G * MassMass.GetMassMass(bL, bH) / dSquared;
+
+#if false
+                    System.Diagnostics.Debug.WriteLine("NextPosition:CalcForceVectors, "
+                        + " " + lBody.Name
+                        + " ForceVector (X,Y,Z) (" + ForceVectors[i].X + "," + ForceVectors[i].Y + "," + ForceVectors[i].Z + ")"
+                        + " d " + d.ToString()
+                        + " newtons " + newtons.ToString()
+                        );
+#endif
 
                     // Each force vector's length is the Newtons of force the pair of bodies exert on one another.
                     ForceVectors[i] *= newtons;
