@@ -82,9 +82,12 @@ void main()
             
             Shader.Use();
 
-            // Pass A - render any paths
+            // Pass A - render any paths and hgighlighting (collisions)
             foreach (SimBody sB in BodyList)
+            {
                 sB.RenderPath(fC, BodyColorUniform, MVP_Uniform, ref simCamera._VP_Matrix);
+                sB.RenderHighlight(ms, simCamera, BodyColorUniform, MVP_Uniform);
+            }
 
             // Pass B - render visible bodies
             // Model (Scale * Trans) * View * Projection
@@ -101,6 +104,9 @@ void main()
 
             foreach (SimBody sB in BodyList)
             {
+                if (sB.ExcludeFromSim)
+                    continue;
+
                 // SimBody's center (U coords)
                 center.X = sB.X;
                 center.Y = sB.Y;

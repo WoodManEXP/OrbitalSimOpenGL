@@ -46,7 +46,8 @@ namespace OrbitalSimOpenGL
         public Double EphemerisRaduisSquared { get; set; }
 
         private Double _Mass;
-        public Double Mass { 
+        public Double Mass
+        {
             get { return _Mass * MassMultiplier; }
             set { _Mass = value; }
         }
@@ -75,14 +76,13 @@ namespace OrbitalSimOpenGL
             }
         }
         internal CollisionHighlighter? CollisionHighlighter { get; set; }
-
         #endregion
 
         public SimBody(Scale scale, EphemerisBody ephemerisBody)
         {
             Double dVal;
 
-            Scale = scale;;
+            Scale = scale; ;
 
             // Save ephemeris values into current settings (universe coords)
             X = Double.TryParse(ephemerisBody.X_Str, out dVal) ? dVal : -1D;
@@ -148,9 +148,13 @@ namespace OrbitalSimOpenGL
             GL.UniformMatrix4(mvp_Uniform, false, ref mvp);
 
             GL.DrawElements(PrimitiveType.Triangles, indicesLength, DrawElementsType.UnsignedShort, 0);
+        }
 
-            // Collision highlighting
-            CollisionHighlighter?.Render(ms, simCamera, bodyColorUniform, mvp_Uniform);
+        #region Highlights/Collisions/Path
+        public void HighlightCollision()
+        {
+            // These are never freed after collision highlight completes. But this event is most infrequent.
+            CollisionHighlighter = new(this);
         }
 
         /// <summary>
@@ -160,6 +164,12 @@ namespace OrbitalSimOpenGL
         internal void RenderPath(FrustumCuller fC, int bodyColorUniform, int mvp_Uniform, ref Matrix4 vp)
         {
             PathTracer?.Render(fC, BodyColor, bodyColorUniform, mvp_Uniform, ref vp); // If PathTracer is available...
+        }
+        #endregion
+        public void RenderHighlight(int ms, SimCamera simCamera, int bodyColorUniform, int mvp_Uniform)
+        {
+            // Collision highlighting
+            CollisionHighlighter?.Render(ms, simCamera, bodyColorUniform, mvp_Uniform);
         }
 
         /// <summary>
