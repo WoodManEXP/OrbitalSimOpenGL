@@ -97,7 +97,8 @@ namespace OrbitalSimOpenGL
         /// Reposition bodies for a single iteration
         /// </summary>
         /// <param name="seconds">Number of seconds elapsed for the iteration</param>
-        public void IterateOnce(int seconds)
+        /// <param name="secondsSquared">Number of seconds-squared elapsed for the iteration</param>
+        public void IterateOnce(int seconds, int secondsSquared)
         {
             SimBody simBody;
 
@@ -119,18 +120,25 @@ namespace OrbitalSimOpenGL
                 // This force is an acceleration along the velocity vectors over the time interval.
                 // Calculate new velocity VZ, VY, VZ
                 // As derrived from F = ma: dV = (f * dT) / mass-of-body
-                // dX, dY, and dZ calculated as average velocity over interval * interval length (seconds)
+                // a = F / m
+                // V at end = v0 + a * t
+                // Location  = currLoc + v0 * t + 1/2 *a * t-squared  (Position from velocity and acceleration)
                 // Note the new X, Y, Z are placed in the SimBody after force vector calculation are complete.
 
-                // Velocity vectors at end of interval given FVs from beginning of interval
-                Double eVX = simBody.VX + (LastVectorSum[bodyNum].X * seconds) / simBody.Mass;
-                Double eVY = simBody.VY + (LastVectorSum[bodyNum].Y * seconds) / simBody.Mass;
-                Double eVZ = simBody.VZ + (LastVectorSum[bodyNum].Z * seconds) / simBody.Mass;
+                // Acceleration vectors
+                Double aX = LastVectorSum[bodyNum].X / simBody.Mass;
+                Double aY = LastVectorSum[bodyNum].Y / simBody.Mass;
+                Double aZ = LastVectorSum[bodyNum].Z / simBody.Mass;
 
-                // Next location using average of VVs from begining and end of interval
-                Double newX = simBody.X + seconds * simBody.VX; // ((simBody.VX + eVX) / 2D);
-                Double newY = simBody.Y + seconds * simBody.VY; // ((simBody.VY + eVY) / 2D);
-                Double newZ = simBody.Z + seconds * simBody.VZ; // ((simBody.VZ + eVZ) / 2D);
+                // Velocity vectors at end of interval given FVs from beginning of interval
+                Double eVX = simBody.VX + aX * seconds;
+                Double eVY = simBody.VY + aY * seconds;
+                Double eVZ = simBody.VZ + aZ * seconds;
+
+                // Location/displacement at end of interval (Position from velocity and acceleration)
+                Double newX = simBody.X + simBody.VX * seconds + 5E-1D * aX * secondsSquared;
+                Double newY = simBody.Y + simBody.VY * seconds + 5E-1D * aY * secondsSquared;
+                Double newZ = simBody.Z + simBody.VZ * seconds + 5E-1D * aZ * secondsSquared;
 
                 // Update body to its new position and velocity vectors
                 simBody.SetPosAndVel(seconds, newX, newY, newZ, eVX, eVY, eVZ);

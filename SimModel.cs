@@ -26,7 +26,21 @@ namespace OrbitalSimOpenGL
         private NextPosition? NextPosition { get; set; }
         private Double GravConstantSetting { get; set; } = 0D; // Grav Constant starts unmodified
         public String? AppDataFolder { get; set; }
-        public int IterationSeconds { get; set; } = 60; // Each frame iteration represents this many seconds of model simulation
+
+        private int _IterationSeconds;
+        public int IterationSeconds  // Each frame iteration represents this many seconds of model simulation
+        {
+            get
+            {
+                return _IterationSeconds;
+            }
+            set
+            {
+                _IterationSeconds = value;
+                IterationSecondsSquared = value * value;
+            }
+        }
+        public int IterationSecondsSquared { get; private set; }
         public int TimeCompression { get; set; } = 1; // Number of times to iterate per frame
         public Int64 ElapsedSeconds { get; set; } = 0;
         private Axis Axis { get; set; }
@@ -80,6 +94,8 @@ namespace OrbitalSimOpenGL
             // Maximum number of vertex attributes supported
             //int nrAttributes = 0;
             //GL.GetInteger(GetPName.MaxVertexAttribs, out nrAttributes);
+
+            IterationSeconds = 60;
 
             Axis = new(SimCamera, Scale);
 
@@ -175,7 +191,7 @@ namespace OrbitalSimOpenGL
             {
                 for (int i = 0; i < TimeCompression; i++)
                 {
-                    NextPosition?.IterateOnce(IterationSeconds);
+                    NextPosition?.IterateOnce(IterationSeconds, IterationSecondsSquared);
 
                     // Closest approach and collision detection
                     CollisionDetector?.Detect(PrevClosestApproachDistSquared, out _ClosestApproachDistSquared, ref _ClosestApproachBodiesList);

@@ -86,7 +86,7 @@
         </GroupBox>
         <GroupBox Height="54" Header="Time Compression" Width="190" HorizontalAlignment="Left" Canvas.Top="299" VerticalAlignment="Center" Canvas.Left="174">
             <Canvas>
-                <Slider x:Name="TimeCompressionSlider" HorizontalAlignment="Center" Width="137" ToolTipService.ToolTip="(De)Compress time" Height="20" ValueChanged="TimeCompressionSliderChanged" Minimum="1" Maximum="100" LostMouseCapture="TimeCompressionSliderLostMouseCapture" Canvas.Left="-1" Canvas.Top="5" VerticalAlignment="Top"/>
+                <Slider x:Name="TimeCompressionSlider" HorizontalAlignment="Center" Width="137" ToolTipService.ToolTip="(De)Compress time" Height="20" ValueChanged="TimeCompressionSliderChanged" Minimum="1" Maximum="300" LostMouseCapture="TimeCompressionSliderLostMouseCapture" Canvas.Left="-1" Canvas.Top="5" VerticalAlignment="Top"/>
                 <Label x:Name="TimeCompressionLabel" Content=""  HorizontalAlignment="Left" VerticalAlignment="Center" Width="40" Canvas.Left="138"/>
             </Canvas>
         </GroupBox>
