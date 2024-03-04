@@ -43,7 +43,6 @@ namespace OrbitalSimOpenGL
         /// <param name="frameRateMS">calculated frameRate</param>
         internal void Render(TimeSpan timeSpan, int frameRateMS)
         {
-
             int milliseconds = timeSpan.Milliseconds;
 
             // IntervalA stats

@@ -70,22 +70,25 @@ SimBody
 	Add closest approach, so far, indicator to SimWindows status area (done)
 	Produce a visual signal of collision, explosion
 	Collision not disable trace for remaining body (done)
+	Trace setting not preserved in Body Mods list after collision
 - Reset sim button/capability (done)
 - Get JPJ body color from Bodies file (done_)
 - Move body color into the .csv and .json files (done)
 - Three body example
 	https://en.wikipedia.org/wiki/Three-body_problem
-- Mass change range from 1/100 to 100X ?
+- Mass change range from 1/100 to 100X ? Maybe 200x
 - LookAt sets body tracked in status area (done)
 - Stats show body dist from Origin (done)
 - Reset sets back to Start button enabled (original state)
 - Closest approach can be more than 2 bodies simultaneously
 - Check ephemeris values for Mars moons Demios and Phobos
-- Reset change body names back to original values (noticable after collision when body names changed)
+- Reset change body names back to original values (noticable after collision when body names changed) (done)
 - Trace on renamed body throws exception (done)
 - Barycenter after collision calcs wrong (done)
-- Use travel vectors to determione closest approach
+- Use travel vectors to determione closest approach (done)
   The shortest distance between two lines is the length of projection of any vector between the two lines onto the cross product of the direction of the two lines. – 
 	Yiyuan Lee Dec 1, 2015 at 14:20
 	https://math.stackexchange.com/questions/1554820/shortest-distance-between-two-lines-and-common-perpendicular
 	https://www.cuemath.com/geometry/projection-vector/
+- Stats showing for removed Body
+- 

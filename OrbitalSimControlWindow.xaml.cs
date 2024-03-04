@@ -397,11 +397,12 @@ namespace OrbitalSimOpenGL
             GravConstantSlider.Value = 0D;
             CommandSimWindow?.GravConstant(0);
 
-            ShowAxis.IsChecked = ShowReticle.IsChecked = ShowWireframe.IsChecked = ShowBaryCenter.IsChecked = true;
+            ShowAxis.IsChecked = ShowReticle.IsChecked = ShowWireframe.IsChecked = ShowBaryCenter.IsChecked = CollisionDetect.IsChecked = true;
             CommandSimWindow?.Axis(true);
             CommandSimWindow?.Wireframe(true);
             CommandSimWindow?.Reticle(true);
             CommandSimWindow?.Barycenter(true);
+            CommandSimWindow?.DetectCollisions(true);
 
             KeepCombo.SelectedIndex = 0;
             LookAtComboBox.SelectedIndex = -1;
@@ -684,6 +685,17 @@ namespace OrbitalSimOpenGL
         {
             CheckBox checkBox = (CheckBox)sender;
             CommandSimWindow?.Barycenter(checkBox.IsChecked.Value);
+        }
+
+        /// <summary>
+        /// (Dis)able collision detection
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CollisionCheckbox(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            CommandSimWindow?.DetectCollisions(checkBox.IsChecked.Value);
         }
 
         /// <summary>

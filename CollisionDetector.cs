@@ -38,6 +38,8 @@ namespace OrbitalSimOpenGL
 
         private Vector3d DeltaS = new();
         private Vector3d DeltaE = new();
+
+        internal bool DetectCollisions = true;
         #endregion
 
         public CollisionDetector(SimModel simModel)
@@ -65,6 +67,7 @@ namespace OrbitalSimOpenGL
 
             Vector3d lBodyPos, hBodyPos;
             SimBody lBody, hBody;
+            Double radiSquared, lenSquared;
 
             approachDistSquared = Double.MaxValue;
             closestApproachBodies.Clear();
@@ -110,46 +113,61 @@ namespace OrbitalSimOpenGL
                     DeltaE.X = lBody.X - hBody.X;
                     DeltaE.Y = lBody.Y - hBody.Y;
                     DeltaE.Z = lBody.Z - hBody.Z;
-                    //Double k = Math.Max(0D, Math.Min(1D, Vector3d.Dot(DeltaS, DeltaS - DeltaE) / (DeltaS - DeltaE).LengthSquared));
-                    Double k = Vector3d.Dot(DeltaS, DeltaS - DeltaE) / (DeltaS - DeltaE).LengthSquared;
 
-                    // If (k < 0 or k > 1) the closest approach is beyond the current travel vectors. This test ignores fact that bodies
-                    // have a radius > 0, so bodies could have begun a collision.
-                    // Super low probability event and will anyway be picked up on next iteration.
-                    if (0D > k || 1D < k)
+                    // First time thorugh ?
+                    if (0D == (lenSquared = (DeltaS - DeltaE).LengthSquared))
                         continue;
 
-                    // Where were the two bodies at K ?
-                    lBodyPos.X = lBody.PX + k * (lBody.X - lBody.PX);
-                    lBodyPos.Y = lBody.PY + k * (lBody.Y - lBody.PY);
-                    lBodyPos.Z = lBody.PZ + k * (lBody.Z - lBody.PZ);
+                    //Double k = Math.Max(0D, Math.Min(1D, Vector3d.Dot(DeltaS, DeltaS - DeltaE) / (DeltaS - DeltaE).LengthSquared));
+                    Double k = Vector3d.Dot(DeltaS, DeltaS - DeltaE) / lenSquared;
 
-                    hBodyPos.X = hBody.PX + k * (hBody.X - hBody.PX);
-                    hBodyPos.Y = hBody.PY + k * (hBody.Y - hBody.PY);
-                    hBodyPos.Z = hBody.PZ + k * (hBody.Z - hBody.PZ);
+                    if (0D > k || 1D < k)
+                    {
+                        // No collision, calc approach dist as final position on travel vector.
+                        lBodyPos.X = lBody.X; lBodyPos.Y = lBody.Y; lBodyPos.Z = lBody.Z;
+                        hBodyPos.X = hBody.X; hBodyPos.Y = hBody.Y; hBodyPos.Z = hBody.Z;
+                    }
+                    else
+                    {
+                        // k between 0 and 1 inclusive the two bodies may have collided along their travel vector
+                        lBodyPos.X = lBody.PX + k * (lBody.X - lBody.PX);
+                        lBodyPos.Y = lBody.PY + k * (lBody.Y - lBody.PY);
+                        lBodyPos.Z = lBody.PZ + k * (lBody.Z - lBody.PZ);
+
+                        hBodyPos.X = hBody.PX + k * (hBody.X - hBody.PX);
+                        hBodyPos.Y = hBody.PY + k * (hBody.Y - hBody.PY);
+                        hBodyPos.Z = hBody.PZ + k * (hBody.Z - hBody.PZ);
+                    }
 
                     // Vector representing distance between the two centers at k
                     lBodyPos -= hBodyPos;
 
-                    Double radiSquared = lBody.EphemerisRaduisSquared + hBody.EphemerisRaduisSquared;
-                    Double lenSquared = lBodyPos.LengthSquared;
+                    radiSquared = lBody.EphemerisRaduisSquared + hBody.EphemerisRaduisSquared;
+                    lenSquared = lBodyPos.LengthSquared;
 
-                    if (lenSquared < radiSquared)
-                    {
-                        // Collision
-#if false
-                        System.Diagnostics.Debug.WriteLine("CollisionDetector:DetectCollision, ** Collision ** bodies "
+                    // If (k < 0 or k > 1) the closest approach is beyond the current travel vectors. This test ignores fact that bodies
+                    // have a radius > 0, so bodies could have begun a collision.
+                    // Super low probability event and will anyway be picked up on next iteration.
+                    if (true/*DetectCollisions*/)
+                        if (0D <= k && k <= 1D && lenSquared < radiSquared)
+                        {
+                            // Collision
+#if true
+                        System.Diagnostics.Debug.WriteLine("CollisionDetector:DetectCollision, ** Collision ** "
                             + lBody.Name + ", " + hBody.Name
                             );
 #endif
-                        // Two colliding
-                        if (!CollisionList.Contains(bL))
-                            CollisionList.Add(bL);
-                        if (!CollisionList.Contains(bH))
-                            CollisionList.Add(bH);
+                            // Two colliding
+                            if (DetectCollisions)
+                            {
+                                if (!CollisionList.Contains(bL))
+                                    CollisionList.Add(bL);
+                                if (!CollisionList.Contains(bH))
+                                    CollisionList.Add(bH);
+                            }
 
-                        lenSquared = 0D; // This is definitely a closest aproach
-                    }
+                            lenSquared = 0D; // This is definitely a closest aproach
+                        }
 
                     // Collect the 2+ bodies that have lowest (possibly same) closest approach
                     if (lenSquared <= approachDistSquared && lenSquared <= onlyIfLessThanOrEqualToThisD2)

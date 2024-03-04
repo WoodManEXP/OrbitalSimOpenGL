@@ -36,7 +36,6 @@ namespace OrbitalSimOpenGL
         public SimCamera? SimCamera { get; set; }
         internal MassMass? MassMass { get; set; }
         private CollisionDetector? CollisionDetector { get; set; }
-
         private Double PrevClosestApproachDistSquared { get; set; } = Double.MaxValue;
 
         // Closest approach between any two bodies captured here, for each iteration
@@ -199,6 +198,16 @@ namespace OrbitalSimOpenGL
             GravConstantSetting = (Double)v;
             if (NextPosition is not null)
                 NextPosition.UseReg_G = GravConstantSetting;
+        }
+
+        /// <summary>
+        /// (Dis/en)able collision detection
+        /// </summary>
+        /// <param name="detect"></param>
+        internal void DetectCollisions(bool detect)
+        {
+            if (CollisionDetector is not null)
+                CollisionDetector.DetectCollisions = detect;
         }
 
         /// <summary>

@@ -26,6 +26,7 @@ namespace OrbitalSimOpenGL
           , MassMultiplier
           , VelocityMultiplier
           , ResetSim
+          , DetectCollisions
         };
         #endregion
 
@@ -60,6 +61,18 @@ namespace OrbitalSimOpenGL
         public void ResetSim(bool resetCamera)
         {
             object[] args = { CommandSimWindow.GenericCommands.ResetSim, resetCamera };
+            GenericCommand(args);
+        }
+        #endregion
+
+        #region DetectCollisions
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="body"></param>
+        public void DetectCollisions(bool detect)
+        {
+            object[] args = { CommandSimWindow.GenericCommands.DetectCollisions, detect };
             GenericCommand(args);
         }
         #endregion

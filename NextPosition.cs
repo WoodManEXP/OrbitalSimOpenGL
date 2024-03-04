@@ -10,17 +10,32 @@ namespace OrbitalSimOpenGL
         /// Calculates next position of each body.
         /// </summary>
         /// <remarks>
-        /// Were the number of bodies in the sim larger, this would be a great class to
-        /// segment the model and introduce parallel processing across available cores.
+        /// Iteratitive calculation
+        /// Prior to beginning iterations: Calc & sum FVs, save in LastVectorSum
+        /// 
+        /// Iterations:
+        /// 1. Calc body's velocity at next location using saved FV sum
+        /// 2. Reposition body along the FV using avg(current vel and vel at next location)
+        /// 3. Calc and resave FVB sum vectors at this next location
+        /// 
+        /// 
+        /// This is a poor-man's integration technique. FV's change continuously across the interval
+        /// so an average can be used as a better, but not perfect, approximation. Effects are expecially appreciated when 
+        /// bodies pass close by or even through one another, no collision detection, causing a significant change to the FV
+        /// during the interval.
+        /// 
+        /// Were the number of bodies in the sim larger, this would be a candidate class to
+        /// segment the model and introduce parallel processing across available processors.
         /// </remarks>
         #region Properties
         private int[] SumOfIntegers { get; set; } // Lookup table so this is not calculated over and over
 
         // Holds the force vectors for bodies in the system so that is calculated
         // once per iteration instead of twice
-        // Nice memory as well as processing/calculation savings - especially as number
+        // Memory as well as processing/calculation savings - especially as number
         // of bodies increases.
-        private Vector3d[] ForceVectors { get; set; }    // Force vectors
+        private Vector3d[] ForceVectors { get; set; }
+        private Vector3d[] LastVectorSum { get; set; }
         private int NumBodies { get; set; }
         private SimBodyList SimBodyList { get; set; }
         internal MassMass MassMass { get; set; }
@@ -43,18 +58,19 @@ namespace OrbitalSimOpenGL
         #endregion
 
         /// <summary>
-        /// 
+        /// Repositioning iterations
         /// </summary>
         /// <param name="simBodyList"></param>
-        /// <param name="initialGravConstantSetting">Any initial modification to gravitational constant</param>
-        public NextPosition(SimBodyList simBodyList, MassMass massMas, Double initialGravConstantSetting)
+        /// <param name="massMass"></param>
+        /// <param name="initialGravConstantSetting"></param>
+        public NextPosition(SimBodyList simBodyList, MassMass massMass, Double initialGravConstantSetting)
         {
             SimBodyList = simBodyList;
             NumBodies = simBodyList.BodyList.Count;
 
             UseReg_G = initialGravConstantSetting;
 
-            MassMass = massMas;
+            MassMass = massMass;
 
             // Construct sum of integers table/array
             SumOfIntegers = new int[NumBodies];
@@ -69,6 +85,12 @@ namespace OrbitalSimOpenGL
             // this is nice memory/space savings.
             // Number of entries needed is (NumBodies - 1) * NumBodies / 2
             ForceVectors = new Vector3d[(NumBodies - 1) * NumBodies / 2];
+            LastVectorSum = new Vector3d[NumBodies];
+
+            // Prior to beginning iterations: Calc & sum FVs, save in LastVectorSum 
+            CalcForceVectors(); // Between each pair of bodies
+            for (int bodyNum = 0; bodyNum < NumBodies; bodyNum++)
+                SumForceVectors(bodyNum, ref LastVectorSum[bodyNum]); // Acting upon this body
         }
 
         /// <summary>
@@ -78,12 +100,15 @@ namespace OrbitalSimOpenGL
         public void IterateOnce(int seconds)
         {
             SimBody simBody;
-            Vector3d forceVector = new(0D, 0D, 0D);
 
             IterationNumber++;
 
-            CalcForceVectors(); // Between each pair of bodies
+#if false
+            System.Diagnostics.Debug.WriteLine("NextPosition:IterateOnce");
+#endif
 
+            // 1. Calc body's next location using saved FV sum
+            // New location calculated as average velocity over interval = (beginning V + ending V) / 2
             for (int bodyNum = 0; bodyNum < NumBodies; bodyNum++)
             {
                 simBody = SimBodyList.BodyList[bodyNum];
@@ -91,26 +116,48 @@ namespace OrbitalSimOpenGL
                 if (simBody.ExcludeFromSim)
                     continue; // No need if bodyNum has been excluded
 
-                SumForceVectors(bodyNum, ref forceVector); // Acting upon this body
-
                 // This force is an acceleration along the velocity vectors over the time interval.
                 // Calculate new velocity VZ, VY, VZ
                 // As derrived from F = ma: dV = (f * dT) / mass-of-body
                 // dX, dY, and dZ calculated as average velocity over interval * interval length (seconds)
                 // Note the new X, Y, Z are placed in the SimBody after force vector calculation are complete.
 
-                // New velocity vectors
-                Double vX = simBody.VX + (forceVector.X * seconds) / simBody.Mass;
-                Double vY = simBody.VY + (forceVector.Y * seconds) / simBody.Mass;
-                Double vZ = simBody.VZ + (forceVector.Z * seconds) / simBody.Mass;
+                // Velocity vectors at end of interval given FVs from beginning of interval
+                Double eVX = simBody.VX + (LastVectorSum[bodyNum].X * seconds) / simBody.Mass;
+                Double eVY = simBody.VY + (LastVectorSum[bodyNum].Y * seconds) / simBody.Mass;
+                Double eVZ = simBody.VZ + (LastVectorSum[bodyNum].Z * seconds) / simBody.Mass;
 
-                Double newX = simBody.X + seconds * ((simBody.VX + simBody.VX) / 2D);
-                Double newY = simBody.Y + seconds * ((simBody.VY + simBody.VY) / 2D);
-                Double newZ = simBody.Z + seconds * ((simBody.VZ + simBody.VZ) / 2D);
+                // Next location using average of VVs from begining and end of interval
+                Double newX = simBody.X + seconds * simBody.VX; // ((simBody.VX + eVX) / 2D);
+                Double newY = simBody.Y + seconds * simBody.VY; // ((simBody.VY + eVY) / 2D);
+                Double newZ = simBody.Z + seconds * simBody.VZ; // ((simBody.VZ + eVZ) / 2D);
 
                 // Update body to its new position and velocity vectors
-                simBody.SetPosAndVel(seconds, newX, newY, newZ, vX, vY, vZ );
+                simBody.SetPosAndVel(seconds, newX, newY, newZ, eVX, eVY, eVZ);
             }
+
+            // Calc FVs at new location (for next iteration)
+            CalcForceVectors(); // Between each pair of bodies
+            for (int bodyNum = 0; bodyNum < NumBodies; bodyNum++)
+                if (!SimBodyList.BodyList[bodyNum].ExcludeFromSim)
+                    SumForceVectors(bodyNum, ref LastVectorSum[bodyNum]); // Sum of FVs acting upon this body
+
+#if false
+                Vector3d vVec = new(vX, vY, vZ);
+                Vector3d vNVec = new(vVec);
+                vNVec.Normalize();
+                Double vel = vVec.Length;
+                String mphStr = "(" + (2236.94D * vel).ToString("#,##0") + " mph)";
+
+                System.Diagnostics.Debug.WriteLine("NextPosition:IterateOnce, "
+                    + " " + simBody.Name
+                    + " dY Vel " + ((forceVector.Y * seconds) / simBody.Mass).ToString("E")
+                    + " vVec (X,Y,Z) (" + vVec.X + "," + vVec.Y + "," + vVec.Z + ")"
+                    + " vNVec (X,Y,Z) (" + vNVec.X + "," + vNVec.Y + "," + vNVec.Z + ")"
+                    + " forceVector (X,Y,Z) (" + forceVector.X + "," + forceVector.Y + "," + forceVector.Z + ")"
+                    + " mphStr " + mphStr
+                    );
+#endif
         }
 
         /// <summary>
@@ -119,7 +166,8 @@ namespace OrbitalSimOpenGL
         /// <param name="bodyNum"></param>
         /// <param name="forceVector"></param>
         /// <remarks>
-        /// bodyNum should not have Excluded==true
+        /// FVs represent Newtons of force in each dimension.
+        /// bodyNum should not refer to an excluded body.
         /// </remarks>
         private void SumForceVectors(int bodyNum, ref Vector3d forceVector)
         {
@@ -148,6 +196,9 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Generate force vectors among bodies given current state of the SimBodyList
         /// </summary>
+        /// <remarks>
+        /// FVs represent Newtons of force in each dimension
+        /// </remarks>
         private void CalcForceVectors()
         {
             for (int bL = 0; bL < NumBodies; bL++)       // bL - body low number
@@ -186,9 +237,9 @@ namespace OrbitalSimOpenGL
 
 #if false
                     System.Diagnostics.Debug.WriteLine("NextPosition:CalcForceVectors, "
-                        + " " + lBody.Name
+                        + " " + lBody.Name + " to " + hBody.Name
                         + " ForceVector (X,Y,Z) (" + ForceVectors[i].X + "," + ForceVectors[i].Y + "," + ForceVectors[i].Z + ")"
-                        + " d " + d.ToString()
+                        + " d km " + (Math.Sqrt(dSquared) / 1000D).ToString("E")
                         + " newtons " + newtons.ToString()
                         );
 #endif

@@ -219,6 +219,10 @@ namespace OrbitalSimOpenGL
                         SimModel.TracePath((bool)args[1], (String)args[2]);
                         break;
 
+                    case CommandSimWindow.GenericCommands.DetectCollisions:
+                        SimModel.DetectCollisions((bool)args[1]);
+                        break;
+
                     default:
                         break;
                 }
