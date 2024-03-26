@@ -153,8 +153,9 @@ namespace OrbitalSimOpenGL
                         {
                             // Collision
 #if true
-                        System.Diagnostics.Debug.WriteLine("CollisionDetector:DetectCollision, ** Collision ** "
+                        System.Diagnostics.Debug.WriteLine("\nCollisionDetector:DetectCollision, ** Collision ** "
                             + lBody.Name + ", " + hBody.Name
+                            + "\n"
                             );
 #endif
                             // Two colliding

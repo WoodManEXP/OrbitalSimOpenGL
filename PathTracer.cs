@@ -103,7 +103,7 @@ namespace OrbitalSimOpenGL
         /// <remarks>
         /// Loss of precision is too high using Vector3d.NormalizeFast()
         /// </remarks>
-        public void AddLoc(int seconds, Double x, Double y, Double z, Double vX, Double vY, Double vZ)
+        public void AddLoc(Double seconds, Double x, Double y, Double z, Double vX, Double vY, Double vZ)
         {
             if (FirstTime)
             {

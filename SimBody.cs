@@ -18,9 +18,9 @@ namespace OrbitalSimOpenGL
         internal Scale? Scale { get; set; }
 
         // Current settings, U coords
-        public Double X { get; private set; } // km
-        public Double Y { get; private set; } // km
-        public Double Z { get; private set; } // km
+        public Double X { get; set; } // km
+        public Double Y { get; set; } // km
+        public Double Z { get; set; } // km
         public Double PX { get; set; } // km
         public Double PY { get; set; } // km
         public Double PZ { get; set; } // km
@@ -196,7 +196,7 @@ namespace OrbitalSimOpenGL
         /// <remarks>
         /// Called for each iteration
         /// </remarks>
-        public void SetPosAndVel(int seconds, Double x, Double y, Double z, Double vX, Double vY, Double vZ)
+        public void SetPosAndVel(Double seconds, Double x, Double y, Double z, Double vX, Double vY, Double vZ)
         {
             Double d;
 

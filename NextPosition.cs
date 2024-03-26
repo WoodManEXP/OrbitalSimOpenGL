@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using System;
 using System.Windows.Media.Media3D;
 
@@ -36,6 +37,9 @@ namespace OrbitalSimOpenGL
         // of bodies increases.
         private Vector3d[] ForceVectors { get; set; }
         private Vector3d[] LastVectorSum { get; set; }
+        private Vector3d[] SavedVectorSum { get; set; }
+        private Vector3d[] SavedBodyLocation { get; set; }
+        private Vector3d[] SavedBodyVelVec { get; set; }
         private int NumBodies { get; set; }
         private SimBodyList SimBodyList { get; set; }
         internal MassMass MassMass { get; set; }
@@ -55,6 +59,8 @@ namespace OrbitalSimOpenGL
             }
         }
         public int IterationNumber { get; set; } = -1;
+        private Double CosThreshold { get; } = Math.Cos(MathHelper.DegreesToRadians(5E0D));
+        private static int MaxSubdivide { get; } = 4;
         #endregion
 
         /// <summary>
@@ -85,7 +91,13 @@ namespace OrbitalSimOpenGL
             // this is nice memory/space savings.
             // Number of entries needed is (NumBodies - 1) * NumBodies / 2
             ForceVectors = new Vector3d[(NumBodies - 1) * NumBodies / 2];
+
+            // Keep an iteration's beginning valuse here in case interval must be subdivided
+            // (case of FV anle change exceeding RadianThreshold)
             LastVectorSum = new Vector3d[NumBodies];
+            SavedVectorSum = new Vector3d[NumBodies];
+            SavedBodyLocation = new Vector3d[NumBodies];
+            SavedBodyVelVec = new Vector3d[NumBodies];
 
             // Prior to beginning iterations: Calc & sum FVs, save in LastVectorSum 
             CalcForceVectors(); // Between each pair of bodies
@@ -96,21 +108,75 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Reposition bodies for a single iteration
         /// </summary>
-        /// <param name="seconds">Number of seconds elapsed for the iteration</param>
-        /// <param name="secondsSquared">Number of seconds-squared elapsed for the iteration</param>
-        public void IterateOnce(int seconds, int secondsSquared)
+        /// <param name="seconds">Target number of seconds to elapse for the iteration.</param>
+        /// <remarks>
+        ///  The seconds ref param may be changed to a lower number, so be sure to check upon function return.
+        /// </remarks>
+        public void IterateOnce(ref Double seconds)
         {
             SimBody simBody;
+            Double minAngleCos;
+            int bodyNum;
 
             IterationNumber++;
 
-#if false
-            System.Diagnostics.Debug.WriteLine("NextPosition:IterateOnce");
-#endif
+            // Attempt to process and interval of requested amount of seconds
+            minAngleCos = SubIterate(seconds, true);
 
-            // 1. Calc body's next location using saved FV sum
-            // New location calculated as average velocity over interval = (beginning V + ending V) / 2
-            for (int bodyNum = 0; bodyNum < NumBodies; bodyNum++)
+#if false
+            System.Diagnostics.Debug.WriteLine("NextPosition:IterateOnce"
+                + " IterationNumber=" + IterationNumber.ToString()
+                + " CosThreshold=" + CosThreshold.ToString()
+                + " minAngleCos=" + minAngleCos.ToString()
+                + " min angle degrees=" + MathHelper.RadiansToDegrees(Math.Acos(minAngleCos)).ToString()
+                );
+#endif
+            if (minAngleCos > CosThreshold) // By far the most common case
+                return;
+
+            if (minAngleCos == -1D) ; // 180 degrees. this case not yet handled
+            else
+            {
+                // Subdivide interval till maxAngleRadians falls below RadianThreshold
+                for (int subdivide = 0; subdivide < MaxSubdivide; subdivide++)
+                {
+                    // Restore values from beginning of interval
+                    for (bodyNum = 0; bodyNum < NumBodies; bodyNum++)
+                    {
+                        simBody = SimBodyList.BodyList[bodyNum];
+                        if (simBody.ExcludeFromSim)
+                            continue;
+                        // Back to original values
+                        Restore(simBody, bodyNum);
+                    }
+
+                    seconds /= 2D;
+                    minAngleCos = SubIterate(seconds, false);
+#if false
+                    System.Diagnostics.Debug.WriteLine("NextPosition:IterateOnce"
+                        + " subdivide= " + subdivide.ToString()
+                        + " IterationNumber=" + IterationNumber.ToString()
+                        + " CosThreshold=" + CosThreshold.ToString()
+                        + " minAngleCos=" + minAngleCos.ToString()
+                        + " max angle degrees=" + MathHelper.RadiansToDegrees(Math.Acos(minAngleCos)).ToString()
+                        );
+#endif
+                    if (minAngleCos > CosThreshold)
+                        return;
+                }
+            }
+
+            // Here either
+            // 1. maxAngleRadians was 180 in which case bodies will reach crazy high veloviies and fly away
+            // 2. subdividing went to the max depth and system was unable subdivide interval enough till maxAngleRadians falls below RadianThreshold
+        }
+
+        private Double SubIterate(Double seconds, bool saveForPossibleRestore)
+        {
+            SimBody simBody;
+            int bodyNum;
+
+            for (bodyNum = 0; bodyNum < NumBodies; bodyNum++)
             {
                 simBody = SimBodyList.BodyList[bodyNum];
 
@@ -122,7 +188,7 @@ namespace OrbitalSimOpenGL
                 // As derrived from F = ma: dV = (f * dT) / mass-of-body
                 // a = F / m
                 // V at end = v0 + a * t
-                // Location  = currLoc + v0 * t + 1/2 *a * t-squared  (Position from velocity and acceleration)
+                // Location  = currLoc + v0 * t + 1/2 * a * t-squared  (Position from velocity and acceleration)
                 // Note the new X, Y, Z are placed in the SimBody after force vector calculation are complete.
 
                 // Acceleration vectors
@@ -130,42 +196,74 @@ namespace OrbitalSimOpenGL
                 Double aY = LastVectorSum[bodyNum].Y / simBody.Mass;
                 Double aZ = LastVectorSum[bodyNum].Z / simBody.Mass;
 
-                // Velocity vectors at end of interval given FVs from beginning of interval
+                // New velocity vectors
                 Double eVX = simBody.VX + aX * seconds;
                 Double eVY = simBody.VY + aY * seconds;
                 Double eVZ = simBody.VZ + aZ * seconds;
 
-                // Location/displacement at end of interval (Position from velocity and acceleration)
-                Double newX = simBody.X + simBody.VX * seconds + 5E-1D * aX * secondsSquared;
-                Double newY = simBody.Y + simBody.VY * seconds + 5E-1D * aY * secondsSquared;
-                Double newZ = simBody.Z + simBody.VZ * seconds + 5E-1D * aZ * secondsSquared;
+                // If new vel is over 1/10th c
+                Vector3d vVec = new(eVX, eVY, eVZ);
+                if (Util.C_OneTentSquaredhKMS < vVec.LengthSquared)
+                {
+                    // Cap the vel vec at C_OneTenthKMS
+                    vVec.Normalize();
+                    vVec *= Util.C_OneTenthKMS;
+                    eVX = vVec.X;
+                    eVY = vVec.Y;
+                    eVZ = vVec.Z;
+                }
 
-                // Update body to its new position and velocity vectors
-                simBody.SetPosAndVel(seconds, newX, newY, newZ, eVX, eVY, eVZ);
+                if (saveForPossibleRestore)
+                {
+                    SavedBodyLocation[bodyNum].X = simBody.X;
+                    SavedBodyLocation[bodyNum].Y = simBody.Y;
+                    SavedBodyLocation[bodyNum].Z = simBody.Z;
+                    SavedBodyVelVec[bodyNum].X = simBody.VX;
+                    SavedBodyVelVec[bodyNum].Y = simBody.VY;
+                    SavedBodyVelVec[bodyNum].Z = simBody.VZ;
+                }
+
+                // Location/displacement at end of interval (Position from initial interval's beginning location and velocity)
+                Double newX = simBody.X + (seconds * eVX);
+                Double newY = simBody.Y + (seconds * eVY);
+                Double newZ = simBody.Z + (seconds * eVZ);
+
+                simBody.SetPosAndVel(seconds, newX, newY, newZ, eVX, eVY, eVZ); // Most of time these setings will stick
             }
 
-            // Calc FVs at new location (for next iteration)
+            // Calc FVs at end of pass
             CalcForceVectors(); // Between each pair of bodies
-            for (int bodyNum = 0; bodyNum < NumBodies; bodyNum++)
-                if (!SimBodyList.BodyList[bodyNum].ExcludeFromSim)
-                    SumForceVectors(bodyNum, ref LastVectorSum[bodyNum]); // Sum of FVs acting upon this body
 
-#if false
-                Vector3d vVec = new(vX, vY, vZ);
-                Vector3d vNVec = new(vVec);
-                vNVec.Normalize();
-                Double vel = vVec.Length;
-                String mphStr = "(" + (2236.94D * vel).ToString("#,##0") + " mph)";
+            // Compare the new FV sums with the previous
+            Vector3d forceVector;
+            Double minAngleCos = 1D;
+            for (bodyNum = 0; bodyNum < NumBodies; bodyNum++)
+            {
+                simBody = SimBodyList.BodyList[bodyNum];
 
-                System.Diagnostics.Debug.WriteLine("NextPosition:IterateOnce, "
-                    + " " + simBody.Name
-                    + " dY Vel " + ((forceVector.Y * seconds) / simBody.Mass).ToString("E")
-                    + " vVec (X,Y,Z) (" + vVec.X + "," + vVec.Y + "," + vVec.Z + ")"
-                    + " vNVec (X,Y,Z) (" + vNVec.X + "," + vNVec.Y + "," + vNVec.Z + ")"
-                    + " forceVector (X,Y,Z) (" + forceVector.X + "," + forceVector.Y + "," + forceVector.Z + ")"
-                    + " mphStr " + mphStr
-                    );
-#endif
+                if (simBody.ExcludeFromSim)
+                    continue;
+
+                forceVector = SavedVectorSum[bodyNum] = LastVectorSum[bodyNum];
+                SumForceVectors(bodyNum, ref LastVectorSum[bodyNum]); // Sum of FVs acting upon this body
+
+                // **** Do CalculateAngle more efficiently *****
+                Double angle = CalculateAngleCos(in LastVectorSum[bodyNum], in forceVector);
+                minAngleCos = Math.Min(minAngleCos, angle);
+            }
+
+            return minAngleCos;
+        }
+
+        private void Restore(SimBody simBody, int bodyNum)
+        {
+            LastVectorSum[bodyNum] = SavedVectorSum[bodyNum];
+            simBody.X = SavedBodyLocation[bodyNum].X;
+            simBody.Y = SavedBodyLocation[bodyNum].Y;
+            simBody.Z = SavedBodyLocation[bodyNum].Z;
+            simBody.VX = SavedBodyVelVec[bodyNum].X;
+            simBody.VY = SavedBodyVelVec[bodyNum].Y;
+            simBody.VZ = SavedBodyVelVec[bodyNum].Z;
         }
 
         /// <summary>
@@ -237,20 +335,12 @@ namespace OrbitalSimOpenGL
                     ForceVectors[i].X = hBody.X - lBody.X;
                     ForceVectors[i].Y = hBody.Y - lBody.Y;
                     ForceVectors[i].Z = hBody.Z - lBody.Z;
+
                     Double dSquared = 1E6 * ForceVectors[i].LengthSquared; // From km to m
                     ForceVectors[i].Normalize();
 
                     // Newton's gravational attraction/force calculation
                     Double newtons = UseReg_G * MassMass.GetMassMass(bL, bH) / dSquared;
-
-#if false
-                    System.Diagnostics.Debug.WriteLine("NextPosition:CalcForceVectors, "
-                        + " " + lBody.Name + " to " + hBody.Name
-                        + " ForceVector (X,Y,Z) (" + ForceVectors[i].X + "," + ForceVectors[i].Y + "," + ForceVectors[i].Z + ")"
-                        + " d km " + (Math.Sqrt(dSquared) / 1000D).ToString("E")
-                        + " newtons " + newtons.ToString()
-                        );
-#endif
 
                     // Each force vector's length is the Newtons of force the pair of bodies exert on one another.
                     ForceVectors[i] *= newtons;
@@ -270,6 +360,23 @@ namespace OrbitalSimOpenGL
             var lBh = Math.Max(body0, body1);
 
             return (lBL * NumBodies) - SumOfIntegers[lBL] + lBh - lBL - 1;
+        }
+
+        /// <summary>
+        /// Calc Cos of angle between two Vector3ds
+        /// Use this rather than the Vector3d version. More efficient.
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="second"></param>
+        /// <remarks>
+        /// No need to do the acos call, as in Vector3d version, to obtain a usable result
+        /// </remarks>
+        /// <returns></returns>
+        private static Double CalculateAngleCos(in Vector3d first, in Vector3d second)
+        {
+            Vector3d.Dot(in first, in second, out var result2);
+            Double result = MathHelper.Clamp(result2 / (first.Length * second.Length), -1.0, 1.0);
+            return result;
         }
     }
 }

@@ -27,8 +27,8 @@ namespace OrbitalSimOpenGL
         private Double GravConstantSetting { get; set; } = 0D; // Grav Constant starts unmodified
         public String? AppDataFolder { get; set; }
 
-        private int _IterationSeconds;
-        public int IterationSeconds  // Each frame iteration represents this many seconds of model simulation
+        private Double _IterationSeconds;
+        public Double IterationSeconds  // Each frame iteration represents this many seconds of model simulation
         {
             get
             {
@@ -37,12 +37,10 @@ namespace OrbitalSimOpenGL
             set
             {
                 _IterationSeconds = value;
-                IterationSecondsSquared = value * value;
             }
         }
-        public int IterationSecondsSquared { get; private set; }
         public int TimeCompression { get; set; } = 1; // Number of times to iterate per frame
-        public Int64 ElapsedSeconds { get; set; } = 0;
+        public Double ElapsedSeconds { get; set; } = 0D;
         private Axis Axis { get; set; }
         public bool ShowAxis { get; set; } = true; // Render the three axis elements (X, Y, Z)
         public OrbitalSimWindow OrbitalSimWindow { get; set; }
@@ -95,7 +93,7 @@ namespace OrbitalSimOpenGL
             //int nrAttributes = 0;
             //GL.GetInteger(GetPName.MaxVertexAttribs, out nrAttributes);
 
-            IterationSeconds = 60;
+            IterationSeconds = 60D;
 
             Axis = new(SimCamera, Scale);
 
@@ -125,7 +123,7 @@ namespace OrbitalSimOpenGL
             // Stop the sim, to avoid any timing and indetrerminate-state issues relative to
             // OpenTK's calling OrbitalSimWindow:OnRender during reset.
             SceneReady = false;
-            ElapsedSeconds = 0;
+            ElapsedSeconds = 0D;
 
             PrevClosestApproachDistSquared = Double.MaxValue;
 
@@ -191,7 +189,8 @@ namespace OrbitalSimOpenGL
             {
                 for (int i = 0; i < TimeCompression; i++)
                 {
-                    NextPosition?.IterateOnce(IterationSeconds, IterationSecondsSquared);
+                    Double seconds = IterationSeconds;
+                    NextPosition?.IterateOnce(ref seconds);
 
                     // Closest approach and collision detection
                     CollisionDetector?.Detect(PrevClosestApproachDistSquared, out _ClosestApproachDistSquared, ref _ClosestApproachBodiesList);
@@ -199,7 +198,7 @@ namespace OrbitalSimOpenGL
                     // Keep PrevClosestApproachDistSquared around to supply CollisionDetector. Saves work.
                     PrevClosestApproachDistSquared = ClosestApproachDistSquared;
 
-                    ElapsedSeconds += IterationSeconds;
+                    ElapsedSeconds += seconds;
                 }
             }
         }

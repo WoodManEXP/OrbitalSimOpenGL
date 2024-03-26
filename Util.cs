@@ -15,11 +15,12 @@ namespace OrbitalSimOpenGL
         public static Double G_KM { get; } = 1E-3 * 6.6743E-11;     // Gravitational constant is typically offered in kg*m/s-squared
                                                                     // The 1E-3 converts from kg*m/s-squared to kg*km/s-squared
                                                                     // (sim distancs are in km rather than m)
-        public static Double G_M { get; } =  6.6743E-11;            // Typically seen value kg m / sec-squared
+        public static Double G_M { get; } = 6.6743E-11;            // Typically seen value kg m / sec-squared
+        public static Double C_KMS { get; } = 299792D;  // Speed of light 299,792 km/s
         public static Double C_M { get; } = 299792458D;  // Speed of light 299,792,458 m/s
         public static Double CSquared_M { get; } = C_M * C_M;
-        public static Double C_KM { get; } = 299792D;  // Speed of light 299,792 km/s
-        public static Double CSquared_KM { get; } = C_KM * C_KM;  // Speed of light ~300,000 km/s
+        public static Double C_OneTenthKMS { get; } = C_KMS * 1D - 1; // 1/10th C km/s
+        public static Double C_OneTentSquaredhKMS { get; } = C_OneTenthKMS * C_OneTenthKMS;
 
         static public void MakeUnitSphere(out float[] sharedSphereMesh, out UInt16[] sharedSphereIndices)
         {
