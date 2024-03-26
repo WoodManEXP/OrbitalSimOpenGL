@@ -358,7 +358,6 @@ namespace OrbitalSimOpenGL
         {
             var lBL = Math.Min(body0, body1);
             var lBh = Math.Max(body0, body1);
-
             return (lBL * NumBodies) - SumOfIntegers[lBL] + lBh - lBL - 1;
         }
 
