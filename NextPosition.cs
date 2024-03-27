@@ -14,17 +14,6 @@ namespace OrbitalSimOpenGL
         /// Iteratitive calculation
         /// Prior to beginning iterations: Calc & sum FVs, save in LastVectorSum
         /// 
-        /// Iterations:
-        /// 1. Calc body's velocity at next location using saved FV sum
-        /// 2. Reposition body along the FV using avg(current vel and vel at next location)
-        /// 3. Calc and resave FVB sum vectors at this next location
-        /// 
-        /// 
-        /// This is a poor-man's integration technique. FV's change continuously across the interval
-        /// so an average can be used as a better, but not perfect, approximation. Effects are expecially appreciated when 
-        /// bodies pass close by or even through one another, no collision detection, causing a significant change to the FV
-        /// during the interval.
-        /// 
         /// Were the number of bodies in the sim larger, this would be a candidate class to
         /// segment the model and introduce parallel processing across available processors.
         /// </remarks>
@@ -224,6 +213,10 @@ namespace OrbitalSimOpenGL
                 }
 
                 // Location/displacement at end of interval (Position from initial interval's beginning location and velocity)
+                // Note: Use a constant velocity over the interval to calc new positions. Rather than the continuous
+                // version of position + (vel * seconds) + (.5 * accel * seconds-squared).
+                // Acceleration is approximated by working constant velocity in the intervals, making acceleration
+                // within interval unnecessary. Velocity between intervals is ever-changing --> acceleration.
                 Double newX = simBody.X + (seconds * eVX);
                 Double newY = simBody.Y + (seconds * eVY);
                 Double newZ = simBody.Z + (seconds * eVZ);

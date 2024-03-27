@@ -92,3 +92,21 @@ SimBody
 	https://www.cuemath.com/geometry/projection-vector/
 - Stats showing for removed Body
 - 
+
+Examples
+- Stable system
+	- In a plane
+	- Pluto slighty out of plane
+- How does does the Sun move (mostly influence of Jupiter)
+- What if Sun
+	- Got more massive
+	- Went away
+		- See Moon stays with Earth
+- Massive body approaches perpendicular to the plane
+- Primordial BH approaches system (like in Three Body Problem)
+- Grav constant changes (with Star Trek Q clip)
+- Only Sun and Jupier in system
+- What if Jupiter
+	- Went away
+	- Got more massive
+- What happens to moon if Earth goes away
