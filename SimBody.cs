@@ -28,6 +28,8 @@ namespace OrbitalSimOpenGL
         public Double VY { get; set; } // km/s
         public Double VZ { get; set; } // km/s
 
+        public bool CoastThisInterval { get; set; } = false;
+
         // Radius-squared of sphere encompassing travel from last iteration. Includes dist traveled + body radius.
         // Precalculated for collision rule-out.
         public Double LastPathRadiusSquared { get; set; } // On last iteration
