@@ -52,7 +52,6 @@ namespace OrbitalSimOpenGL
         private Double CosThreshold { get; } = Math.Cos(MathHelper.DegreesToRadians(5E0D));
         private static int MaxSubdivide { get; } = 4;
         private static int BSteps { get; } = 15;
-        private Double CoastSeconds { get; set; } = -1D;
         #endregion
 
         /// <summary>
@@ -104,31 +103,21 @@ namespace OrbitalSimOpenGL
         /// <remarks>
         ///  The seconds ref param may be changed to a lower number, so be sure to check upon function return.
         /// </remarks>
-        public void IterateOnce(ref Double seconds)
+        public void IterateOnce(ref Double seconds, Double secondsSquared)
         {
             Double minAngleCos;
 
             IterationNumber++;
 
-#if true
+#if false
             System.Diagnostics.Debug.WriteLine("\nNextPosition:IterateOnce"
                 + " IterationNumber=" + IterationNumber.ToString()
                 );
 #endif
 
-            // Look out for entering a coasting interval, no accel, from the Degen case
-            if (-1D != CoastSeconds)
-            {
-                seconds = CoastSeconds;
-                CoastSeconds = -1D;
-            }
-
             // Attempt to process and interval of requested amount of seconds
-            minAngleCos = Subiterate(seconds, true);
+            minAngleCos = Subiterate(seconds, secondsSquared, true);
 
-#if false
-
-#endif
             if (minAngleCos > CosThreshold) ; // Most common case
             else
             if (minAngleCos == -1D)// 180 degrees
@@ -137,13 +126,13 @@ namespace OrbitalSimOpenGL
                 // Set to run next interval for same period of time so coasting bodies will move
                 // to desired location (where FVs balance to save values as beginning of interval).
                 // Will sync vectors  symmertrically bac to interval beginning.
-                seconds = CoastSeconds = DegenCase(seconds);
+                seconds = DegenCase(seconds, secondsSquared);
             else
                 // A larger than comfortable threshold is being crossed. Subdivide the interval to
                 // reduce the threshold -> lowers errors in the numerical/incremental methods.
-                seconds = NondegenCase(seconds);
+                seconds = NondegenCase(seconds, secondsSquared);
 
-#if true
+#if false
             System.Diagnostics.Debug.WriteLine("NextPosition:IterateOnce"
                 + " minAngleCos=" + minAngleCos.ToString()
                 + " seconds=" + seconds.ToString()
@@ -169,7 +158,7 @@ namespace OrbitalSimOpenGL
 #endif
         }
 
-        private Double Subiterate(Double seconds, bool saveForPossibleRestore)
+        private Double Subiterate(Double seconds, Double secondsSquared, bool saveForPossibleRestore)
         {
             SimBody simBody;
             int bodyNum;
@@ -181,52 +170,20 @@ namespace OrbitalSimOpenGL
                 if (simBody.ExcludeFromSim)
                     continue; // No need if bodyNum has been excluded
 
-                // This force is an acceleration along the velocity vectors over the time interval.
-                // Calculate new velocity VZ, VY, VZ
-                // As derrived from F = ma: dV = (f * dT) / mass-of-body
-                // a = F / m
-                // V at end = v0 + a * t
-                // Location  = currLoc + v0 * t + 1/2 * a * t-squared  (Position from velocity and acceleration)
-                // Note the new X, Y, Z are placed in the SimBody after force vector calculation are complete.
+                // Acceleration vectors, constant during interval
+                Double aX = LastVectorSum[bodyNum].X / simBody.Mass;
+                Double aY = LastVectorSum[bodyNum].Y / simBody.Mass;
+                Double aZ = LastVectorSum[bodyNum].Z / simBody.Mass;
 
-#if true
-                System.Diagnostics.Debug.WriteLine("NextPosition:Subiterate"
-                    + " simBody.Name=" + simBody.Name
-                    + " simBody.X=" + simBody.X.ToString()
-                    + " coasting=" + simBody.CoastThisInterval.ToString()
-                    + " seconds=" + seconds.ToString()
-                    + " Used VX=" + simBody.VX.ToString()
-                );
-#endif
+                // Next location
+                Double newX = simBody.X + simBody.VX * seconds + .5D * aX * secondsSquared;
+                Double newY = simBody.Y + simBody.VY * seconds + .5D * aY * secondsSquared;
+                Double newZ = simBody.Z + simBody.VZ * seconds + .5D * aZ * secondsSquared;
 
-                // Begin calculation of new velocity vectors
-                Double eVX = simBody.VX;
-                Double eVY = simBody.VY;
-                Double eVZ = simBody.VZ;
-
-                // Is the body to coast this interval?
-                if (simBody.CoastThisInterval)
-                    simBody.CoastThisInterval = false;
-                else
-                {
-                    // Not coasting, include acceleration vectors
-                    Double aX = LastVectorSum[bodyNum].X / simBody.Mass;
-                    Double aY = LastVectorSum[bodyNum].Y / simBody.Mass;
-                    Double aZ = LastVectorSum[bodyNum].Z / simBody.Mass;
-
-                    // Add the acceleration
-                    eVX += aX * seconds;
-                    eVY += aY * seconds;
-                    eVZ += aZ * seconds;
-#if true
-                    System.Diagnostics.Debug.WriteLine("NextPosition:Subiterate"
-                        + " simBody.Name=" + simBody.Name
-                        + " Used FX=" + LastVectorSum[bodyNum].X.ToString()
-                        + " calculated aX=" + aX.ToString()
-                        + " calculated eVX=" + eVX.ToString()
-                    );
-#endif
-                }
+                // Velocity at end of interval
+                Double eVX = simBody.VX + aX * seconds;
+                Double eVY = simBody.VY + aY * seconds;
+                Double eVZ = simBody.VZ + aZ * seconds;
 
                 // If new vel is over 1/10th c (Does this ever happen ?)
                 Vector3d vVec = new(eVX, eVY, eVZ);
@@ -250,23 +207,7 @@ namespace OrbitalSimOpenGL
                     SavedBodyVelVec[bodyNum].Z = simBody.VZ;
                 }
 
-                // Location/displacement at end of interval (Position from initial interval's beginning location and velocity)
-                // Note: Use a constant velocity over the interval to calc new positions. Rather than the continuous
-                // version of position + (vel * seconds) + (.5 * accel * seconds-squared).
-                // Acceleration is approximated by working constant velocity in the intervals, making acceleration
-                // within interval unnecessary. Velocity between intervals is ever-changing --> acceleration.
-                Double newX = simBody.X + (seconds * eVX);
-                Double newY = simBody.Y + (seconds * eVY);
-                Double newZ = simBody.Z + (seconds * eVZ);
-
                 simBody.SetPosAndVel(seconds, newX, newY, newZ, eVX, eVY, eVZ); // Most of time these setings will stick
-#if true
-                System.Diagnostics.Debug.WriteLine("NextPosition:Subiterate"
-                    + " simBody.Name=" + simBody.Name
-                    + " calculated newX=" + newX.ToString()
-#endif
-                );
-
             }
 
             // Calc FVs at end of pass
@@ -292,7 +233,7 @@ namespace OrbitalSimOpenGL
             return minAngleCos;
         }
 
-        private Double DegenSubiterate(Double seconds)
+        private Double DegenSubiterate(Double seconds, Double secondsSquared)
         {
             SimBody simBody;
             int bodyNum;
@@ -304,20 +245,17 @@ namespace OrbitalSimOpenGL
                 if (simBody.ExcludeFromSim)
                     continue; // No need if bodyNum has been excluded
 
-                // This force is an acceleration along the velocity vectors over the time interval.
-                // Calculate new velocity VZ, VY, VZ
-                // As derrived from F = ma: dV = (f * dT) / mass-of-body
-                // a = F / m
-                // V at end = v0 + a * t
-                // Location  = currLoc + v0 * t + 1/2 * a * t-squared  (Position from velocity and acceleration)
-                // Note the new X, Y, Z are placed in the SimBody after force vector calculation are complete.
-
-                // Acceleration vectors
+                // Acceleration vectors, constant during interval
                 Double aX = LastVectorSum[bodyNum].X / simBody.Mass;
                 Double aY = LastVectorSum[bodyNum].Y / simBody.Mass;
                 Double aZ = LastVectorSum[bodyNum].Z / simBody.Mass;
 
-                // New velocity vectors
+                // Next location
+                Double newX = simBody.X + simBody.VX * seconds + .5D * aX * secondsSquared;
+                Double newY = simBody.Y + simBody.VY * seconds + .5D * aY * secondsSquared;
+                Double newZ = simBody.Z + simBody.VZ * seconds + .5D * aZ * secondsSquared;
+
+                // Velocity at end of interval
                 Double eVX = simBody.VX + aX * seconds;
                 Double eVY = simBody.VY + aY * seconds;
                 Double eVZ = simBody.VZ + aZ * seconds;
@@ -333,15 +271,6 @@ namespace OrbitalSimOpenGL
                     eVY = vVec.Y;
                     eVZ = vVec.Z;
                 }
-
-                // Location/displacement at end of interval (Position from initial interval's beginning location and velocity)
-                // Note: Use a constant velocity over the interval to calc new positions. Rather than the continuous
-                // version of position + (vel * seconds) + (.5 * accel * seconds-squared).
-                // Acceleration is approximated by working constant velocity in the intervals, making acceleration
-                // within interval unnecessary. Velocity between intervals is ever-changing --> acceleration.
-                Double newX = simBody.X + (seconds * eVX);
-                Double newY = simBody.Y + (seconds * eVY);
-                Double newZ = simBody.Z + (seconds * eVZ);
 
                 simBody.SetPosAndVel(seconds, newX, newY, newZ, eVX, eVY, eVZ);
             }
@@ -373,11 +302,9 @@ namespace OrbitalSimOpenGL
             return minAngleCos;
         }
 
-        private Double NondegenCase(Double seconds)
+        private Double NondegenCase(Double seconds, Double secondsSquared)
         {
-            SimBody simBody;
             Double minAngleCos;
-            int bodyNum;
 
             // Subdivide interval till minAngleCos rises above CosThreshold
             for (int subdivide = 0; subdivide < MaxSubdivide; subdivide++)
@@ -385,7 +312,7 @@ namespace OrbitalSimOpenGL
                 Restore();// Restore values from beginning of interval
 
                 seconds /= 2D;
-                minAngleCos = Subiterate(seconds, false);
+                minAngleCos = Subiterate(seconds, secondsSquared, false);
 #if false
                     System.Diagnostics.Debug.WriteLine("NextPosition:IterateOnce"
                         + " subdivide= " + subdivide.ToString()
@@ -408,7 +335,7 @@ namespace OrbitalSimOpenGL
         /// Approximation of seconds value where flip occurs
         /// </returns>
         /// <exception cref="NotImplementedException"></exception>
-        private double DegenCase(Double seconds)
+        private double DegenCase(Double seconds, Double secondsSquared)
         {
             Double minAngleCos = 1D;
 
@@ -419,7 +346,7 @@ namespace OrbitalSimOpenGL
             {
                 Restore(); // Restore values from beginning of interval
 
-                minAngleCos = DegenSubiterate(seconds);
+                minAngleCos = DegenSubiterate(seconds, secondsSquared);
 
                 halfInterval /= 2D;
                 if (-1D == minAngleCos) // 180 degrees
@@ -428,10 +355,6 @@ namespace OrbitalSimOpenGL
                     seconds += halfInterval;
             }
 
-#if false
-            System.Diagnostics.Debug.WriteLine("NextPosition:DegenCase"
-                );
-#endif
             // Here an approximation has been made for where the FV flips 180 degrees
             // The +halfInterval ensures approximation is on other side of flip - so
             // that on next interval this flip will not be encountered.
@@ -439,7 +362,7 @@ namespace OrbitalSimOpenGL
                 seconds += halfInterval;    // Advanve time just past flip
 
             Restore();
-            minAngleCos = DegenSubiterate(seconds);   // Move over the flip
+            minAngleCos = DegenSubiterate(seconds, secondsSquared);   // Move over the flip
 
             return seconds;
         }

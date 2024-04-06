@@ -77,7 +77,6 @@ SimBody
 - Three body example
 	https://en.wikipedia.org/wiki/Three-body_problem
 - Mass change range from 1/100 to 100X ? Maybe 200x
-- LookAt sets body tracked in status area (done)
 - Stats show body dist from Origin (done)
 - Reset sets back to Start button enabled (original state)
 - Closest approach can be more than 2 bodies simultaneously
@@ -91,7 +90,8 @@ SimBody
 	https://math.stackexchange.com/questions/1554820/shortest-distance-between-two-lines-and-common-perpendicular
 	https://www.cuemath.com/geometry/projection-vector/
 - Stats showing for removed Body
-- 
+- *********  LookAt sets body tracked in status area (done) ??????
+- Pause, or something, turns off tracing ??
 
 Examples
 - Stable system
