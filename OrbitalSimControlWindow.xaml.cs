@@ -338,7 +338,8 @@ namespace OrbitalSimOpenGL
 
             PopulateComboBoxes();
 
-            PopulateBodyMods();
+            if (SimHasBeenStarted is false)
+                PopulateBodyMods();
 
             startButton.IsEnabled = false;
             pauseButton.IsEnabled = true;
@@ -796,9 +797,6 @@ namespace OrbitalSimOpenGL
         /// </summary>
         private void PopulateBodyMods()
         {
-            //            if (SimHasBeenStarted)
-            //                return;
-
             BodyModsListBox.Items.Clear();
 
             int itemIndex = -1;

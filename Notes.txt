@@ -91,7 +91,7 @@ SimBody
 	https://www.cuemath.com/geometry/projection-vector/
 - Stats showing for removed Body
 - *********  LookAt sets body tracked in status area (done) ??????
-- Pause, or something, turns off tracing ??
+- Pause then Continue unchecks tracing (done) ??
 
 Examples
 - Stable system
