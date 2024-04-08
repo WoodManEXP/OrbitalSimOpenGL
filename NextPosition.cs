@@ -49,7 +49,7 @@ namespace OrbitalSimOpenGL
             }
         }
         public int IterationNumber { get; set; } = -1;
-        private Double CosThreshold { get; } = Math.Cos(MathHelper.DegreesToRadians(5E0D));
+        private Double CosThreshold { get; } = Math.Cos(MathHelper.DegreesToRadians(10E0D));
         private static int MaxSubdivide { get; } = 4;
         private static int BSteps { get; } = 15;
         #endregion
@@ -101,7 +101,7 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="seconds">Target number of seconds to elapse for the iteration.</param>
         /// <remarks>
-        ///  The seconds ref param may be changed to a lower number, so be sure to check upon function return.
+        ///  The seconds ref param may be changed to a lower number, so be sure to check upon method return.
         /// </remarks>
         public void IterateOnce(ref Double seconds, Double secondsSquared)
         {
@@ -109,14 +109,15 @@ namespace OrbitalSimOpenGL
 
             IterationNumber++;
 
+            // Attempt to process and interval of requested amount of seconds
+            minAngleCos = Subiterate(seconds, secondsSquared, true);
+
 #if false
             System.Diagnostics.Debug.WriteLine("\nNextPosition:IterateOnce"
                 + " IterationNumber=" + IterationNumber.ToString()
+                + " min angle degrees=" + MathHelper.RadiansToDegrees(Math.Acos(minAngleCos)).ToString()
                 );
 #endif
-
-            // Attempt to process and interval of requested amount of seconds
-            minAngleCos = Subiterate(seconds, secondsSquared, true);
 
             if (minAngleCos > CosThreshold) ; // Most common case
             else
@@ -126,11 +127,11 @@ namespace OrbitalSimOpenGL
                 // Set to run next interval for same period of time so coasting bodies will move
                 // to desired location (where FVs balance to save values as beginning of interval).
                 // Will sync vectors  symmertrically bac to interval beginning.
-                seconds = DegenCase(seconds, secondsSquared);
+                DegenCase(ref seconds);
             else
                 // A larger than comfortable threshold is being crossed. Subdivide the interval to
                 // reduce the threshold -> lowers errors in the numerical/incremental methods.
-                seconds = NondegenCase(seconds, secondsSquared);
+                NondegenCase(ref seconds);
 
 #if false
             System.Diagnostics.Debug.WriteLine("NextPosition:IterateOnce"
@@ -169,7 +170,7 @@ namespace OrbitalSimOpenGL
 
                 if (simBody.ExcludeFromSim)
                     continue; // No need if bodyNum has been excluded
-
+#if false
                 // Acceleration vectors, constant during interval
                 Double aX = LastVectorSum[bodyNum].X / simBody.Mass;
                 Double aY = LastVectorSum[bodyNum].Y / simBody.Mass;
@@ -184,6 +185,11 @@ namespace OrbitalSimOpenGL
                 Double eVX = simBody.VX + aX * seconds;
                 Double eVY = simBody.VY + aY * seconds;
                 Double eVZ = simBody.VZ + aZ * seconds;
+#endif
+                // New velocity vectors
+                Double eVX = simBody.VX + ((LastVectorSum[bodyNum].X * seconds) / simBody.Mass);
+                Double eVY = simBody.VY + ((LastVectorSum[bodyNum].Y * seconds) / simBody.Mass);
+                Double eVZ = simBody.VZ + ((LastVectorSum[bodyNum].Z * seconds) / simBody.Mass);
 
                 // If new vel is over 1/10th c (Does this ever happen ?)
                 Vector3d vVec = new(eVX, eVY, eVZ);
@@ -196,6 +202,10 @@ namespace OrbitalSimOpenGL
                     eVY = vVec.Y;
                     eVZ = vVec.Z;
                 }
+
+                Double newX = simBody.X + seconds * eVX;
+                Double newY = simBody.Y + seconds * eVY;
+                Double newZ = simBody.Z + seconds * eVZ;
 
                 if (saveForPossibleRestore)
                 {
@@ -228,6 +238,17 @@ namespace OrbitalSimOpenGL
 
                 Double angleCos = CalculateAngleCos(in LastVectorSum[bodyNum], in forceVector);
                 minAngleCos = Math.Min(minAngleCos, angleCos);
+
+#if true
+                if (angleCos <= CosThreshold)
+                {
+                    System.Diagnostics.Debug.WriteLine("NextPosition:Subiterate"
+                        + " body=" + simBody.Name
+                        + " angleCos=" + angleCos.ToString()
+                        + " angleCos degrees=" + MathHelper.RadiansToDegrees(Math.Acos(angleCos)).ToString()
+                    );
+                }
+#endif
             }
 
             return minAngleCos;
@@ -244,7 +265,7 @@ namespace OrbitalSimOpenGL
 
                 if (simBody.ExcludeFromSim)
                     continue; // No need if bodyNum has been excluded
-
+#if false
                 // Acceleration vectors, constant during interval
                 Double aX = LastVectorSum[bodyNum].X / simBody.Mass;
                 Double aY = LastVectorSum[bodyNum].Y / simBody.Mass;
@@ -259,6 +280,11 @@ namespace OrbitalSimOpenGL
                 Double eVX = simBody.VX + aX * seconds;
                 Double eVY = simBody.VY + aY * seconds;
                 Double eVZ = simBody.VZ + aZ * seconds;
+#endif
+                // New velocity vectors
+                Double eVX = simBody.VX + ((LastVectorSum[bodyNum].X * seconds) / simBody.Mass);
+                Double eVY = simBody.VY + ((LastVectorSum[bodyNum].Y * seconds) / simBody.Mass);
+                Double eVZ = simBody.VZ + ((LastVectorSum[bodyNum].Z * seconds) / simBody.Mass);
 
                 // If new vel is over 1/10th c (Does this ever happen ?)
                 Vector3d vVec = new(eVX, eVY, eVZ);
@@ -271,6 +297,10 @@ namespace OrbitalSimOpenGL
                     eVY = vVec.Y;
                     eVZ = vVec.Z;
                 }
+
+                Double newX = simBody.X + seconds * eVX;
+                Double newY = simBody.Y + seconds * eVY;
+                Double newZ = simBody.Z + seconds * eVZ;
 
                 simBody.SetPosAndVel(seconds, newX, newY, newZ, eVX, eVY, eVZ);
             }
@@ -302,7 +332,7 @@ namespace OrbitalSimOpenGL
             return minAngleCos;
         }
 
-        private Double NondegenCase(Double seconds, Double secondsSquared)
+        private void NondegenCase(ref Double seconds)
         {
             Double minAngleCos;
 
@@ -312,20 +342,19 @@ namespace OrbitalSimOpenGL
                 Restore();// Restore values from beginning of interval
 
                 seconds /= 2D;
-                minAngleCos = Subiterate(seconds, secondsSquared, false);
-#if false
-                    System.Diagnostics.Debug.WriteLine("NextPosition:IterateOnce"
+                minAngleCos = Subiterate(seconds, seconds * seconds, false);
+#if true
+                    System.Diagnostics.Debug.WriteLine("NextPosition:NondegenCase"
                         + " subdivide= " + subdivide.ToString()
                         + " IterationNumber=" + IterationNumber.ToString()
                         + " CosThreshold=" + CosThreshold.ToString()
                         + " minAngleCos=" + minAngleCos.ToString()
-                        + " max angle degrees=" + MathHelper.RadiansToDegrees(Math.Acos(minAngleCos)).ToString()
+                        + " minAngleCos degrees=" + MathHelper.RadiansToDegrees(Math.Acos(minAngleCos)).ToString()
                         );
 #endif
                 if (minAngleCos > CosThreshold)
                     break;
             }
-            return seconds;
         }
 
         /// <summary>
@@ -335,7 +364,7 @@ namespace OrbitalSimOpenGL
         /// Approximation of seconds value where flip occurs
         /// </returns>
         /// <exception cref="NotImplementedException"></exception>
-        private double DegenCase(Double seconds, Double secondsSquared)
+        private void DegenCase(ref Double seconds)
         {
             Double minAngleCos = 1D;
 
@@ -346,7 +375,7 @@ namespace OrbitalSimOpenGL
             {
                 Restore(); // Restore values from beginning of interval
 
-                minAngleCos = DegenSubiterate(seconds, secondsSquared);
+                minAngleCos = DegenSubiterate(seconds, seconds * seconds);
 
                 halfInterval /= 2D;
                 if (-1D == minAngleCos) // 180 degrees
@@ -362,9 +391,7 @@ namespace OrbitalSimOpenGL
                 seconds += halfInterval;    // Advanve time just past flip
 
             Restore();
-            minAngleCos = DegenSubiterate(seconds, secondsSquared);   // Move over the flip
-
-            return seconds;
+            minAngleCos = DegenSubiterate(seconds, seconds * seconds);   // Move over the flip
         }
 
         /// <summary>
