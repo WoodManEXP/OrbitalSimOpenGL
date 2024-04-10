@@ -90,18 +90,61 @@ SimBody
 	https://math.stackexchange.com/questions/1554820/shortest-distance-between-two-lines-and-common-perpendicular
 	https://www.cuemath.com/geometry/projection-vector/
 - Stats showing for removed Body
-- *********  LookAt sets body tracked in status area (done) ??????
-- Pause then Continue unchecks tracing (done) ??
+- *********  LookAt sets body tracked in status area (done)
+- Pause then Continue unchecks tracing (done)
 
 Examples
-- Stable system
+- Stable system - but "The Sun"
 	- In a plane
 	- Pluto slighty out of plane
-- How does does the Sun move (mostly influence of Jupiter)
+	- Mercury slightly out of plane
+	- Mars and its moons
+	- Earth and Moon
+	- What does the Sun do? How does does the Sun move (mostly influence of Jupiter)
+
+	1. Camera back to see full system
+		- Turn axes on/off
+		- Axes coord system is defined by astronomical conventions based on super far-away things that appear "unmoving" w.r.t. Sol
+		- Without the conventions it's be really tough to describe where things are in the Solar System
+		- The conventions well for describing our Solar System. The further away from Sol, in time and distance, the less useful/accurate the Axes are
+		- Navigating to far away places involves best estimation and constant course corrections, as new info becomes available during travel.
+		- This system is influenced only by grav attraction of bodies in the system. That OK though as the rest of the Galaxt and Universe is so far away
+		the effects are negligable, on the time scales this sim covers.
+	1a. Go Near Sun 
+		- Point out Barycenter
+	1b. Pull back
+		- Point out closest approach
+		- Turn on path tracing and speed sim
+		- Look/orbit around.
+		- System is mostly in same plane
+		- Pluto slighty out of plane
+		- Mercury slightly out of plane
+	2. Pause and go near Mars and its moons
+		- Turn off wireframe and see Mars's moons orbit
+		- Set Look At + Keep distance for Mars, Continue sim and watch them orbit
+		- Move back a bit
+	3. Pause and go near Earth and its moon
+		- Turn off wireframe and see Earth's moon orbit
+		- Set Look At Earth, Continue sim and watch them orbit
+		- Move back a bit
+	4. What does the Sun do? How does does the Sun move (mostly influence of Jupiter)
+		- Pause sim, Go Near Sun
+		- Back up a bit, enable path tracing for Sun
+		- Speed sim
+		- This oscillation is like largely due to influence of Juipter
+		- Watching this motion from far away reveals the Sun has planets
+	5. What happens if the Sun goes away?
+		- Look at origin and back up till full solar system available
+		- Exclude sun
+		- Watch it all disperse
+			- Barycenter tends to follow Juipter
+			- Mercury is gone!
+			- See Moon stays with Earth
+			- Everything drifts away
 - What if Sun
 	- Got more massive
 	- Went away
-		- See Moon stays with Earth
+
 - Massive body approaches perpendicular to the plane
 - Primordial BH approaches system (like in Three Body Problem)
 	- 1 PBH approaching plane, shallow angle.jsonjjkjkj

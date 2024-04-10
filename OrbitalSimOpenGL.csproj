@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <None Include="C:\Users\Robert\AppData\Local\OrbitalSimOpenGL\InitJPL_Bodies.csv" Link="InitJPL_Bodies.csv" />
+    <None Include="C:\Users\rober\OneDrive\Desktop\Notes.txt" Link="Notes.txt" />
   </ItemGroup>
 
   <ItemGroup>

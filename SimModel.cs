@@ -27,7 +27,7 @@ namespace OrbitalSimOpenGL
         private Double GravConstantSetting { get; set; } = 0D; // Grav Constant starts unmodified
         public String? AppDataFolder { get; set; }
 
-        private Double _IterationSeconds, _IterationSecondsSquared;
+        private Double _IterationSeconds;
         public Double IterationSeconds  // Each frame iteration represents this many seconds of model simulation
         {
             get
@@ -37,7 +37,6 @@ namespace OrbitalSimOpenGL
             set
             {
                 _IterationSeconds = value;
-                _IterationSecondsSquared = value * value; // For computational efficieny deeper down
             }
         }
         public int TimeCompression { get; set; } = 1; // Number of times to iterate per frame
@@ -191,7 +190,7 @@ namespace OrbitalSimOpenGL
                 for (int i = 0; i < TimeCompression; i++)
                 {
                     Double seconds = IterationSeconds;
-                    NextPosition?.IterateOnce(ref seconds, _IterationSecondsSquared);
+                    NextPosition?.IterateOnce(ref seconds);
 
                     // Closest approach and collision detection
                     CollisionDetector?.Detect(PrevClosestApproachDistSquared, out _ClosestApproachDistSquared, ref _ClosestApproachBodiesList);
