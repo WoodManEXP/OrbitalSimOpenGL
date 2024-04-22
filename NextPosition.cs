@@ -119,7 +119,7 @@ namespace OrbitalSimOpenGL
                 );
 #endif
 
-            if (minAngleCos > CosThreshold) ; // Most common case
+            if (true/*minAngleCos > CosThreshold*/) ; // Most common case
             else
             if (minAngleCos == -1D)// 180 degrees
                 // The 180/degenerate case. Bodies are approaching one another along the same vector
@@ -192,6 +192,9 @@ namespace OrbitalSimOpenGL
                 forceVector = SavedVectorSum[bodyNum] = LastVectorSum[bodyNum];
                 SumForceVectors(bodyNum, ref LastVectorSum[bodyNum]); // Sum of FVs acting upon this body
 
+                // Perhaps change this to check for parallel but opposite FV's.
+                // Should be less computation.
+                //
                 Double angleCos = CalculateAngleCos(in LastVectorSum[bodyNum], in forceVector);
                 minAngleCos = Math.Min(minAngleCos, angleCos);
             }
