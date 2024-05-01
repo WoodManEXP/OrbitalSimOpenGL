@@ -188,7 +188,9 @@ namespace OrbitalSimOpenGL
                             if (!closestApproachBodies.Contains(bH))
                                 closestApproachBodies.Add(bH);
                         }
-                        approachDistSquared = lenSquared - radiSquared; // Distance between surfaces
+
+                        // Distance between surfaces, or 0 in collision case.
+                        approachDistSquared = Math.Max(0D, lenSquared - radiSquared);
                     }
                 }
 
