@@ -10,7 +10,7 @@ using System.Windows.Navigation;
 namespace OrbitalSimOpenGL
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for OrbitalSimControlWindow.xaml
     /// </summary>
     public partial class OrbitalSimControlWindow : Window
     {

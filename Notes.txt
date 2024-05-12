@@ -92,6 +92,7 @@ SimBody
 - Stats showing for removed Body
 - *********  LookAt sets body tracked in status area (done)
 - Pause then Continue unchecks tracing (done)
+- Reset did not restore ""Body mods" list entries that had been combined from collision
 
 Examples
 - Stable system - but "The Sun"
@@ -147,10 +148,11 @@ Examples
 
 - Massive body approaches perpendicular to the plane
 - Primordial BH approaches system (like in Three Body Problem)
-	- 1 PBH approaching plane, shallow angle.jsonjjkjkj
+	- 1 PBH approaching plane, shallow angle.json
 - Grav constant changes (with Star Trek Q clip)
 - Only Sun and Jupier in system
 - What if Jupiter
 	- Went away
 	- Got more massive
 - What happens to moon if Earth goes away
+- Apophis closest approach to Earth and Moon

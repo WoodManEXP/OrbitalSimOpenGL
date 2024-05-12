@@ -60,8 +60,8 @@ namespace OrbitalSimOpenGL
         private Color4 _BodyColor;
         Color4 BodyColor { get { return _BodyColor; } set { _BodyColor = value; } }
         public bool ExcludeFromSim { get; set; } = false; // Body is to be or not be excluded from the sim
+        public bool RecordApproaches { get; set; } = false; // ApproachDistances monitors this
         private PathTracer? PathTracer { get; set; } = null;
-        private Highlighter? Highlighter { get; set; }
 
         private Double _MassMultiplier = 1D;
         public Double MassMultiplier
