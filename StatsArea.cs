@@ -11,9 +11,9 @@ using System.Windows.Media;
 namespace OrbitalSimOpenGL
 {
     /// <summary>
-    /// Handles stats info display on OrbitalSimWindow
+    /// Handles stats area info display on OrbitalSimWindow
     /// </summary>
-    internal class Stats
+    internal class StatsArea
     {
         #region Properties
         OrbitalSimWindow OrbitalSimWindow { get; set; }
@@ -29,7 +29,7 @@ namespace OrbitalSimOpenGL
         private Double ClosestApproachDistSquared { get; set; } = Double.MaxValue;
         #endregion
 
-        public Stats(OrbitalSimWindow orbitalSimWindow, SimModel simModel, SimCamera simCamera)
+        public StatsArea(OrbitalSimWindow orbitalSimWindow, SimModel simModel, SimCamera simCamera)
         {
             OrbitalSimWindow = orbitalSimWindow;
             SimModel = simModel;

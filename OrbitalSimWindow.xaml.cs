@@ -32,7 +32,7 @@ namespace OrbitalSimOpenGL
         /// </summary>
         private static OrbitalSimWindow? ThisOrbitalSimWindow { get; set; }
 
-        private Stats? Stats { get; set; }
+        private StatsArea? StatsArea { get; set; }
         public CommandControlWindow CommandControlWindow { get; set; }
         #endregion
 
@@ -100,7 +100,7 @@ namespace OrbitalSimOpenGL
                         OpenTkControl.ActualWidth, OpenTkControl.ActualHeight);
 
             SimModel = SimCamera.SimModel = new(this);
-            Stats = new(this, SimModel, SimCamera);
+            StatsArea = new(this, SimModel, SimCamera);
         }
 
         #region Frame rendering
@@ -156,7 +156,7 @@ namespace OrbitalSimOpenGL
                 SimCamera.Render(); // In case camera needs to render (e.g. recticle)
             }
 
-            Stats.Render(timeSpan, frameRateMS);
+            StatsArea.Render(timeSpan, frameRateMS);
         }
         #endregion
 
@@ -421,7 +421,7 @@ namespace OrbitalSimOpenGL
 
             SimModel.ResetScene(EphemerisBodyList);
 
-            Stats.Reset();
+            StatsArea.Reset();
         }
         #endregion
 
