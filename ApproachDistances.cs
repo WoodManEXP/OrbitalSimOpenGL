@@ -12,15 +12,22 @@ namespace OrbitalSimOpenGL
     internal class ApproachDistances
     {
 
-        private Double[] CApproach { get; set; } // Closest approach, km
-        private Double[] FApproach { get; set; } // Furthest approach, km
-        private int NumBodies { get; set; }
-        private SparseArray SumOfIntegers { get; set; }
+        private struct ApproachElement
+        {
+            public Double CDist { get; set; }       // Closest approach, km
+            public Double CSeconds { get; set; }    // Timestamp for closest approach
+            public Double FDist { get; set; }       // Furthest approach, km
+            public Double FSeconds { get; set; }    // Timestamp for closest approach
+        }
 
-        public ApproachDistances(int numBodies, SparseArray sumOfIntegers)
+        private ApproachElement[] Approach { get; set; }
+        private int NumBodies { get; set; }
+        private SparseArray SparseArray { get; set; }
+
+        public ApproachDistances(int numBodies, SparseArray sparseArray)
         {
             NumBodies = numBodies;
-            SumOfIntegers = sumOfIntegers;
+            SparseArray = sparseArray;
 
             // Construct the Vectors lookup table/array.
             // Could be constructed as a NxN matrix, but the matrix is symmetrical and
@@ -28,24 +35,23 @@ namespace OrbitalSimOpenGL
             // function to generate indices into the array. As model size increases
             // this is nice memory/space savings.
             // Number of entries needed is (NumBodies - 1) * NumBodies / 2
-            CApproach = new Double[(NumBodies - 1) * NumBodies / 2];
-            FApproach = new Double[(NumBodies - 1) * NumBodies / 2];
-            //Reset();
+            Approach = new ApproachElement[SparseArray.NumSlots];
+            Reset();
 
         }
 
         /// <summary>
-        /// Record closest and furtherest approach values between two bodies
+        /// Record closest and furthest approach values between two bodies
         /// </summary>
         /// <param name="lBody"></param>
         /// <param name="hBody"></param>
         /// <param name="approachDist"></param>
-        public void SetApproach(int lBody, int hBody, Double approachDist)
+        public void SetApproach(int lBody, int hBody, Double approachDist, Double seconds)
         {
             if (lBody == hBody)
                 return;
             if (lBody > hBody)
-                (lBody, hBody) = (hBody, lBody); // Tuple swap
+                (lBody, hBody) = (hBody, lBody); // Tuple swap. Could have used XOR swap. But this is the C# way
             /*
                 _ = hBody ^= lBody ^= hBody;
 
@@ -56,7 +62,7 @@ namespace OrbitalSimOpenGL
 
 
         }
-#if false
+
         /// <summary>
         /// Reset to initial state
         /// </summary>
@@ -72,13 +78,14 @@ namespace OrbitalSimOpenGL
 
                     // Index of this bL, bH combo into the Vectors table/array.
                     // Same algorithm as used in MassMass.
-                    int i = ValuesIndex(bL, bH);
+                    int i = SparseArray.ValuesIndex(bL, bH);
 
-                    // Each force vector's length is the Newtons of force the pair of bodies exert on one another.
-                    ForceVectors[i] *= newtons;
+                    // Set initial values
+                    Approach[i].CDist = Double.MaxValue;
+                    Approach[i].FDist = Double.MinValue;
+                    Approach[i].CSeconds = Approach[i].FSeconds = 0D;
                 }
             }
         }
-#endif
     }
 }

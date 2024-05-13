@@ -7,13 +7,15 @@ using System.Threading.Tasks;
 namespace OrbitalSimOpenGL
 {
     /// <summary>
-    /// Lookup table so this is not calculated over and over
+    /// Lookup table so this is not calculated over and over.
+    /// Plus other useful methods for dealing with the NxN sparse matrix.
     /// </summary>
     internal class SparseArray
     {
         #region Properties
         private readonly int NumIntegers;
         private readonly int[] Sum;
+        public int NumSlots { get; private set; }
 
         public int this[int index]
         {
@@ -30,6 +32,9 @@ namespace OrbitalSimOpenGL
             Sum[0] = 0;
             for (int i = 1; i < NumIntegers; i++)
                 Sum[i] = i + Sum[i - 1];
+
+            // Number of slots needed in an array to represent the sparse matrix
+            NumSlots = (NumIntegers - 1) * NumIntegers / 2;
         }
 
         /// <summary>

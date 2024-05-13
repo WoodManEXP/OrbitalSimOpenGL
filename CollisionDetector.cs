@@ -30,6 +30,7 @@ namespace OrbitalSimOpenGL
         private SimBodyList? SimBodyList { get; set; }
         internal MassMass? MassMass { get; set; }
         internal Barycenter? Barycenter { get; set; }
+        internal ApproachDistances? ApproachDistances { get; set; }
 
         private List<int> _CollisionList = new(3);
         private List<int> CollisionList { get { return _CollisionList; } }
@@ -42,12 +43,13 @@ namespace OrbitalSimOpenGL
         internal bool DetectCollisions = true;
         #endregion
 
-        public CollisionDetector(SimModel simModel)
+        public CollisionDetector(SimModel simModel, ApproachDistances approachDistances)
         {
             SimModel = simModel;
             MassMass = SimModel.MassMass;
             Barycenter = SimModel.Barycenter;
             SimBodyList = SimModel.SimBodyList;
+            ApproachDistances = approachDistances;
         }
 
         /// <summary>

@@ -131,12 +131,13 @@ namespace OrbitalSimOpenGL
 
             SimBodyList = new SimBodyList(Scale, ephemerisBodyList, AppDataFolder);
 
-            Barycenter = new(Scale, SimBodyList);
-            MassMass = new(SimBodyList);
             SparseArray = new(SimBodyList.BodyList.Count);
 
-            CollisionDetector = new(this);
+            Barycenter = new(Scale, SimBodyList);
+            MassMass = new(SimBodyList, SparseArray);
+
             ApproachDistances = new(SimBodyList.BodyList.Count, SparseArray);
+            CollisionDetector = new(this, ApproachDistances);
 
             NextPosition = new(SimBodyList, SparseArray, MassMass, GravConstantSetting);
 

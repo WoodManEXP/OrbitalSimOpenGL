@@ -76,7 +76,7 @@ namespace OrbitalSimOpenGL
             // function to generate indices into the array. As model size increases
             // this is nice memory/space savings.
             // Number of entries needed is (NumBodies - 1) * NumBodies / 2
-            ForceVectors = new Vector3d[(NumBodies - 1) * NumBodies / 2];
+            ForceVectors = new Vector3d[SparseArray.NumSlots/*(NumBodies - 1) * NumBodies / 2*/];
 
             // Keep an iteration's beginning valuse here in case interval must be subdivided
             // (case of FV anle change exceeding RadianThreshold)
