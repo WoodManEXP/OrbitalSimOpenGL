@@ -223,6 +223,10 @@ namespace OrbitalSimOpenGL
                         SimModel.DetectCollisions((bool)args[1]);
                         break;
 
+                    case CommandSimWindow.GenericCommands.ApproachDistance:
+                        SimModel.ApproachDistance((bool)args[1], (String)args[2]);
+                        break;
+
                     default:
                         break;
                 }

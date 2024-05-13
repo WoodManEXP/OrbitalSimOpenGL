@@ -123,14 +123,15 @@
                 <Label x:Name="GravConstantLabel" Content="Std"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="28" Canvas.Left="153" Canvas.Top="3"/>
             </Canvas>
         </GroupBox>
-        <GroupBox Height="174" Header="Body mods" Width="596" Canvas.Left="7" Canvas.Top="358" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <Canvas>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Width="538">
-                    <Label Content="Body" ToolTip="Body name" Margin="10,0,0,0" Width="86" FontWeight="Bold"/>
-                    <Label Content="Exclude" ToolTip="Exclude from sim" Margin="0,0,0,0" Width="53" FontWeight="Bold"/>
-                    <Label Content="Trace" ToolTip="Exclude from sim" Margin="0,0,0,0" Width="103" FontWeight="Bold"/>
-                    <Label Content="Mass" ToolTip="Alter mass" Margin="0,0,0,0" Width="169" FontWeight="Bold"/>
-                    <Label Content="Velocity" ToolTip="Alter velocity" Margin="0,0,0,0" FontWeight="Bold"/>
+        <GroupBox Height="174" Header="Body mods/info" Width="596" Canvas.Left="7" Canvas.Top="358" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Canvas Margin="0,0,-2,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Width="574">
+                    <Label Content="Body" ToolTip="Body name" Margin="0,0,0,0" Width="86" FontWeight="Bold"/>
+                    <Label Content="Exclude" ToolTip="Exclude from sim" Margin="0,0,0,0" Width="53" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                    <Label Content="Trace" ToolTip="Trace body's path" Margin="0,0,0,0" Width="44" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                    <Label Content="Approach" ToolTip="Display closest and furthest approach" Margin="0,0,0,0" Width="64" FontWeight="Bold"/>
+                    <Label Content="Mass" ToolTip="Alter mass" Margin="0,0,0,0" Width="150" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+                    <Label Content="Velocity" ToolTip="Alter velocity" FontWeight="Bold" Width="150" HorizontalContentAlignment="Center"/>
                 </StackPanel>
                 <ListBox x:Name="BodyModsListBox" BorderThickness="0" VerticalAlignment="Center" HorizontalAlignment="Center" Height="125" Canvas.Top="26">
                 </ListBox>

@@ -11,12 +11,11 @@ namespace OrbitalSimOpenGL
     /// </summary>
     internal class ApproachDistances
     {
-
         private struct ApproachElement
         {
-            public Double CDist { get; set; }       // Closest approach, km
+            public Double CDist { get; set; }       // Closest approach, km-squared
             public Double CSeconds { get; set; }    // Timestamp for closest approach
-            public Double FDist { get; set; }       // Furthest approach, km
+            public Double FDist { get; set; }       // Furthest approach, km-squared
             public Double FSeconds { get; set; }    // Timestamp for closest approach
         }
 
@@ -45,8 +44,8 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="lBody"></param>
         /// <param name="hBody"></param>
-        /// <param name="approachDist"></param>
-        public void SetApproach(int lBody, int hBody, Double approachDist, Double seconds)
+        /// <param name="distanceSquared"></param>
+        public void SetApproach(int lBody, int hBody, Double distanceSquared, Double seconds)
         {
             if (lBody == hBody)
                 return;
@@ -59,8 +58,21 @@ namespace OrbitalSimOpenGL
                int a = 4, b = 6;
                 a ^= b ^= a ^= b;
             */
+            int i = SparseArray.ValuesIndex(lBody, hBody);
+            
+            // Closest approach ?
+            if (distanceSquared < Approach[i].CDist)
+            {
+                Approach[i].CDist = distanceSquared;
+                Approach[i].CSeconds = seconds;
+            }
 
-
+            // Furthest approach ?
+            if (distanceSquared > Approach[i].FDist)
+            {
+                Approach[i].FDist = distanceSquared;
+                Approach[i].FSeconds = seconds;
+            }
         }
 
         /// <summary>

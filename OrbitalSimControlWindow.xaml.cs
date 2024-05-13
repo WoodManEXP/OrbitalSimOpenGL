@@ -806,36 +806,58 @@ namespace OrbitalSimOpenGL
             {
                 itemIndex++;
 
+                CheckBox checkBox;
+                Slider slider;
+                Label label;
+
                 ListBoxItem listBoxItem = new() { Uid = "LBI" + itemIndex.ToString() };
 
                 StackPanel stackPanel = new() { VerticalAlignment = VerticalAlignment.Center, Orientation = Orientation.Horizontal };
-                Label label0 = new() { Content = b.Name, Uid = "Entry" + itemIndex.ToString(), Width = 102, Margin = new(0, 0, 5, 0) };
 
-                CheckBox excludeCheckBox = new() { Uid = "Ex" +  b.Name, VerticalAlignment = VerticalAlignment.Center, Width = 33, Margin = new(0, 0, 10, 0), ToolTip = "Exclude " + b.Name + " from sim" };
-                excludeCheckBox.Click += new(BodyModsExcludeCheckbox);
+                Label bodyLabel = new() { Content = b.Name, Uid = "Entry" + itemIndex.ToString(), Width = 86, VerticalAlignment = VerticalAlignment.Center };
 
-                CheckBox traceCheckBox = new() { Uid = "Tr" + b.Name, VerticalAlignment = VerticalAlignment.Center, Width = 31, Margin = new(0, 0, 10, 0), ToolTip = "Trace " + b.Name + "'s path" };
-                traceCheckBox.Click += new(BodyModsTraceCheckbox);
+                // Exclude CB
+                checkBox = new() { Uid = "Ex" + b.Name, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center, ToolTip = "Exclude " + b.Name + " from sim" };
+                checkBox.Click += new(BodyModsExcludeCheckbox);
+                StackPanel excludeSP = new() { Width = 53 };
+                excludeSP.Children.Add(checkBox);
 
-                Slider massSlider = new() { Uid = b.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Alter " + b.Name + " +'s mass", Minimum = -9, Maximum = 9, Value = 0, Width = 145 };
-                massSlider.LostMouseCapture += new(BodyModsMassSliderLostMouseCapture);
-                massSlider.ValueChanged += new(BodyModsMassSliderChanged);
+                // Trace CB
+                checkBox = new() { Uid = "Tr" + b.Name, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center, ToolTip = "Trace " + b.Name + "'s path" };
+                checkBox.Click += new(BodyModsTraceCheckbox);
+                StackPanel traceSP = new() { Width = 44 };
+                traceSP.Children.Add(checkBox);
 
-                Label label1 = new() { Uid = b.Name + ":L1", Content = "Std", HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Width = 28, Margin = new(2, 0, 5, 0) };
+                // Approach CB
+                checkBox = new() { Uid = "Ap" + b.Name, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center, ToolTip = "Display approach info for " + b.Name };
+                checkBox.Click += new(BodyModsApproachCheckbox);
+                StackPanel approachSP = new() { Width = 64 };
+                approachSP.Children.Add(checkBox);
 
-                Slider velSlider = new() { Uid = b.Name, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Alter " + b.Name + "'s velocity", Minimum = -9, Maximum = 9, Value = 0, Width = 145 };
-                velSlider.LostMouseCapture += new(BodyModsVelocitySliderLostMouseCapture);
-                velSlider.ValueChanged += new(BodyModsVelocitySliderChanged);
+                // Mass slider
+                slider = new() { Uid = b.Name, Width = 120, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Alter " + b.Name + " +'s mass", Minimum = -9, Maximum = 9, Value = 0 };
+                slider.LostMouseCapture += new(BodyModsMassSliderLostMouseCapture);
+                slider.ValueChanged += new(BodyModsMassSliderChanged);
+                label = new() { Uid = b.Name + ":L1", Content = "Std", VerticalAlignment = VerticalAlignment.Center };
+                StackPanel massSP = new() { Width = 150, Orientation=Orientation.Horizontal };
+                massSP.Children.Add(slider);
+                massSP.Children.Add(label);
 
-                Label label2 = new() { Uid = b.Name + ":L2", Content = "Std", HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Center, Width = 28, Margin = new(2, 0, 5, 0) };
+                // Velocity slider
+                slider = new() { Uid = b.Name, Width = 120, VerticalAlignment = VerticalAlignment.Center, ToolTip = "Alter " + b.Name + "'s velocity", Minimum = -9, Maximum = 9, Value = 0 };
+                slider.LostMouseCapture += new(BodyModsVelocitySliderLostMouseCapture);
+                slider.ValueChanged += new(BodyModsVelocitySliderChanged);
+                label = new() { Uid = b.Name + ":L2", Content = "Std", VerticalAlignment = VerticalAlignment.Center };
+                StackPanel velocitySP = new() { Width = 150, Orientation = Orientation.Horizontal };
+                velocitySP.Children.Add(slider);
+                velocitySP.Children.Add(label);
 
-                stackPanel.Children.Add(label0);
-                stackPanel.Children.Add(excludeCheckBox);
-                stackPanel.Children.Add(traceCheckBox);
-                stackPanel.Children.Add(massSlider);
-                stackPanel.Children.Add(label1);
-                stackPanel.Children.Add(velSlider);
-                stackPanel.Children.Add(label2);
+                stackPanel.Children.Add(bodyLabel);
+                stackPanel.Children.Add(excludeSP);
+                stackPanel.Children.Add(traceSP);
+                stackPanel.Children.Add(approachSP);
+                stackPanel.Children.Add(massSP);
+                stackPanel.Children.Add(velocitySP);
 
                 listBoxItem.Content = stackPanel;
 
@@ -970,6 +992,21 @@ namespace OrbitalSimOpenGL
 
             // Send over name of body to turn on/off tracing
             CommandSimWindow?.TracePath(checkBox.Uid.Substring(2), checkBox.IsChecked.Value); // Substring removes the Tr prefix
+        }
+
+        /// <summary>
+        /// (Dis)able path tracing
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BodyModsApproachCheckbox(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = (CheckBox)sender;
+            if (checkBox is null)
+                return;
+
+            // Send over name of body to turn on/off tracing
+            CommandSimWindow?.ApproachDist(checkBox.Uid.Substring(2), checkBox.IsChecked.Value); // Substring removes the Ap prefix
         }
     }
     #endregion

@@ -62,7 +62,7 @@ namespace OrbitalSimOpenGL
         /// <param name="closestApproachBodies">ref, to List of bodies involved in closest approach</param>
         /// <remrks>
         /// </remrks>
-        internal void Detect(Double onlyIfLessThanOrEqualToThisD2, out Double approachDistSquared, ref List<int> closestApproachBodies)
+        internal void Detect(Double seconds, Double onlyIfLessThanOrEqualToThisD2, out Double approachDistSquared, ref List<int> closestApproachBodies)
         {
 
             int numBodies = SimBodyList.BodyList.Count;
@@ -97,15 +97,6 @@ namespace OrbitalSimOpenGL
                     d = lBody.MiddleOfPath.X - hBody.MiddleOfPath.X; distSquared = d * d;
                     d = lBody.MiddleOfPath.Y - hBody.MiddleOfPath.Y; distSquared += d * d;
                     d = lBody.MiddleOfPath.Z - hBody.MiddleOfPath.Z; distSquared += d * d;
-
-                    // Could this possibly be a collision?
-                    bool possibleCollision = (distSquared <= (lBody.LastPathRadiusSquared + hBody.LastPathRadiusSquared));
-
-                    // Could this possibly represent a new closest approach?
-                    bool possibleClosestApproach = (distSquared <= onlyIfLessThanOrEqualToThisD2);
-
-                    if (!possibleCollision && !possibleClosestApproach)
-                        continue; // No possible collision or closest approach, no need to continue calculations
 
                     // Closest approach of the two bodies along their most recent movement vectors.
                     // DeltaS - starting positions, DeltaE - ending positions
@@ -150,27 +141,29 @@ namespace OrbitalSimOpenGL
                     // If (k < 0 or k > 1) the closest approach is beyond the current travel vectors. This test ignores fact that bodies
                     // have a radius > 0, so bodies could have begun a collision.
                     // Super low probability event and will anyway be picked up on next iteration.
-                    if (true/*DetectCollisions*/)
-                        if (0D <= k && k <= 1D && lenSquared < radiSquared)
-                        {
-                            // Collision
+                    if (0D <= k && k <= 1D && lenSquared < radiSquared)
+                    {
+                        // Collision
 #if true
                         System.Diagnostics.Debug.WriteLine("\nCollisionDetector:DetectCollision, ** Collision ** "
                             + lBody.Name + ", " + hBody.Name
                             + "\n"
                             );
 #endif
-                            // Two colliding
-                            if (DetectCollisions)
-                            {
-                                if (!CollisionList.Contains(bL))
-                                    CollisionList.Add(bL);
-                                if (!CollisionList.Contains(bH))
-                                    CollisionList.Add(bH);
-                            }
-
-                            lenSquared = 0D; // This is definitely a closest aproach
+                        // Two colliding
+                        if (DetectCollisions)
+                        {
+                            if (!CollisionList.Contains(bL))
+                                CollisionList.Add(bL);
+                            if (!CollisionList.Contains(bH))
+                                CollisionList.Add(bH);
                         }
+
+                        lenSquared = 0D; // This is definitely a closest aproach
+                    }
+
+                    // Report approach distance to ApproachDistance
+                    ApproachDistances?.SetApproach(bL, bH, lenSquared, seconds);
 
                     // Collect the 2+ bodies that have lowest (possibly same) closest approach
                     if (lenSquared <= approachDistSquared && lenSquared <= onlyIfLessThanOrEqualToThisD2)

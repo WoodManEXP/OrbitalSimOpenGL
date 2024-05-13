@@ -60,7 +60,7 @@ namespace OrbitalSimOpenGL
         private Color4 _BodyColor;
         Color4 BodyColor { get { return _BodyColor; } set { _BodyColor = value; } }
         public bool ExcludeFromSim { get; set; } = false; // Body is to be or not be excluded from the sim
-        public bool RecordApproaches { get; set; } = false; // ApproachDistances monitors this
+        public bool DisplayApproaches { get; set; } = false; // Stats monitors this
         private PathTracer? PathTracer { get; set; } = null;
 
         private Double _MassMultiplier = 1D;
@@ -404,6 +404,18 @@ namespace OrbitalSimOpenGL
                 PathTracer ??= new(Scale); // Start a PathTracer for this body, if not already started (the null-coalescing operators)
             else
                 PathTracer = null; // Let go the resources
+        }
+
+        /// <summary>
+        /// ApproachDistance on or off
+        /// </summary>
+        /// <param name="onOff"></param>
+        /// <remarks>
+        /// If turned off path history for the body is lost.
+        /// </remarks>
+        internal void ApproachDistance(bool onOff)
+        {
+            DisplayApproaches = onOff;
         }
     }
 }

@@ -27,6 +27,7 @@ namespace OrbitalSimOpenGL
           , VelocityMultiplier
           , ResetSim
           , DetectCollisions
+          , ApproachDistance
         };
         #endregion
 
@@ -39,6 +40,19 @@ namespace OrbitalSimOpenGL
             : base(dispatcher)
         {
         }
+
+        #region ApproachDist
+        /// <summary>
+        /// Have a body turn on/off retain and trace its travel path
+        /// </summary>
+        /// <param name="show"></param>
+        /// <param name="bodyName"></param>
+        public void ApproachDist(String bodyName, bool show)
+        {
+            object[] args = { CommandSimWindow.GenericCommands.ApproachDistance, show, bodyName };
+            GenericCommand(args);
+        }
+        #endregion
 
         #region TracePath
         /// <summary>

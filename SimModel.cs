@@ -199,7 +199,7 @@ namespace OrbitalSimOpenGL
                     NextPosition?.IterateOnce(ref seconds);
 
                     // Closest approach and collision detection
-                    CollisionDetector?.Detect(PrevClosestApproachDistSquared, out _ClosestApproachDistSquared, ref _ClosestApproachBodiesList);
+                    CollisionDetector?.Detect(seconds, PrevClosestApproachDistSquared, out _ClosestApproachDistSquared, ref _ClosestApproachBodiesList);
 
                     // Keep PrevClosestApproachDistSquared around to supply CollisionDetector. Saves work.
                     PrevClosestApproachDistSquared = ClosestApproachDistSquared;
@@ -323,5 +323,18 @@ namespace OrbitalSimOpenGL
             int sBI = SimBodyList.GetIndex(bodyName);
             SimBodyList.BodyList[sBI].TracePath(onOff);
         }
+
+        internal void ApproachDistance(bool onOff, String bodyName)
+        {
+            if (!SceneReady)
+                return;
+
+            if (SimBodyList is null) // JIC
+                return;
+
+            int sBI = SimBodyList.GetIndex(bodyName);
+            SimBodyList.BodyList[sBI].ApproachDistance(onOff);
+        }
+
     }
 }
