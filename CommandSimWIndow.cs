@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Threading;
+using static OrbitalSimOpenGL.CommandStatuslWindow;
 using static OrbitalSimOpenGL.OrbitalSimWindow;
 
 namespace OrbitalSimOpenGL

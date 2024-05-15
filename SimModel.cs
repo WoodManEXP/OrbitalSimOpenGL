@@ -49,7 +49,7 @@ namespace OrbitalSimOpenGL
         internal MassMass? MassMass { get; set; }
         internal SparseArray? SparseArray { get; set; }
         private CollisionDetector? CollisionDetector { get; set; }
-        private ApproachDistances? ApproachDistances { get; set; }
+        internal ApproachDistances? ApproachDistances { get; set; }
         private Double PrevClosestApproachDistSquared { get; set; } = Double.MaxValue;
 
         // Closest approach between any two bodies captured here, for each iteration

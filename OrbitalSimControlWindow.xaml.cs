@@ -25,13 +25,14 @@ namespace OrbitalSimOpenGL
         private EphemerisBodyList? _XtraEphemerisBodyList = null;
         public EphemerisBodyList XtraEphemerisBodyList { get => _XtraEphemerisBodyList; set { _XtraEphemerisBodyList = value; } }
         public OrbitalSimWindow? OrbitalSimWindow { get; set; }
+        public OrbitalSimStatusWindow OrbitalSimStatusWindow { get; set; }
         private Single OrbitCameraDegrees { get; set; } // Current value on OrbitDegreesSlider
         private Single LookTiltCameraDegrees { get; set; } // Current value on LookTiltDegreesSlider
         private String AppDataFolder { get; set; }
         #endregion
 
         private CommandSimWindow? CommandSimWindow { get; set; } // For sending commands to SimWindow
-        public CommandControlWindow? OrbitalControlCmds { get; set; }
+        public CommandControlWindow? CommandControlWindow { get; set; }
 
         public OrbitalSimControlWindow()
         {
@@ -70,22 +71,25 @@ namespace OrbitalSimOpenGL
             {
                 EphemerisBodyList = EphemerisReader.ReadEphemerisFile(savedSimBodiesPath);
             }
+
+            // Receives commands for control window
+            CommandControlWindow = new(Dispatcher);
+
+            // Register command delegate(s)
+            CommandControlWindow.GenericRegister(GenericCommand);
         }
 
         // Window loaded
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // Receives commands for control window
-            OrbitalControlCmds = new CommandControlWindow(Dispatcher);
 
-            // Register command delegate(s)
-            OrbitalControlCmds.GenericRegister(GenericCommand);
+            // Create sim status window
+            OrbitalSimStatusWindow = new();
 
             // Create the sim window
-            //var orbitalSimWindow = new OrbitalSimWindow();
-            OrbitalSimWindow = new OrbitalSimWindow(OrbitalControlCmds);
+            OrbitalSimWindow = new(CommandControlWindow, OrbitalSimStatusWindow.CommandStatuslWindow);
 
-            CommandSimWindow = OrbitalSimWindow.OrbitalSimCmds;
+            CommandSimWindow = OrbitalSimWindow.CommandSimWindow;
 
             // Set move camera scale control initial
             MoveScaleSlider.Minimum = 0;
@@ -108,7 +112,8 @@ namespace OrbitalSimOpenGL
 
             TimeCompressionLabel.Content = "1 x";
 
-            // Show sim window
+            // Show sim windows
+            OrbitalSimStatusWindow.Show();
             OrbitalSimWindow.Show();
 
             //System.Diagnostics.Debug.WriteLine("OrbitalSimControlWindow: Window_Loaded ");

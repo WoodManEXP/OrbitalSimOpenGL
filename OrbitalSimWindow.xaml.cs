@@ -3,9 +3,11 @@ using OpenTK.Wpf;
 using System;
 using System.Configuration;
 using System.IO;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using static OrbitalSimOpenGL.CommandStatuslWindow;
 using static OrbitalSimOpenGL.SimCamera;
 
 namespace OrbitalSimOpenGL
@@ -16,7 +18,7 @@ namespace OrbitalSimOpenGL
     public partial class OrbitalSimWindow : Window
     {
         #region Properties
-        public CommandSimWindow? OrbitalSimCmds { get; set; }
+        public CommandSimWindow? CommandSimWindow { get; set; }
         private EphemerisBodyList? EphemerisBodyList { get; set; }
         public SimCamera? SimCamera { get; set; }
         private SimModel? SimModel { get; set; }
@@ -34,12 +36,14 @@ namespace OrbitalSimOpenGL
 
         private StatsArea? StatsArea { get; set; }
         public CommandControlWindow CommandControlWindow { get; set; }
+        public CommandStatuslWindow CommandStatusWindow { get; set; }
         #endregion
 
-        public OrbitalSimWindow(CommandControlWindow commandControlWindow)
+        public OrbitalSimWindow(CommandControlWindow commandControlWindow, CommandStatuslWindow commandStatusWindow)
         {
-            // In order to send commands/info to the controller window
+            // For sending commands/info to the controller and status windows
             CommandControlWindow = commandControlWindow;
+            CommandStatusWindow = commandStatusWindow;
 
             ThisOrbitalSimWindow = this; // In order to find this in the static method(s)
 
@@ -54,32 +58,36 @@ namespace OrbitalSimOpenGL
             OpenTkControl.Start(settings);
 
             var assembly = System.Reflection.Assembly.GetAssembly(this.GetType());//Get the assembly object
-            var appName = assembly.GetName().Name;
+            var appName = assembly?.GetName().Name;
 
             string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             AppDataFolder = Path.Combine(localAppData, appName); // appDataFolder = "C:\\Users\\Robert\\AppData\\Local\\OrbitalSimOpenGL"
 
-            OrbitalSimCmds = new CommandSimWindow(Dispatcher);
+            CommandSimWindow = new(Dispatcher);
 
             // Register command delegates
-            OrbitalSimCmds.ScaleCameraRegister(ScaleCamera);
-            OrbitalSimCmds.MoveCameraRegister(MoveCamera);
-            OrbitalSimCmds.GoNearRegister(GoNear);
-            OrbitalSimCmds.LookCameraRegister(LookCamera);
-            OrbitalSimCmds.LookAtCameraRegister(LookAtCamera);
-            OrbitalSimCmds.TiltCameraRegister(TiltCamera);
-            OrbitalSimCmds.OrbitCameraRegister(OrbitCamera);
-            OrbitalSimCmds.OrbitAboutRegister(OrbitAbout);
+            CommandSimWindow.ScaleCameraRegister(ScaleCamera);
+            CommandSimWindow.MoveCameraRegister(MoveCamera);
+            CommandSimWindow.GoNearRegister(GoNear);
+            CommandSimWindow.LookCameraRegister(LookCamera);
+            CommandSimWindow.LookAtCameraRegister(LookAtCamera);
+            CommandSimWindow.TiltCameraRegister(TiltCamera);
+            CommandSimWindow.OrbitCameraRegister(OrbitCamera);
+            CommandSimWindow.OrbitAboutRegister(OrbitAbout);
 
-            OrbitalSimCmds.StartSimRegister(StartSim);
-            OrbitalSimCmds.PauseSimRegister(PauseSim);
+            CommandSimWindow.StartSimRegister(StartSim);
+            CommandSimWindow.PauseSimRegister(PauseSim);
 
-            OrbitalSimCmds.SimIterationRateRegister(IterationRate);
-            OrbitalSimCmds.SimTimeCompressionRegister(TimeCompression);
+            CommandSimWindow.SimIterationRateRegister(IterationRate);
+            CommandSimWindow.SimTimeCompressionRegister(TimeCompression);
 
-            OrbitalSimCmds.GenericRegister(GenericCommand);
+            CommandSimWindow.GenericRegister(GenericCommand);
         }
 
+        // Window loaded
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -106,6 +114,7 @@ namespace OrbitalSimOpenGL
         #region Frame rendering
         readonly IntMovingAverage FrameRateMovingAverage = new(50); // Moving average from last N calls
         int UpdateFrameLastMS = 0;
+        int EllapsedMS_A = 0;
 
         /// <summary>
         /// Rendering and hit-testing
@@ -135,6 +144,8 @@ namespace OrbitalSimOpenGL
 
             int ms = timeSpan.Milliseconds;
 
+            EllapsedMS_A += ms;
+
             if (0 == UpdateFrameLastMS)
             {
                 UpdateFrameLastMS = ms;
@@ -156,8 +167,50 @@ namespace OrbitalSimOpenGL
                 SimCamera.Render(); // In case camera needs to render (e.g. recticle)
             }
 
-            StatsArea.Render(timeSpan, frameRateMS);
+            StatsArea?.Render(timeSpan, frameRateMS);
+
+            // *** Send closest approach stats to Stats Windows ***
+            // Once every n real-time seconds
+            if (EllapsedMS_A >= 2000)
+            {
+                EllapsedMS_A = 0; // Reset
+                ClosestApproachStats();
+                //string jsonString = JsonSerializer.Serialize(SimModel.ApproachDistances);
+            }
+
+
         }
+        #endregion
+
+        #region ClosestApproach stats
+
+        /// <summary>
+        /// Prepare and send ClosestApproachStats to OrbitalSimStatusWindow
+        /// </summary>
+        private void ClosestApproachStats()
+        {
+
+            // Build up the approach information bloc to send to status window
+            int numBodies = SimModel.ApproachDistances.NumBodies;
+            String names = new(""), excludes = new("");
+
+            for (int i = 0; i < numBodies; i++)
+            {
+                if (i > 0)
+                {
+                    names += ",";
+                    excludes += ",";
+                }
+                names += SimModel.SimBodyList.BodyList[i].Name;
+                excludes += SimModel.SimBodyList.BodyList[i].ExcludeFromSim ? "1" : "0";
+            }
+
+            String approachElements = JsonSerializer.Serialize(SimModel.ApproachDistances.ApproachElements);
+
+            // Send info across thread boundary to Status Window (via event queue)
+            CommandStatusWindow.ApproachDist(approachElements, names, excludes);
+        }
+
         #endregion
 
         #region Commands
@@ -288,11 +341,6 @@ namespace OrbitalSimOpenGL
             Double scale = (Double)args[0];
             if (SimModel is not null)
                 SimModel.Scale.CamMoveAmt = (int)scale; // 0 .. 20
-        }
-
-        // Window loaded
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
         }
 
         // Move camera
