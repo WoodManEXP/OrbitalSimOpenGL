@@ -46,11 +46,11 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Have a body turn on/off retain and trace its travel path
         /// </summary>
-        /// <param name="show"></param>
-        /// <param name="bodyName"></param>
+        /// <param name="bodyName">Body name for which to show approach distances</param>
+        /// <param name="show">true/false</param>
         public void ApproachDist(String bodyName, bool show)
         {
-            object[] args = { CommandSimWindow.GenericCommands.ApproachDistance, show, bodyName };
+            object[] args = { CommandSimWindow.GenericCommands.ApproachDistance, bodyName, show };
             GenericCommand(args);
         }
         #endregion

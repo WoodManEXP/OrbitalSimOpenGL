@@ -62,6 +62,7 @@ namespace OrbitalSimOpenGL
         public List<int> ClosestApproachBodiesList { get { return _ClosestApproachBodiesList; } }
         public bool SimRunning { get; set; } = false;
         internal SimBody? ShowStatsForSB { get; set; } = null;
+        internal int NumApproachDistancesSet { get; set; } = 0;
 
         private bool _Wireframe;
         public bool Wireframe
@@ -137,6 +138,8 @@ namespace OrbitalSimOpenGL
             MassMass = new(SimBodyList, SparseArray);
 
             ApproachDistances = new(SimBodyList.BodyList.Count, SparseArray);
+            NumApproachDistancesSet = 0;
+
             CollisionDetector = new(this, ApproachDistances);
 
             NextPosition = new(SimBodyList, SparseArray, MassMass, GravConstantSetting);
@@ -321,10 +324,20 @@ namespace OrbitalSimOpenGL
                 return;
 
             int sBI = SimBodyList.GetIndex(bodyName);
-            SimBodyList.BodyList[sBI].TracePath(onOff);
+
+            if (-1 == sBI) // JIC
+                return;
+
+            SimBody sB = SimBodyList.BodyList[sBI];
+            sB.TracePath(onOff);
         }
 
-        internal void ApproachDistance(bool onOff, String bodyName)
+        /// <summary>
+        /// (Dis)able display of approach distance info for body
+        /// </summary>
+        /// <param name="bodyName"></param>
+        /// <param name="onOff"></param>
+        internal void DisplayApproachDistance(String bodyName, bool onOff)
         {
             if (!SceneReady)
                 return;
@@ -333,6 +346,25 @@ namespace OrbitalSimOpenGL
                 return;
 
             int sBI = SimBodyList.GetIndex(bodyName);
+
+            if (-1 == sBI) // JIC
+                return;
+
+            SimBody sB = SimBodyList.BodyList[sBI];
+
+            // Keep a count of number of bodies for which approach distances are curently being collected,
+            // as an optimization.
+            if (true == onOff)
+            {
+                if (!sB.DisplayApproaches)
+                    NumApproachDistancesSet = Math.Min(SimBodyList.BodyList.Count, NumApproachDistancesSet+1);
+            }
+            else
+            {
+                if (sB.DisplayApproaches)
+                    NumApproachDistancesSet = Math.Max(0, NumApproachDistancesSet - 1);
+            }
+
             SimBodyList.BodyList[sBI].ApproachDistance(onOff);
         }
 

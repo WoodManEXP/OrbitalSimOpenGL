@@ -57,9 +57,9 @@ namespace OrbitalSimOpenGL
             }
         }
 
-        internal void ApproachDistances(String approachElements, String names, String excludes)
+        internal void ApproachDistances(String approachElementsStr, String names, String excludes)
         {
-
+            ApproachElements approachElements = new(approachElementsStr);
         }
     }
 }

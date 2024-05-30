@@ -11,14 +11,17 @@ namespace OrbitalSimOpenGL
     /// </summary>
     internal class ApproachDistances
     {
+#if false
         internal struct ApproachElement
         {
             public Double CDist { get; set; }       // Closest approach, km-squared
             public Double CSeconds { get; set; }    // Timestamp for closest approach
             public Double FDist { get; set; }       // Furthest approach, km-squared
-            public Double FSeconds { get; set; }    // Timestamp for closest approach
+            public Double FSeconds { get; set; }    // Timestamp for furthest approach
         }
         internal ApproachElement[] ApproachElements { get; set; }
+#endif
+        internal ApproachElements ApproachElements { get; set; }
         internal int NumBodies { get; set; }
         private SparseArray SparseArray { get; set; }
 
@@ -33,9 +36,9 @@ namespace OrbitalSimOpenGL
             // function to generate indices into the array. As model size increases
             // this is nice memory/space savings.
             // Number of entries needed is (NumBodies - 1) * NumBodies / 2
-            ApproachElements = new ApproachElement[SparseArray.NumSlots];
-            Reset();
+            ApproachElements = new ApproachElements(SparseArray.NumSlots);
 
+            Reset();
         }
 
         /// <summary>
@@ -48,8 +51,7 @@ namespace OrbitalSimOpenGL
         {
             if (lBody == hBody)
                 return;
-            if (lBody > hBody)
-                (lBody, hBody) = (hBody, lBody); // Tuple swap. Could have used XOR swap. But this is the C# way
+
             /*
                 _ = hBody ^= lBody ^= hBody;
 
@@ -57,20 +59,23 @@ namespace OrbitalSimOpenGL
                int a = 4, b = 6;
                 a ^= b ^= a ^= b;
             */
+            if (lBody > hBody)
+                (lBody, hBody) = (hBody, lBody); // Tuple swap. Could have used XOR swap. But this is the C# way
+
             int i = SparseArray.ValuesIndex(lBody, hBody);
             
             // Closest approach ?
-            if (distanceSquared < ApproachElements[i].CDist)
+            if (distanceSquared < ApproachElements.Elements[i].CDist)
             {
-                ApproachElements[i].CDist = distanceSquared;
-                ApproachElements[i].CSeconds = seconds;
+                ApproachElements.Elements[i].CDist = distanceSquared;
+                ApproachElements.Elements[i].CSeconds = seconds;
             }
 
             // Furthest approach ?
-            if (distanceSquared > ApproachElements[i].FDist)
+            if (distanceSquared > ApproachElements.Elements[i].FDist)
             {
-                ApproachElements[i].FDist = distanceSquared;
-                ApproachElements[i].FSeconds = seconds;
+                ApproachElements.Elements[i].FDist = distanceSquared;
+                ApproachElements.Elements[i].FSeconds = seconds;
             }
         }
 
@@ -92,9 +97,9 @@ namespace OrbitalSimOpenGL
                     int i = SparseArray.ValuesIndex(bL, bH);
 
                     // Set initial values
-                    ApproachElements[i].CDist = Double.MaxValue;
-                    ApproachElements[i].FDist = Double.MinValue;
-                    ApproachElements[i].CSeconds = ApproachElements[i].FSeconds = 0D;
+                    ApproachElements.Elements[i].CDist = Double.MaxValue;
+                    ApproachElements.Elements[i].FDist = Double.MinValue;
+                    ApproachElements.Elements[i].CSeconds = ApproachElements.Elements[i].FSeconds = 0D;
                 }
             }
         }

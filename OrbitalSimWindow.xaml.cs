@@ -114,7 +114,7 @@ namespace OrbitalSimOpenGL
         #region Frame rendering
         readonly IntMovingAverage FrameRateMovingAverage = new(50); // Moving average from last N calls
         int UpdateFrameLastMS = 0;
-        int EllapsedMS_A = 0;
+        int EllapsedMS_ApproachDisatances = 0;
 
         /// <summary>
         /// Rendering and hit-testing
@@ -144,8 +144,6 @@ namespace OrbitalSimOpenGL
 
             int ms = timeSpan.Milliseconds;
 
-            EllapsedMS_A += ms;
-
             if (0 == UpdateFrameLastMS)
             {
                 UpdateFrameLastMS = ms;
@@ -170,15 +168,13 @@ namespace OrbitalSimOpenGL
             StatsArea?.Render(timeSpan, frameRateMS);
 
             // *** Send closest approach stats to Stats Windows ***
-            // Once every n real-time seconds
-            if (EllapsedMS_A >= 2000)
+            // If at least one body is displaying approach distances then once every n, real-time seconds
+            EllapsedMS_ApproachDisatances += ms;
+            if (SimModel.NumApproachDistancesSet > 0 && EllapsedMS_ApproachDisatances >= 2000)
             {
-                EllapsedMS_A = 0; // Reset
+                EllapsedMS_ApproachDisatances = 0; // Reset
                 ClosestApproachStats();
-                //string jsonString = JsonSerializer.Serialize(SimModel.ApproachDistances);
             }
-
-
         }
         #endregion
 
@@ -205,7 +201,7 @@ namespace OrbitalSimOpenGL
                 excludes += SimModel.SimBodyList.BodyList[i].ExcludeFromSim ? "1" : "0";
             }
 
-            String approachElements = JsonSerializer.Serialize(SimModel.ApproachDistances.ApproachElements);
+            String approachElements = SimModel.ApproachDistances.ApproachElements.Serialize();
 
             // Send info across thread boundary to Status Window (via event queue)
             CommandStatusWindow.ApproachDist(approachElements, names, excludes);
@@ -252,8 +248,8 @@ namespace OrbitalSimOpenGL
 
                     case CommandSimWindow.GenericCommands.ExcludeBody:
                         SimModel.ExcludeBody((String)args[1]);              // Tell the model (sometimes a NOp)
-//                        if (SimModel.SimBodyList is not null)
-//                            CommandControlWindow.ExcludeBody(SimModel.SimBodyList.GetIndex((String)args[1]));  // Tell CommandControlWindow
+                                                                            //                        if (SimModel.SimBodyList is not null)
+                                                                            //                            CommandControlWindow.ExcludeBody(SimModel.SimBodyList.GetIndex((String)args[1]));  // Tell CommandControlWindow
                         break;
 
                     case CommandSimWindow.GenericCommands.MassMultiplier:
@@ -277,7 +273,7 @@ namespace OrbitalSimOpenGL
                         break;
 
                     case CommandSimWindow.GenericCommands.ApproachDistance:
-                        SimModel.ApproachDistance((bool)args[1], (String)args[2]);
+                        SimModel.DisplayApproachDistance((String)args[1], (bool)args[2]);
                         break;
 
                     default:
