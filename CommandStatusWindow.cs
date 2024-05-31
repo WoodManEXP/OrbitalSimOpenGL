@@ -38,12 +38,12 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Update ApproachDist status area
         /// </summary>
-        /// <param name="approachElements">JSON serilization of ApproachDistances.ApproachElements</param>
+        /// <param name="approachStatusStr">JSON serilization of ApproachDistances.ApproachElements</param>
         /// <param name="names">CSV list of body names/param>
         /// <param name="excludes">CSV list of exclude from sim settings</param>
-        public void ApproachDist(String approachElements, String names, String excludes)
+        public void ApproachDist(String approachStatusStr)
         {
-            object[] args = { CommandStatuslWindow.GenericCommands.ApproachDistance, approachElements, names, excludes };
+            object[] args = { CommandStatuslWindow.GenericCommands.ApproachDistance, approachStatusStr };
             GenericCommand(args);
         }
         #endregion

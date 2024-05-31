@@ -181,32 +181,66 @@ namespace OrbitalSimOpenGL
         #region ClosestApproach stats
 
         /// <summary>
-        /// Prepare and send ClosestApproachStats to OrbitalSimStatusWindow
+        /// Prepare and send approach stats to OrbitalSimStatusWindow
         /// </summary>
         private void ClosestApproachStats()
         {
 
             // Build up the approach information bloc to send to status window
             int numBodies = SimModel.ApproachDistances.NumBodies;
-            String names = new(""), excludes = new("");
+            int numApproachDistancesSet = SimModel.NumApproachDistancesSet;
 
-            for (int i = 0; i < numBodies; i++)
+            ApproachStatus approachStatus = new(new DateTime(), numApproachDistancesSet, numBodies);
+            ApproachElements approachElements = SimModel.ApproachDistances.ApproachElements;
+
+            // Copy info from ApproachDistances to approachStatus.
+            // ApproachDistances maintained in this thread.
+            // ApproachStatus will be seralized and sent to another thread.
+            int slot = -1;
+            int lBody = -1;
+            SparseArray sparseArray = SimModel.SparseArray;
+            foreach (SimBody sB in SimModel.SimBodyList.BodyList)
             {
-                if (i > 0)
+                lBody++;
+
+                if (sB.ExcludeFromSim)
+                    continue;
+
+                if (!sB.DisplayApproaches)
+                    continue;
+
+                if (++slot >= numApproachDistancesSet)
+                    continue; // JIC
+
+                ref ApproachStatusBody approachStatusBody = ref approachStatus.ApproachStatusInfo.ApproachStatusBody[slot];
+
+                approachStatusBody.Name = new(sB.Name);
+
+                int j = -1; // There are numBodies-1 elements in the approachStatusBody.ApproachElements array
+                for (int hBody = 0;hBody < numBodies;hBody++)
                 {
-                    names += ",";
-                    excludes += ",";
+                    if (lBody == hBody)
+                        continue;
+
+                    j++;
+
+                    int i = sparseArray.ValuesIndex(lBody, hBody);
+
+                    ref ApproachElement approachElement = ref approachStatusBody.ApproachElements[j];
+
+                    SimBody hSB = SimModel.SimBodyList.BodyList[hBody];
+                    approachElement.Name = new(hSB.Name);
+                    approachElement.CDist = approachElements.Elements[i].CDist;
+                    approachElement.CSeconds = approachElements.Elements[i].CSeconds;
+                    approachElement.FDist = approachElements.Elements[i].FDist;
+                    approachElement.FSeconds = approachElements.Elements[i].FSeconds;
                 }
-                names += SimModel.SimBodyList.BodyList[i].Name;
-                excludes += SimModel.SimBodyList.BodyList[i].ExcludeFromSim ? "1" : "0";
             }
 
-            String approachElements = SimModel.ApproachDistances.ApproachElements.Serialize();
-
-            // Send info across thread boundary to Status Window (via event queue)
-            CommandStatusWindow.ApproachDist(approachElements, names, excludes);
+            // Serialize and send info across thread boundary to Status Window (via event queue)
+            String approachStatusStr = approachStatus.Serialize();
+            CommandStatusWindow.ApproachDist(approachStatusStr);
         }
-
         #endregion
 
         #region Commands

@@ -11,7 +11,6 @@ namespace OrbitalSimOpenGL
 {
     internal class ApproachElements
     {
-
         internal struct ApproachElement
         {
             public Double CDist { get; set; }       // Closest approach, km-squared

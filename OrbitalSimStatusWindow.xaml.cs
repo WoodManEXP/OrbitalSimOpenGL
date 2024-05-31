@@ -49,7 +49,7 @@ namespace OrbitalSimOpenGL
             switch ((CommandStatuslWindow.GenericCommands)args[0])
             {
                 case CommandStatuslWindow.GenericCommands.ApproachDistance:
-                    ApproachDistances((String)args[1], (String)args[2], (String)args[3]);
+                    ApproachDistances((String)args[1]);
                     break;
 
                 default:
@@ -57,9 +57,9 @@ namespace OrbitalSimOpenGL
             }
         }
 
-        internal void ApproachDistances(String approachElementsStr, String names, String excludes)
+        internal void ApproachDistances(String approachStatusStr)
         {
-            ApproachElements approachElements = new(approachElementsStr);
+            ApproachStatus approachStatus = new(approachStatusStr);
         }
     }
 }
