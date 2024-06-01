@@ -10,6 +10,7 @@ namespace OrbitalSimOpenGL
     public class EphemerisBodyList
     {
         #region Properties
+        public DateTime EphemerisDateTime { get; set; } // DT for ephemeris gather
         public List<EphemerisBody> Bodies { get; }
         #endregion 
 

@@ -350,6 +350,7 @@ namespace OrbitalSimOpenGL
             pauseButton.IsEnabled = true;
             saveBodiesButton.IsEnabled = false;
 
+            // *** Is this a problem sending EphemerisBodyList object from this thread to another thread?
             CommandSimWindow?.StartSim(EphemerisBodyList);
 
             SimHasBeenStarted = true;

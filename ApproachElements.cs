@@ -14,9 +14,9 @@ namespace OrbitalSimOpenGL
         internal struct ApproachElement
         {
             public Double CDist { get; set; }       // Closest approach, km-squared
-            public Double CSeconds { get; set; }    // Timestamp for closest approach
+            public Double CSeconds { get; set; }    // Seconds from start of sim for closest approach
             public Double FDist { get; set; }       // Furthest approach, km-squared
-            public Double FSeconds { get; set; }    // Timestamp for furthest approach
+            public Double FSeconds { get; set; }    // Seconds from start of sim for furthest approach
         }
 
         internal ApproachElement[]? Elements { get; set; }

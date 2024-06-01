@@ -97,6 +97,8 @@ namespace OrbitalSimOpenGL
             DateTime sDT = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, 0, 0);
             DateTime eDT = sDT.AddHours(2);
 
+            EphemerisBodyList.EphemerisDateTime = sDT; // Record DT for ephemeris start
+
             String sDT_Str = sDT.ToString("s");
             String eDT_Str = eDT.ToString("s");
 

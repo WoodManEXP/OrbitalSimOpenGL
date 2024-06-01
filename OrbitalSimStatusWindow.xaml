@@ -5,8 +5,69 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OrbitalSimOpenGL"
         mc:Ignorable="d"
-        Title="Status" Height="450" Width="341">
-    <Grid Margin="0,0,489,0">
-        
-    </Grid>
+        Title="Status" Height="450" Width="533">
+    <FlowDocumentScrollViewer Margin="5">
+        <FlowDocument x:Name="FlowDocument" IsOptimalParagraphEnabled="True" IsHyphenationEnabled="True" FontFamily="Calibri" FontSize="10">
+            <Paragraph>
+                <Bold>Approaches</Bold> (Dist is km)
+                <LineBreak/>Ephemeris DT</Paragraph>
+            <Table>
+                <Table.Columns>
+                    <TableColumn/>
+                    <TableColumn/>
+                    <TableColumn/>
+                    <TableColumn/>
+                    <TableColumn/>
+                </Table.Columns>
+
+                <TableRowGroup>
+                    <TableRow>
+                        <TableCell ColumnSpan="1" Background="LightGray" >
+                            <Paragraph></Paragraph>
+                        </TableCell>
+                        <TableCell ColumnSpan="2" TextAlignment="Center" >
+                            <Paragraph>Closest</Paragraph>
+                        </TableCell>
+                        <TableCell ColumnSpan="2" TextAlignment="Center">
+                            <Paragraph>Furthest</Paragraph>
+                        </TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell ColumnSpan="1">
+                            <Paragraph></Paragraph>
+                        </TableCell>
+                        <TableCell ColumnSpan="1" TextAlignment="Center" >
+                            <Paragraph>Dist</Paragraph>
+                        </TableCell>
+                        <TableCell ColumnSpan="1" TextAlignment="Center">
+                            <Paragraph>Date/Time</Paragraph>
+                        </TableCell>
+                        <TableCell ColumnSpan="1" TextAlignment="Center" >
+                            <Paragraph>Dist</Paragraph>
+                        </TableCell>
+                        <TableCell ColumnSpan="1" TextAlignment="Center">
+                            <Paragraph>Date/Time</Paragraph>
+                        </TableCell>
+                    </TableRow>
+                </TableRowGroup>
+                <TableRowGroup>
+                    <TableRow>
+                        <TableCell ColumnSpan="1">
+                            <Paragraph>Apophis</Paragraph>
+                        </TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell ColumnSpan="1">
+                            <Paragraph>&#160;&#160;Sun</Paragraph>
+                        </TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell ColumnSpan="1">
+                            <Paragraph>&#160;&#160;Mercury</Paragraph>
+                        </TableCell>
+                    </TableRow>
+                </TableRowGroup>
+            </Table>
+        </FlowDocument>
+    </FlowDocumentScrollViewer>
 </Window>

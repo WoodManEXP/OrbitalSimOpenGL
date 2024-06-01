@@ -190,7 +190,7 @@ namespace OrbitalSimOpenGL
             int numBodies = SimModel.ApproachDistances.NumBodies;
             int numApproachDistancesSet = SimModel.NumApproachDistancesSet;
 
-            ApproachStatus approachStatus = new(new DateTime(), numApproachDistancesSet, numBodies);
+            ApproachStatus approachStatus = new(EphemerisBodyList.EphemerisDateTime, numApproachDistancesSet, numBodies);
             ApproachElements approachElements = SimModel.ApproachDistances.ApproachElements;
 
             // Copy info from ApproachDistances to approachStatus.
