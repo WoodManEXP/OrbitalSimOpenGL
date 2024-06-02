@@ -201,13 +201,13 @@ namespace OrbitalSimOpenGL
                     Double seconds = IterationSeconds;
                     NextPosition?.IterateOnce(ref seconds);
 
+                    ElapsedSeconds += seconds;
+
                     // Closest approach and collision detection
-                    CollisionDetector?.Detect(seconds, PrevClosestApproachDistSquared, out _ClosestApproachDistSquared, ref _ClosestApproachBodiesList);
+                    CollisionDetector?.Detect(ElapsedSeconds, PrevClosestApproachDistSquared, out _ClosestApproachDistSquared, ref _ClosestApproachBodiesList);
 
                     // Keep PrevClosestApproachDistSquared around to supply CollisionDetector. Saves work.
                     PrevClosestApproachDistSquared = ClosestApproachDistSquared;
-
-                    ElapsedSeconds += seconds;
                 }
             }
         }

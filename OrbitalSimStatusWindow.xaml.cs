@@ -56,6 +56,8 @@ namespace OrbitalSimOpenGL
             }
         }
 
+        readonly String DFmt = "dd MMM yyyy HH:mm";
+
         internal void ApproachDistances(String approachStatusStr)
         {
             Paragraph aParagraph;
@@ -64,6 +66,7 @@ namespace OrbitalSimOpenGL
             TableRowGroup aTableRowGroup;
             TableCell aTableCell;
             Run aRun;
+            SolidColorBrush aSolidColorBrush;
             String aStr;
 
             ApproachStatus approachStatus = new(approachStatusStr);
@@ -75,7 +78,7 @@ namespace OrbitalSimOpenGL
             aParagraph.Inlines.Add(new Run("(Dist is km)"));
             aParagraph.Inlines.Add(new LineBreak());
             aParagraph.Inlines.Add(new Run("Ephemeris gather DT "));
-            aParagraph.Inlines.Add(approachStatus.ApproachStatusInfo.DateTime.ToString("F"));
+            aParagraph.Inlines.Add(approachStatus.ApproachStatusInfo.DateTime.ToString(DFmt));
 
             FlowDocument.Blocks.Add(aParagraph);
 
@@ -119,9 +122,21 @@ namespace OrbitalSimOpenGL
             aTableRow.Cells.Add(aTableCell);
             aTableRowGroup.Rows.Add(aTableRow);
 
+            bool first = true;
             // Over each element in ApproachStatusInfo.ApproachStatusBody
             foreach (var approachStatusBody in approachStatus.ApproachStatusInfo.ApproachStatusBody)
             {
+                // Separator between sections
+                if (!first)
+                {
+                    aTableRow = new TableRow();
+                    aTableCell = new TableCell() { ColumnSpan = 1 };
+                    aTableCell.Blocks.Add(new Paragraph());
+                    aTableRow.Cells.Add(aTableCell);
+                    aTableRowGroup.Rows.Add(aTableRow);
+                }
+                first = false;
+
                 // Body for which approaches will be displayed
                 aTableRow = new TableRow();
                 aTableCell = new TableCell() { ColumnSpan = 1, Background = Brushes.LightGreen };
@@ -144,40 +159,52 @@ namespace OrbitalSimOpenGL
                     aTableRow = new TableRow();
                     // Body name
                     aTableCell = new TableCell() { ColumnSpan = 1, Background = Brushes.LightGreen };
-                    aTableCell.Blocks.Add(new Paragraph(new Run("\u00A0\u00A0" + approachElement.Name))); // Thise are nonbreaking spaces
+                    aTableCell.Blocks.Add(new Paragraph(new Run("\u00A0\u00A0" + approachElement.Name))); // These are nonbreaking spaces
                     aTableRow.Cells.Add(aTableCell);
                     // Closest distance
-                    aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Right, Background = Brushes.LightGreen };
-                    aStr = approachElement.CDist.ToString("#,##0");
+                    aStr = Math.Sqrt(approachElement.CDist).ToString("#,##0");
                     if (closestDist == approachElement.CDist)
-                        aParagraph = new Paragraph(new Bold(new Run(aStr)));
+                    {
+                        aParagraph = new Paragraph(new Bold(new Run(aStr))) { Foreground = Brushes.Black };
+                        aSolidColorBrush = Brushes.DarkSalmon;
+                    }
                     else
+                    {
                         aParagraph = new Paragraph(new Run(aStr));
+                        aSolidColorBrush = Brushes.LightGreen;
+                    }
+                    aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Right, Background = aSolidColorBrush };
                     aTableCell.Blocks.Add(aParagraph);
                     aTableRow.Cells.Add(aTableCell);
                     // Date/Time for this CDist
                     DateTime aDT = approachStatus.ApproachStatusInfo.DateTime.AddSeconds(approachElement.CSeconds);
                     aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Right, Background = Brushes.LightGreen };
                     aParagraph = new Paragraph();
-                    aParagraph.Inlines.Add(new Run(aDT.ToString("F")));
+                    aParagraph.Inlines.Add(new Run(aDT.ToString(DFmt)));
                     aParagraph.Inlines.Add(new LineBreak());
                     aParagraph.Inlines.Add(new Run(ElapsedTime(approachElement.CSeconds)));
                     aTableCell.Blocks.Add(aParagraph);
                     aTableRow.Cells.Add(aTableCell);
                     // Furthest distance
-                    aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Right, Background = Brushes.LightGreen };
-                    aStr = approachElement.FDist.ToString("#,##0");
+                    aStr = Math.Sqrt(approachElement.FDist).ToString("#,##0");
                     if (furthestDist == approachElement.FDist)
-                        aParagraph = new Paragraph(new Bold(new Run(aStr)));
+                    {
+                        aParagraph = new Paragraph(new Bold(new Run(aStr))) { Foreground = Brushes.Black };
+                        aSolidColorBrush = Brushes.DarkSalmon;
+                    }
                     else
+                    {
                         aParagraph = new Paragraph(new Run(aStr));
+                        aSolidColorBrush = Brushes.LightGreen;
+                    }
+                    aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Right, Background = aSolidColorBrush };
                     aTableCell.Blocks.Add(aParagraph);
                     aTableRow.Cells.Add(aTableCell);
                     // Date/Time for this FDist
                     aDT = approachStatus.ApproachStatusInfo.DateTime.AddSeconds(approachElement.FSeconds);
                     aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Right, Background = Brushes.LightGreen };
                     aParagraph = new Paragraph();
-                    aParagraph.Inlines.Add(new Run(aDT.ToString("F")));
+                    aParagraph.Inlines.Add(new Run(aDT.ToString(DFmt)));
                     aParagraph.Inlines.Add(new LineBreak());
                     aParagraph.Inlines.Add(new Run(ElapsedTime(approachElement.FSeconds)));
                     aTableCell.Blocks.Add(aParagraph);
