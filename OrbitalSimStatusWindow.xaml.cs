@@ -173,6 +173,7 @@ namespace OrbitalSimOpenGL
                         aParagraph = new Paragraph(new Run(aStr));
                         aSolidColorBrush = Brushes.LightGreen;
                     }
+                    aParagraph.Padding = new Thickness(2);
                     aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Right, Background = aSolidColorBrush };
                     aTableCell.Blocks.Add(aParagraph);
                     aTableRow.Cells.Add(aTableCell);
@@ -180,6 +181,7 @@ namespace OrbitalSimOpenGL
                     DateTime aDT = approachStatus.ApproachStatusInfo.DateTime.AddSeconds(approachElement.CSeconds);
                     aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Right, Background = Brushes.LightGreen };
                     aParagraph = new Paragraph();
+                    aParagraph.Padding = new Thickness(2);
                     aParagraph.Inlines.Add(new Run(aDT.ToString(DFmt)));
                     aParagraph.Inlines.Add(new LineBreak());
                     aParagraph.Inlines.Add(new Run(ElapsedTime(approachElement.CSeconds)));
@@ -197,6 +199,7 @@ namespace OrbitalSimOpenGL
                         aParagraph = new Paragraph(new Run(aStr));
                         aSolidColorBrush = Brushes.LightGreen;
                     }
+                    aParagraph.Padding = new Thickness(2);
                     aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Right, Background = aSolidColorBrush };
                     aTableCell.Blocks.Add(aParagraph);
                     aTableRow.Cells.Add(aTableCell);
@@ -204,6 +207,7 @@ namespace OrbitalSimOpenGL
                     aDT = approachStatus.ApproachStatusInfo.DateTime.AddSeconds(approachElement.FSeconds);
                     aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Right, Background = Brushes.LightGreen };
                     aParagraph = new Paragraph();
+                    aParagraph.Padding = new Thickness(2);
                     aParagraph.Inlines.Add(new Run(aDT.ToString(DFmt)));
                     aParagraph.Inlines.Add(new LineBreak());
                     aParagraph.Inlines.Add(new Run(ElapsedTime(approachElement.FSeconds)));
