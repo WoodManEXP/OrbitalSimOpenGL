@@ -187,11 +187,11 @@ namespace OrbitalSimOpenGL
         {
 
             // Build up the approach information bloc to send to status window
-            int numBodies = SimModel.ApproachDistances.NumBodies;
+            int numBodies = SimModel.ApproachInfo.NumBodies;
             int numApproachDistancesSet = SimModel.NumApproachDistancesSet;
 
             ApproachStatus approachStatus = new(EphemerisBodyList.EphemerisDateTime, numApproachDistancesSet, numBodies);
-            ApproachElements approachElements = SimModel.ApproachDistances.ApproachElements;
+            ApproachElements approachElements = SimModel.ApproachInfo.ApproachElements;
 
             // Copy info from ApproachDistances to approachStatus.
             // ApproachDistances maintained in this thread.
@@ -229,11 +229,8 @@ namespace OrbitalSimOpenGL
                     ref ApproachElement approachElement = ref approachStatusBody.ApproachElements[j];
 
                     SimBody hSB = SimModel.SimBodyList.BodyList[hBody];
+                    approachElement = approachElements.Elements[i];
                     approachElement.Name = new(hSB.Name);
-                    approachElement.CDist = approachElements.Elements[i].CDist;
-                    approachElement.CSeconds = approachElements.Elements[i].CSeconds;
-                    approachElement.FDist = approachElements.Elements[i].FDist;
-                    approachElement.FSeconds = approachElements.Elements[i].FSeconds;
                 }
             }
 

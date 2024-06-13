@@ -49,7 +49,7 @@ namespace OrbitalSimOpenGL
         internal MassMass? MassMass { get; set; }
         internal SparseArray? SparseArray { get; set; }
         private CollisionDetector? CollisionDetector { get; set; }
-        internal ApproachDistances? ApproachDistances { get; set; }
+        internal ApproachInfo? ApproachInfo { get; set; }
         private Double PrevClosestApproachDistSquared { get; set; } = Double.MaxValue;
 
         // Closest approach between any two bodies captured here, for each iteration
@@ -137,10 +137,10 @@ namespace OrbitalSimOpenGL
             Barycenter = new(Scale, SimBodyList);
             MassMass = new(SimBodyList, SparseArray);
 
-            ApproachDistances = new(SimBodyList.BodyList.Count, SparseArray);
+            ApproachInfo = new(SimBodyList.BodyList.Count, SparseArray);
             NumApproachDistancesSet = 0;
 
-            CollisionDetector = new(this, ApproachDistances);
+            CollisionDetector = new(this, ApproachInfo);
 
             NextPosition = new(SimBodyList, SparseArray, MassMass, GravConstantSetting);
 

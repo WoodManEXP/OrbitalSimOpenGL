@@ -786,7 +786,7 @@ namespace OrbitalSimOpenGL
         private int GN_FramesSoFar { get; set; }
 
         private Vector3d GN_TargetPoint; //
-        private SimBody GN_SimBody { get; set; } = null;
+        private SimBody? GN_SimBody { get; set; } = null;
         private int GN_BodyIndex { get; set; }
         private KindOfKeep GN_RetainedKeep { get; set; }
         /// <summary>

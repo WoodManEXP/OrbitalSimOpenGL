@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,15 +10,23 @@ using System.Xml.Linq;
 
 namespace OrbitalSimOpenGL
 {
-    internal class ApproachElements
+    public struct ApproachElement // One of these at each position in SparseArray
     {
-        internal struct ApproachElement
-        {
-            public Double CDist { get; set; }       // Closest approach, km-squared
-            public Double CSeconds { get; set; }    // Seconds from start of sim for closest approach
-            public Double FDist { get; set; }       // Furthest approach, km-squared
-            public Double FSeconds { get; set; }    // Seconds from start of sim for furthest approach
-        }
+        public String Name { get; set; }        // Name of body approached
+        public Double CDist { get; set; }       // Closest approach, km-squared
+        public Double CSeconds { get; set; }    // Seconds from start of sim for closest approach
+        public Double CVX { get; set; }
+        public Double CVY { get; set; }
+        public Double CVZ { get; set; }
+        public Double FDist { get; set; }       // Furthest approach, km-squared
+        public Double FSeconds { get; set; }    // Seconds from start of sim for furthest approach
+        public Double FVX { get; set; }
+        public Double FVY { get; set; }
+        public Double FVZ { get; set; }
+    }
+
+    internal class ApproachElements
+    {   
 
         internal ApproachElement[]? Elements { get; set; }
 
@@ -25,18 +34,5 @@ namespace OrbitalSimOpenGL
         {
             Elements = new ApproachElement[numSlots];
         }
-
-        public ApproachElements(String aStr)
-        {
-            Elements = JsonSerializer.Deserialize<ApproachElement[]>(aStr);
-        }
-
-        public String Serialize()
-        {
-            String aStr = JsonSerializer.Serialize(Elements);
-
-            return aStr;
-        }
-
     }
 }

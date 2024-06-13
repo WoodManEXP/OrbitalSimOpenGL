@@ -67,15 +67,15 @@ namespace OrbitalSimOpenGL
             TableCell aTableCell;
             Run aRun;
             SolidColorBrush aSolidColorBrush;
-            String aStr;
+            String aStr, vectorLenStr;
 
             ApproachStatus approachStatus = new(approachStatusStr);
 
-            FlowDocument.Blocks.Clear(); // Empty the document contents
+            FlowDocument.Blocks.Clear(); // Clear any document contents
 
             aParagraph = new Paragraph();
             aParagraph.Inlines.Add(new Bold(new Run("Approaches ")));
-            aParagraph.Inlines.Add(new Run("(Dist is km)"));
+            aParagraph.Inlines.Add(new Run("(Dist is km, Velocity is km/s)"));
             aParagraph.Inlines.Add(new LineBreak());
             aParagraph.Inlines.Add(new Run("Ephemeris gather DT "));
             aParagraph.Inlines.Add(approachStatus.ApproachStatusInfo.DateTime.ToString(DFmt));
@@ -109,13 +109,13 @@ namespace OrbitalSimOpenGL
             aTableCell.Blocks.Add(new Paragraph());
             aTableRow.Cells.Add(aTableCell);
             aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Center };
-            aTableCell.Blocks.Add(new Paragraph(new Run("Dist")));
+            aTableCell.Blocks.Add(new Paragraph(new Run("Dist/Rel velocity")));
             aTableRow.Cells.Add(aTableCell);
             aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Center };
             aTableCell.Blocks.Add(new Paragraph(new Run("Date/Time")));
             aTableRow.Cells.Add(aTableCell);
             aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Center };
-            aTableCell.Blocks.Add(new Paragraph(new Run("Dist")));
+            aTableCell.Blocks.Add(new Paragraph(new Run("Dist/Rel velocity")));
             aTableRow.Cells.Add(aTableCell);
             aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Center };
             aTableCell.Blocks.Add(new Paragraph(new Run("Date/Time")));
@@ -145,6 +145,7 @@ namespace OrbitalSimOpenGL
                 aTableRowGroup.Rows.Add(aTableRow);
 
                 // What are the closest and furthest distances in this pass?
+                // Calc their values for highlighting below.
                 Double closestDist = Double.MaxValue;
                 Double furthestDist = Double.MinValue;
                 foreach (var approachElement in approachStatusBody.ApproachElements)
@@ -163,16 +164,22 @@ namespace OrbitalSimOpenGL
                     aTableRow.Cells.Add(aTableCell);
                     // Closest distance
                     aStr = Math.Sqrt(approachElement.CDist).ToString("#,##0");
+                    vectorLenStr = VectorLen(approachElement.CVX, approachElement.CVY, approachElement.CVZ);
                     if (closestDist == approachElement.CDist)
                     {
                         aParagraph = new Paragraph(new Bold(new Run(aStr))) { Foreground = Brushes.Black };
+                        aParagraph.Inlines.Add(new LineBreak());
+                        aParagraph.Inlines.Add(new Bold(new Run(vectorLenStr)));
                         aSolidColorBrush = Brushes.DarkSalmon;
                     }
                     else
                     {
                         aParagraph = new Paragraph(new Run(aStr));
+                        aParagraph.Inlines.Add(new LineBreak());
+                        aParagraph.Inlines.Add(new Run(vectorLenStr));
                         aSolidColorBrush = Brushes.LightGreen;
                     }
+
                     aParagraph.Padding = new Thickness(2);
                     aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Right, Background = aSolidColorBrush };
                     aTableCell.Blocks.Add(aParagraph);
@@ -189,16 +196,22 @@ namespace OrbitalSimOpenGL
                     aTableRow.Cells.Add(aTableCell);
                     // Furthest distance
                     aStr = Math.Sqrt(approachElement.FDist).ToString("#,##0");
+                    vectorLenStr = VectorLen(approachElement.FVX, approachElement.FVY, approachElement.FVZ);
                     if (furthestDist == approachElement.FDist)
                     {
                         aParagraph = new Paragraph(new Bold(new Run(aStr))) { Foreground = Brushes.Black };
+                        aParagraph.Inlines.Add(new LineBreak());
+                        aParagraph.Inlines.Add(new Bold(new Run(vectorLenStr)));
                         aSolidColorBrush = Brushes.DarkSalmon;
                     }
                     else
                     {
                         aParagraph = new Paragraph(new Run(aStr));
+                        aParagraph.Inlines.Add(new LineBreak());
+                        aParagraph.Inlines.Add(new Run(vectorLenStr));
                         aSolidColorBrush = Brushes.LightGreen;
                     }
+
                     aParagraph.Padding = new Thickness(2);
                     aTableCell = new TableCell() { ColumnSpan = 1, TextAlignment = TextAlignment.Right, Background = aSolidColorBrush };
                     aTableCell.Blocks.Add(aParagraph);
@@ -222,6 +235,11 @@ namespace OrbitalSimOpenGL
             aTable.RowGroups.Add(aTableRowGroup);
 
             FlowDocument.Blocks.Add(aTable);
+        }
+
+        private static string VectorLen(double cVX, double cVY, double cVZ)
+        {
+            return Math.Sqrt(cVX*cVX + cVY*cVY + cVZ*cVZ).ToString("#,##0");
         }
 
         private String ElapsedTime(Double seconds)

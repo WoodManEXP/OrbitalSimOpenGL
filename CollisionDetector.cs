@@ -30,7 +30,7 @@ namespace OrbitalSimOpenGL
         private SimBodyList? SimBodyList { get; set; }
         internal MassMass? MassMass { get; set; }
         internal Barycenter? Barycenter { get; set; }
-        internal ApproachDistances? ApproachDistances { get; set; }
+        internal ApproachInfo? ApproachInfo { get; set; }
 
         private List<int> _CollisionList = new(3);
         private List<int> CollisionList { get { return _CollisionList; } }
@@ -43,17 +43,17 @@ namespace OrbitalSimOpenGL
         internal bool DetectCollisions = true;
         #endregion
 
-        public CollisionDetector(SimModel simModel, ApproachDistances approachDistances)
+        public CollisionDetector(SimModel simModel, ApproachInfo approachInfo)
         {
             SimModel = simModel;
             MassMass = SimModel.MassMass;
             Barycenter = SimModel.Barycenter;
             SimBodyList = SimModel.SimBodyList;
-            ApproachDistances = approachDistances;
+            ApproachInfo = approachInfo;
         }
 
         /// <summary>
-        /// Detect closest approach and process collisions
+        /// Determine approach info and process collisions
         /// </summary>
         /// <param name="onlyIfLessThanOrEqualToThisD2"> Process closest approach onlyIfLessThanOrEqualTo this value,
         /// an efficiency check. This is also a distSquared value. No need to gather approaches if none are less than any earlier encountered.
@@ -162,8 +162,8 @@ namespace OrbitalSimOpenGL
                         lenSquared = 0D; // This is definitely a closest aproach
                     }
 
-                    // Report approach distance to ApproachDistance
-                    ApproachDistances?.SetApproach(bL, bH, lenSquared, seconds);
+                    // Report approach info to ApproachDistance
+                    ApproachInfo?.SetApproachInfo(bL, lBody, bH, hBody, lenSquared, seconds);
 
                     // Collect the 2+ bodies that have lowest (possibly same) closest approach
                     if (lenSquared <= approachDistSquared && lenSquared <= onlyIfLessThanOrEqualToThisD2)

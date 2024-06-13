@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,15 +12,19 @@ namespace OrbitalSimOpenGL
     /// <summary>
     /// The class deals with sending and receiving approach values across thread boundary
     /// </summary>
+
+#if false
     internal struct ApproachElement
     {
-        public String Name { get; set; }                            // Name of body approached
+        public String Name { get; set; }        // Name of body approached
         public Double CDist { get; set; }       // Closest approach, km-squared
         public Double CSeconds { get; set; }    // Timestamp for closest approach
+        public Vector3d CVelocityVec { get; set; }
         public Double FDist { get; set; }       // Furthest approach, km-squared
         public Double FSeconds { get; set; }    // Timestamp for furthest approach
+        public Vector3d FVelocityVec { get; set; }
     }
-
+#endif
     internal struct ApproachStatusBody
     {
         public String Name { get; set; }  // Name of body for which approach status applies

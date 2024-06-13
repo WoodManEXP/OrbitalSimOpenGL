@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,23 +10,13 @@ namespace OrbitalSimOpenGL
     /// <summary>
     /// Collects Closest and Furtherest approach values
     /// </summary>
-    internal class ApproachDistances
+    internal class ApproachInfo
     {
-#if false
-        internal struct ApproachElement
-        {
-            public Double CDist { get; set; }       // Closest approach, km-squared
-            public Double CSeconds { get; set; }    // Timestamp for closest approach
-            public Double FDist { get; set; }       // Furthest approach, km-squared
-            public Double FSeconds { get; set; }    // Timestamp for furthest approach
-        }
-        internal ApproachElement[] ApproachElements { get; set; }
-#endif
         internal ApproachElements ApproachElements { get; set; }
         internal int NumBodies { get; set; }
         private SparseArray SparseArray { get; set; }
 
-        public ApproachDistances(int numBodies, SparseArray sparseArray)
+        public ApproachInfo(int numBodies, SparseArray sparseArray)
         {
             NumBodies = numBodies;
             SparseArray = sparseArray;
@@ -44,13 +35,13 @@ namespace OrbitalSimOpenGL
         /// <summary>
         /// Record closest and furthest approach values between two bodies
         /// </summary>
-        /// <param name="lBody"></param>
-        /// <param name="hBody"></param>
+        /// <param name="bL">Lower body number</param>
+        /// <param name="bH">Digher body number</param>
         /// <param name="distanceSquared"></param>
-        public void SetApproach(int lBody, int hBody, Double distanceSquared, Double seconds)
+        public void SetApproachInfo(int bL, SimBody lBody, int bH, SimBody hBody, Double distanceSquared, Double seconds)
         {
-            if (lBody == hBody)
-                return;
+            if (bL == bH)
+                return; // JIC
 
             /*
                 _ = hBody ^= lBody ^= hBody;
@@ -59,16 +50,28 @@ namespace OrbitalSimOpenGL
                int a = 4, b = 6;
                 a ^= b ^= a ^= b;
             */
-            if (lBody > hBody)
-                (lBody, hBody) = (hBody, lBody); // Tuple swap. Could have used XOR swap. But this is the C# way
 
-            int i = SparseArray.ValuesIndex(lBody, hBody);
+            // This is a JIC check.
+            bool swapped = false;
+            if (bL > bH)
+            {
+                swapped = true;
+                (bL, bH) = (bH, bL); // Tuple swap. Could have used XOR swap. But this is the C# way
+                (lBody, hBody) = (hBody, lBody);
+            }
+
+            int i = SparseArray.ValuesIndex(bL, bH);
             
             // Closest approach ?
             if (distanceSquared < ApproachElements.Elements[i].CDist)
             {
                 ApproachElements.Elements[i].CDist = distanceSquared;
                 ApproachElements.Elements[i].CSeconds = seconds;
+
+                // Relative velocity at this closest approach
+                ApproachElements.Elements[i].CVX = swapped ? hBody.VX - lBody.VX : lBody.VX - hBody.VX;
+                ApproachElements.Elements[i].CVY = swapped ? hBody.VY - lBody.VY : lBody.VY - hBody.VY;
+                ApproachElements.Elements[i].CVZ = swapped ? hBody.VZ - lBody.VZ : lBody.VZ - hBody.VZ;
             }
 
             // Furthest approach ?
@@ -76,6 +79,11 @@ namespace OrbitalSimOpenGL
             {
                 ApproachElements.Elements[i].FDist = distanceSquared;
                 ApproachElements.Elements[i].FSeconds = seconds;
+
+                // Relative velocity at this closest approach
+                ApproachElements.Elements[i].FVX = swapped ? hBody.VX - lBody.VX : lBody.VX - hBody.VX;
+                ApproachElements.Elements[i].FVY = swapped ? hBody.VY - lBody.VY : lBody.VY - hBody.VY;
+                ApproachElements.Elements[i].FVZ = swapped ? hBody.VZ - lBody.VZ : lBody.VZ - hBody.VZ;
             }
         }
 
