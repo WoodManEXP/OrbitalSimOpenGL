@@ -156,3 +156,4 @@ Examples
 	- Got more massive
 - What happens to moon if Earth goes away
 - Apophis closest approach to Earth and Moon
+	- What about 99942 Apophis?

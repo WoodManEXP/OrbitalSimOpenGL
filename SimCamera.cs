@@ -813,8 +813,11 @@ namespace OrbitalSimOpenGL
             }
             else
             {
+                // There is a problem in this area when going near small bodies. It overshoots them
+                // and may be related to rounding effects.
+                // Quick correction is to ensure camera stops at least 1000 km from body's center point.
                 GN_SimBody = SimModel.SimBodyList.BodyList[GN_BodyIndex];
-                GN_NearDistance = 3E0 * GN_SimBody.EphemerisDiameter; // Stop N diameters from the body
+                GN_NearDistance = Math.Max(1000D, 3E0 * GN_SimBody.EphemerisDiameter); // Stop N diameters from the body
             }
 
             // Disable Keep during this animation
