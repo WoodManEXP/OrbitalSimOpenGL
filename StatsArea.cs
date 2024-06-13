@@ -24,7 +24,7 @@ namespace OrbitalSimOpenGL
         private System.Windows.Point LastMousePosition { get; set; }
         private static int StatIntervalA { get; } = 1000;
         private static int StatIntervalB { get; } = 30 * 1000;
-        private SimBody? ShowStatsForSB { get; set; } = null;
+        private SimBody? ShowStatsForSB { get; set; } = null; // Show stats for SimBody
 
         private Double ClosestApproachDistSquared { get; set; } = Double.MaxValue;
         #endregion
