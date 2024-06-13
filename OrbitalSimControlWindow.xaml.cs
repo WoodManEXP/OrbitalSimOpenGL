@@ -414,6 +414,7 @@ namespace OrbitalSimOpenGL
             KeepCombo.SelectedIndex = 0;
             LookAtComboBox.SelectedIndex = -1;
             LookAtComboBox.SelectedIndex = 0;       // Origin
+            GoNearComboBox.SelectedIndex = -1;
             OrbitAboutComboBox.SelectedIndex = 0;   // Origin
 
             PopulateBodyMods();
