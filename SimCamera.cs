@@ -678,7 +678,7 @@ namespace OrbitalSimOpenGL
         #endregion
 
         #region Movement Up, Down, Left, Right, Forward, Backward, or Move
-        private Vector3d UDLRFB_To { get; set; } // Up Down Left Right Universe coords
+        private Vector3d UDLRFB_To { get; set; } // Up Down Left Right Front Back, Universe coords
         private int UDLRFB_FramesSoFar { get; set; }
         private int UDLRFB_FramesGoal { get; set; }
         private Single UDLRFB_DX_PerFrame { get; set; }

@@ -59,7 +59,7 @@ namespace OrbitalSimOpenGL
                 // Distance to ShowStatsForSB
                 if (ShowStatsForSB is not null && SimCamera is not null)
                 {
-                    Vector3d position3D = new(ShowStatsForSB.X, ShowStatsForSB.X, ShowStatsForSB.X);
+                    Vector3d position3D = new(ShowStatsForSB.X, ShowStatsForSB.Y, ShowStatsForSB.Z);
 
                     Vector3d cameraVector3D = new(position3D.X - SimCamera.CameraPosition.X
                                         , position3D.Y - SimCamera.CameraPosition.Y
