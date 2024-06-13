@@ -678,12 +678,12 @@ namespace OrbitalSimOpenGL
         #endregion
 
         #region Movement Up, Down, Left, Right, Forward, Backward, or Move
-        private Vector3d UDLRFB_To { get; set; } // Universe coords
+        private Vector3d UDLRFB_To { get; set; } // Up Down Left Right Universe coords
         private int UDLRFB_FramesSoFar { get; set; }
-        private int ODLRFB_FramesGoal { get; set; }
-        private Single ODLRFB_DX_PerFrame { get; set; }
-        private Single ODLRFB_DY_PerFrame { get; set; }
-        private Single ODLRFB_DZ_PerFrame { get; set; }
+        private int UDLRFB_FramesGoal { get; set; }
+        private Single UDLRFB_DX_PerFrame { get; set; }
+        private Single UDLRFB_DY_PerFrame { get; set; }
+        private Single UDLRFB_DZ_PerFrame { get; set; }
         private static Duration UDLRFB_Duration { get; } = new Duration(TimeSpan.FromMilliseconds(500E0));
 
         /// <summary>
@@ -755,22 +755,22 @@ namespace OrbitalSimOpenGL
             {
                 // As a calculation optimization this assumes the FramerateMS will be nearly constant during 
                 // any given movement animation.
-                ODLRFB_FramesGoal = (int)Math.Ceiling((1E3 * UDLRFB_Duration.TimeSpan.TotalSeconds) / FramerateMS);
+                UDLRFB_FramesGoal = (int)Math.Ceiling((1E3 * UDLRFB_Duration.TimeSpan.TotalSeconds) / FramerateMS);
 
                 // Set up to begin animation
-                ODLRFB_DX_PerFrame = (float)(UDLRFB_To.X - currPosn.X) / ODLRFB_FramesGoal;
-                ODLRFB_DY_PerFrame = (float)(UDLRFB_To.Y - currPosn.Y) / ODLRFB_FramesGoal;
-                ODLRFB_DZ_PerFrame = (float)(UDLRFB_To.Z - currPosn.Z) / ODLRFB_FramesGoal;
+                UDLRFB_DX_PerFrame = (float)(UDLRFB_To.X - currPosn.X) / UDLRFB_FramesGoal;
+                UDLRFB_DY_PerFrame = (float)(UDLRFB_To.Y - currPosn.Y) / UDLRFB_FramesGoal;
+                UDLRFB_DZ_PerFrame = (float)(UDLRFB_To.Z - currPosn.Z) / UDLRFB_FramesGoal;
             }
 
             // Calc a frame position
-            currPosn.X += ODLRFB_DX_PerFrame;
-            currPosn.Y += ODLRFB_DY_PerFrame;
-            currPosn.Z += ODLRFB_DZ_PerFrame;
+            currPosn.X += UDLRFB_DX_PerFrame;
+            currPosn.Y += UDLRFB_DY_PerFrame;
+            currPosn.Z += UDLRFB_DZ_PerFrame;
 
             CameraPosition = currPosn;
 
-            if (++UDLRFB_FramesSoFar >= ODLRFB_FramesGoal)
+            if (++UDLRFB_FramesSoFar >= UDLRFB_FramesGoal)
             {
                 AnimatingUDLRFB = false; // Animation completed
                 KeepKind = LookAtRetainedKeep; // Resore
