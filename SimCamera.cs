@@ -54,7 +54,7 @@ namespace OrbitalSimOpenGL
                 // (hence depth of field of view)
                 ProjectionMatrixD = Matrix4d.CreatePerspectiveFieldOfView(FieldOfView, _AspectRatio,
                                            Scale.ScaleU_ToW(DepthNear), Scale.ScaleU_ToW(DepthFar));
-                Matrix4D_toS(ref _ProjectionMatrixD, ref _ProjectionMatrix);
+                Matrix4D_to4S(ref _ProjectionMatrixD, ref _ProjectionMatrix);
                 Reticle.AspectRatio = _AspectRatio; // Tell the Reticle
             }
         }
@@ -314,8 +314,8 @@ namespace OrbitalSimOpenGL
             VP_MatrixD = ViewMatrixD * ProjectionMatrixD;
 
             // Single precision versions for OpenGL
-            Matrix4D_toS(ref _ViewMatrixD, ref _ViewMatrix);
-            Matrix4D_toS(ref _VP_MatrixD, ref _VP_Matrix);
+            Matrix4D_to4S(ref _ViewMatrixD, ref _ViewMatrix);
+            Matrix4D_to4S(ref _VP_MatrixD, ref _VP_Matrix);
 
             FrustumCuller?.GenerateFrustum();
 
@@ -328,7 +328,7 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="matrix4d"></param>
         /// <param name="matrix4"></param>
-        private void Matrix4D_toS(ref Matrix4d matrix4d, ref Matrix4 matrix4)
+        private void Matrix4D_to4S(ref Matrix4d matrix4d, ref Matrix4 matrix4)
         {
             matrix4.M11 = (Single)matrix4d.M11;
             matrix4.M12 = (Single)matrix4d.M12;
@@ -872,7 +872,7 @@ namespace OrbitalSimOpenGL
 
                 Double distThisFrame = currDistToTarget / (GN_FramesGoal - GN_FramesSoFar);
 
-#if false
+#if true
                 System.Diagnostics.Debug.WriteLine("SimCamera..AnimateGoNear "
                     + " currDistToTarget " + currDistToTarget.ToString("0.000000000000E0")
                     + " distThisFrame " + distThisFrame.ToString("0.000000000000E0")
