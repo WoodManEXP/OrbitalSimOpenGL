@@ -20,7 +20,7 @@ namespace OrbitalSimOpenGL
     public partial class OrbitalSimStatusWindow : Window
     {
         #region Properties
-        public CommandStatuslWindow? CommandStatuslWindow { get; set; }
+        public CommandStatusWindow? CommandStatusWindow { get; set; }
         #endregion
 
         public OrbitalSimStatusWindow()
@@ -28,10 +28,10 @@ namespace OrbitalSimOpenGL
             InitializeComponent();
 
             // Receives commands for status window
-            CommandStatuslWindow = new(Dispatcher);
+            CommandStatusWindow = new(Dispatcher);
 
             // Register command delegate(s)
-            CommandStatuslWindow.GenericRegister(GenericCommand);
+            CommandStatusWindow.GenericRegister(GenericCommand);
         }
 
         // Window loaded
@@ -45,10 +45,14 @@ namespace OrbitalSimOpenGL
         /// <param name="args"></param>
         private void GenericCommand(object[] args)
         {
-            switch ((CommandStatuslWindow.GenericCommands)args[0])
+            switch ((CommandStatusWindow.GenericCommands)args[0])
             {
-                case CommandStatuslWindow.GenericCommands.ApproachDistance:
+                case CommandStatusWindow.GenericCommands.ApproachDistance:
                     ApproachDistances((String)args[1]);
+                    break;
+
+                case CommandStatusWindow.GenericCommands.Reset:
+                    Reset();
                     break;
 
                 default:
@@ -65,13 +69,13 @@ namespace OrbitalSimOpenGL
             TableRow aTableRow;
             TableRowGroup aTableRowGroup;
             TableCell aTableCell;
-            Run aRun;
+            //Run aRun;
             SolidColorBrush aSolidColorBrush;
             String aStr, vectorLenStr;
 
             ApproachStatus approachStatus = new(approachStatusStr);
 
-            FlowDocument.Blocks.Clear(); // Clear any document contents
+            Reset(); // Clear any document contents
 
             aParagraph = new Paragraph();
             aParagraph.Inlines.Add(new Bold(new Run("Approaches ")));
@@ -237,12 +241,17 @@ namespace OrbitalSimOpenGL
             FlowDocument.Blocks.Add(aTable);
         }
 
+        internal void Reset()
+        {
+            FlowDocument.Blocks.Clear(); // Clear any document contents
+        }
+
         private static string VectorLen(double cVX, double cVY, double cVZ)
         {
             return Math.Sqrt(cVX*cVX + cVY*cVY + cVZ*cVZ).ToString("#,##0");
         }
 
-        private String ElapsedTime(Double seconds)
+        private static String ElapsedTime(Double seconds)
         {
             TimeSpan elapsedTime = TimeSpan.FromSeconds(seconds);
 

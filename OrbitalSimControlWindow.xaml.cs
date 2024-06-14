@@ -32,7 +32,8 @@ namespace OrbitalSimOpenGL
         #endregion
 
         private CommandSimWindow? CommandSimWindow { get; set; } // For sending commands to SimWindow
-        public CommandControlWindow? CommandControlWindow { get; set; }
+        public CommandControlWindow? CommandControlWindow { get; set; } // For sending commands to ControlWindow
+        public CommandStatusWindow? CommandStatusWindow { get; set; } // For sending commends to StatusWindow
 
         public OrbitalSimControlWindow()
         {
@@ -87,7 +88,7 @@ namespace OrbitalSimOpenGL
             OrbitalSimStatusWindow = new();
 
             // Create the sim window
-            OrbitalSimWindow = new(CommandControlWindow, OrbitalSimStatusWindow.CommandStatuslWindow);
+            OrbitalSimWindow = new(CommandControlWindow, OrbitalSimStatusWindow.CommandStatusWindow);
 
             CommandSimWindow = OrbitalSimWindow.CommandSimWindow;
 
@@ -115,6 +116,8 @@ namespace OrbitalSimOpenGL
             // Show sim windows
             OrbitalSimStatusWindow.Show();
             OrbitalSimWindow.Show();
+
+            CommandStatusWindow = OrbitalSimStatusWindow.CommandStatusWindow;
 
             //System.Diagnostics.Debug.WriteLine("OrbitalSimControlWindow: Window_Loaded ");
         }
@@ -380,6 +383,8 @@ namespace OrbitalSimOpenGL
             // Issue this command prior to OrbitalSimControlWindow reset activities. With OrbitalSimControlWindow
             // and OrbitalSimWindow on separate threads the avtivities will then happen "simultaneously."
             CommandSimWindow?.ResetSim(resetCamera);
+
+            CommandStatusWindow?.Reset();
 
             // Reset various elements of OrbitalSimControlWindow
             // Set move camera scale control initial

@@ -10,7 +10,7 @@ namespace OrbitalSimOpenGL
     /// <summary>
     /// Commands to the Status window
     /// </summary>
-    public class CommandStatuslWindow : CommandDelegate
+    public class CommandStatusWindow : CommandDelegate
     {
 
         #region Properties
@@ -18,7 +18,8 @@ namespace OrbitalSimOpenGL
         // Commands
         public enum GenericCommands
         {
-            ApproachDistance
+              ApproachDistance
+            , Reset
         };
 
         #endregion
@@ -29,7 +30,7 @@ namespace OrbitalSimOpenGL
         /// </summary>
         /// <param name="dispatcher"></param>
         ///
-        public CommandStatuslWindow(System.Windows.Threading.Dispatcher dispatcher)
+        public CommandStatusWindow(System.Windows.Threading.Dispatcher dispatcher)
             : base(dispatcher)
         {
         }
@@ -43,7 +44,18 @@ namespace OrbitalSimOpenGL
         /// <param name="excludes">CSV list of exclude from sim settings</param>
         public void ApproachDist(String approachStatusStr)
         {
-            object[] args = { CommandStatuslWindow.GenericCommands.ApproachDistance, approachStatusStr };
+            object[] args = { CommandStatusWindow.GenericCommands.ApproachDistance, approachStatusStr };
+            GenericCommand(args);
+        }
+        #endregion
+
+        #region Reset
+        /// <summary>
+        /// (Re)set to initial state
+        /// </summary>
+        public void Reset()
+        {
+            object[] args = { CommandStatusWindow.GenericCommands.Reset };
             GenericCommand(args);
         }
         #endregion

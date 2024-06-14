@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
-using static OrbitalSimOpenGL.CommandStatuslWindow;
+using static OrbitalSimOpenGL.CommandStatusWindow;
 using static OrbitalSimOpenGL.SimCamera;
 
 namespace OrbitalSimOpenGL
@@ -36,10 +36,10 @@ namespace OrbitalSimOpenGL
 
         private StatsArea? StatsArea { get; set; }
         public CommandControlWindow CommandControlWindow { get; set; }
-        public CommandStatuslWindow CommandStatusWindow { get; set; }
+        public CommandStatusWindow CommandStatusWindow { get; set; }
         #endregion
 
-        public OrbitalSimWindow(CommandControlWindow commandControlWindow, CommandStatuslWindow commandStatusWindow)
+        public OrbitalSimWindow(CommandControlWindow commandControlWindow, CommandStatusWindow commandStatusWindow)
         {
             // For sending commands/info to the controller and status windows
             CommandControlWindow = commandControlWindow;
