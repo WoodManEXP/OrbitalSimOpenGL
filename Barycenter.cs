@@ -2,6 +2,7 @@
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Specialized;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 
 namespace OrbitalSimOpenGL
@@ -14,8 +15,8 @@ namespace OrbitalSimOpenGL
         #region Properties
         private SimBodyList SimBodyList { get; set; }
         private Scale Scale { get; set; }
-        private Double SystemMass { get; set; }
-
+        internal Double SystemMass { get; set; }
+        internal Vector3d Numerator; // Numerator of fraction of most recent barycenter Calc
         private Vector3d R; // location of barycenter after last Calc
 
         private Vector3[] WorldPoint;
@@ -81,19 +82,19 @@ namespace OrbitalSimOpenGL
         {
             Vector3d iVec;
 
-            R.X = R.Y = R.Z = 0D;
+            Numerator.X = Numerator.Y = Numerator.Z = 0D;
 
             foreach (SimBody sB in SimBodyList.BodyList)
             {
                 if (!sB.ExcludeFromSim)
                 {
                     iVec.X = sB.X; iVec.Y = sB.Y; iVec.Z = sB.Z;
-                    R += iVec * sB.Mass;
+                    Numerator += iVec * sB.Mass;
                 }
             }
-            R /= SystemMass;
+            R = Numerator / SystemMass;
         }
-
+          
         /// <summary>
         /// Render barycenter symbol
         /// </summary>
@@ -141,6 +142,29 @@ namespace OrbitalSimOpenGL
                 GL.DrawArrays(PrimitiveType.Points, 0, 1);
                 GL.PointSize(ptSize);
             }
+        }
+
+        /// <summary>
+        /// Calculate velocity of baryCenter excluding simBody from the system
+        /// </summary>
+        /// <param name="simBody"></param>
+        /// <returns>Velocity</returns>
+        internal double VelocityLess(SimBody simBody)
+        {
+            Vector3d iVec;
+            Vector3d numerator = new(0D, 0D, 0D), vVec;
+
+            foreach (SimBody sB in SimBodyList.BodyList)
+            {
+                if (!sB.ExcludeFromSim && sB!=simBody)
+                {
+                    iVec.X = sB.VX; iVec.Y = sB.VY; iVec.Z = sB.VZ;
+                    numerator += iVec * sB.Mass;
+                }
+            }
+            vVec = numerator / (SystemMass - simBody.Mass);
+
+            return vVec.Length;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace OrbitalSimOpenGL
         public static Double C_M { get; } = 299792458D;  // Speed of light 299,792,458 m/s
         public static Double CSquared_M { get; } = C_M * C_M;
         public static Double C_OneTenthKMS { get; } = C_KMS * 1D - 1; // 1/10th C km/s
-        public static Double C_OneTentSquaredhKMS { get; } = C_OneTenthKMS * C_OneTenthKMS;
+        public static Double C_OneTenthSquaredhKMS { get; } = C_OneTenthKMS * C_OneTenthKMS;
 
         static public void MakeUnitSphere(out float[] sharedSphereMesh, out UInt16[] sharedSphereIndices)
         {

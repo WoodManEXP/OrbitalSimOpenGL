@@ -28,6 +28,10 @@ namespace OrbitalSimOpenGL
         public Double VY { get; set; } // km/s
         public Double VZ { get; set; } // km/s
 
+        // Force vectors
+        public Vector3d CurrIntervalFV;        // Force vectors acting on body at interval beginning
+        public Vector3d PrevIntervalFV;    // Force vectors acting on body at previous interval beginning
+
         public bool CoastThisInterval { get; set; } = false;
 
         // Radius-squared of sphere encompassing travel from last iteration. Includes dist traveled + body radius.

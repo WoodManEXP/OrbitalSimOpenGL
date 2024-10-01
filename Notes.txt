@@ -93,6 +93,8 @@ SimBody
 - *********  LookAt sets body tracked in status area (done)
 - Pause then Continue unchecks tracing (done)
 - Reset did not restore ""Body mods" list entries that had been combined from collision
+- Reset for BaryCenter and Reticle check boxes
+- 2 bodies dead on collision, final body ends up slightly offset
 
 Examples
 - Stable system - but "The Sun"

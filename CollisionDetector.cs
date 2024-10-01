@@ -40,7 +40,7 @@ namespace OrbitalSimOpenGL
         private Vector3d DeltaS = new();
         private Vector3d DeltaE = new();
 
-        internal bool DetectCollisions = true;
+        internal bool DetectCollisions { get; set; } = true;
         #endregion
 
         public CollisionDetector(SimModel simModel, ApproachInfo approachInfo)

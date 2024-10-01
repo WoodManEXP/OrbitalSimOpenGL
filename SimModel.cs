@@ -48,7 +48,7 @@ namespace OrbitalSimOpenGL
         public SimCamera? SimCamera { get; set; }
         internal MassMass? MassMass { get; set; }
         internal SparseArray? SparseArray { get; set; }
-        private CollisionDetector? CollisionDetector { get; set; }
+        internal CollisionDetector? CollisionDetector { get; set; }
         internal ApproachInfo? ApproachInfo { get; set; }
         private Double PrevClosestApproachDistSquared { get; set; } = Double.MaxValue;
 
@@ -75,6 +75,11 @@ namespace OrbitalSimOpenGL
             }
         }
         internal Barycenter? Barycenter { get; set; }
+        internal Double SystemMass
+        {
+            // Total mass of system as maintained in class Barycenter
+            get { return Barycenter.SystemMass; }
+        }
         public bool ShowBarycenter { get; set; }
         int VertexBufferObject { get; set; }
         int VertexArrayObject { get; set; }
@@ -142,7 +147,7 @@ namespace OrbitalSimOpenGL
 
             CollisionDetector = new(this, ApproachInfo);
 
-            NextPosition = new(SimBodyList, SparseArray, MassMass, GravConstantSetting);
+            NextPosition = new(this, GravConstantSetting);
 
             Wireframe = true;
             SceneReady = true;
@@ -181,7 +186,7 @@ namespace OrbitalSimOpenGL
 
             if (ShowBarycenter)
             {
-                Barycenter?.Calc();
+                //Barycenter?.Calc(); Happens in NextPosition class.
                 // Render can use same shaders as available in SimBodyList
                 Barycenter?.Render(ms, SimCamera, SimBodyList.BodyColorUniform, SimBodyList.MVP_Uniform);
             }
@@ -198,10 +203,8 @@ namespace OrbitalSimOpenGL
             {
                 for (int i = 0; i < TimeCompression; i++)
                 {
-                    Double seconds = IterationSeconds;
-                    NextPosition?.IterateOnce(ref seconds);
-
-                    ElapsedSeconds += seconds;
+                    // NextPosition.IterateOnce will sometimes change the interval
+                    ElapsedSeconds += NextPosition.IterateOnce(IterationSeconds);
 
                     // Closest approach and collision detection
                     CollisionDetector?.Detect(ElapsedSeconds, PrevClosestApproachDistSquared, out _ClosestApproachDistSquared, ref _ClosestApproachBodiesList);
