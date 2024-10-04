@@ -29,8 +29,10 @@ namespace OrbitalSimOpenGL
         public Double VZ { get; set; } // km/s
 
         // Force vectors
-        public Vector3d CurrIntervalFV;        // Force vectors acting on body at interval beginning
-        public Vector3d PrevIntervalFV;    // Force vectors acting on body at previous interval beginning
+        internal Vector3d CurrFV;    // Force vectors acting on body at interval beginning
+        internal Vector3d PrevFV;    // Force vectors acting on body at previous interval beginning
+        internal Vector3d PrevLoc;
+        internal Vector3d PrevVel;
 
         public bool CoastThisInterval { get; set; } = false;
 
@@ -202,9 +204,15 @@ namespace OrbitalSimOpenGL
         /// <remarks>
         /// Called for each iteration
         /// </remarks>
-        public void SetPosAndVel(Double seconds, Double x, Double y, Double z, Double vX, Double vY, Double vZ)
+        public void SetPosAndVel(bool savePrevious, Double seconds, Double x, Double y, Double z, Double vX, Double vY, Double vZ)
         {
             Double d;
+
+            if (savePrevious)
+            {
+                PrevLoc.X = X; PrevLoc.Y = Y; PrevLoc.Z = Z;
+                PrevVel.X = VX; PrevVel.Y = VY; PrevVel.Z = VZ;
+            }
 
             // Calc radius-squared of sphere encompassing travel from last iteration.
             LastPathRadiusSquared = EphemerisRaduisSquared;
@@ -226,7 +234,15 @@ namespace OrbitalSimOpenGL
             PathTracer?.AddLoc(seconds, x, y, z, vX, vY, vZ); // If there is a PathTracer
         }
 
-        //        int iCtr = 0;
+        /// <summary>
+        /// Restore from previously saved pos and vel values
+        /// </summary>
+        public void RestoreToPrev()
+        {
+            X = PrevLoc.X; Y = PrevLoc.Y; Z = PrevLoc.Z;
+            VX = PrevVel.X; VY = PrevVel.Y; VZ = PrevVel.Z;
+            CurrFV = PrevFV;
+        }
 
         /// <summary>
         /// If body has become too small in 3D to 2D projection adjust its size so it remains visible.

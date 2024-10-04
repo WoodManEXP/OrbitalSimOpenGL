@@ -28,11 +28,6 @@ namespace OrbitalSimOpenGL
         // of bodies increases.
         private Vector3d[] ForceVectors { get; set; }
 
-//        private Vector3d[] LastFVSum { get; set; }
-//        private Vector3d[] SavedFVSum { get; set; }
-        private Vector3d[] SavedBodyLocation { get; set; }
-        private Vector3d[] SavedBodyVelVec { get; set; }
-
         internal SimModel SimModel { get; set; }
         private int NumBodies { get; set; }
         private SimBodyList SimBodyList { get; set; }
@@ -85,14 +80,9 @@ namespace OrbitalSimOpenGL
             // Number of entries needed is (NumBodies - 1) * NumBodies / 2
             ForceVectors = new Vector3d[SparseArray.NumSlots];
 
-            // Keep an iteration's beginning values here in case interval must be subdivided
-            // (case of FV angle change exceeding RadianThreshold)
-            SavedBodyLocation = new Vector3d[NumBodies];
-            SavedBodyVelVec = new Vector3d[NumBodies];
-
             // Prior to beginning iterations: Calc & sum FVs, save in LastVectorSum 
             CalcForceVectors(); // Between each pair of bodies
-            SumForceVectors();  // Acting upon bodies
+            SumForceVectors(false);  // Acting upon bodies
         }
 
         /// <summary>
@@ -125,6 +115,10 @@ namespace OrbitalSimOpenGL
             SimBody simBody;
             int bodyNum;
 
+            // If not detecting collisions then degen case may emerge. In which case
+            // previous interval's values are needed.
+            bool savePrevious = !CollisionDetector.DetectCollisions;
+
             for (bodyNum = 0; bodyNum < NumBodies; bodyNum++)
             {
                 simBody = SimBodyList.BodyList[bodyNum];
@@ -133,9 +127,9 @@ namespace OrbitalSimOpenGL
                     continue; // No need if body has been excluded
 
                 // New velocity vectors
-                Double eVX = simBody.VX + ((simBody.CurrIntervalFV.X * seconds) / simBody.Mass);
-                Double eVY = simBody.VY + ((simBody.CurrIntervalFV.Y * seconds) / simBody.Mass);
-                Double eVZ = simBody.VZ + ((simBody.CurrIntervalFV.Z * seconds) / simBody.Mass);
+                Double eVX = simBody.VX + ((simBody.CurrFV.X * seconds) / simBody.Mass);
+                Double eVY = simBody.VY + ((simBody.CurrFV.Y * seconds) / simBody.Mass);
+                Double eVZ = simBody.VZ + ((simBody.CurrFV.Z * seconds) / simBody.Mass);
 
                 // If new vel is over 1/10th c (Does this ever happen ?)
                 Vector3d vVec = new(eVX, eVY, eVZ);
@@ -153,19 +147,7 @@ namespace OrbitalSimOpenGL
                 Double newY = simBody.Y + seconds * eVY;
                 Double newZ = simBody.Z + seconds * eVZ;
 
-                // If not detecting collisions prep for processing degenerate cases
-                if (!CollisionDetector.DetectCollisions)
-                {
-                    simBody.PrevIntervalFV = simBody.CurrIntervalFV;
-                    //                    SavedFVSum[bodyNum] = LastFVSum[bodyNum];
-                    SavedBodyLocation[bodyNum].X = simBody.X;
-                    SavedBodyLocation[bodyNum].Y = simBody.Y;
-                    SavedBodyLocation[bodyNum].Z = simBody.Z;
-                    SavedBodyVelVec[bodyNum].X = simBody.VX;
-                    SavedBodyVelVec[bodyNum].Y = simBody.VY;
-                    SavedBodyVelVec[bodyNum].Z = simBody.VZ;
-                }
-                simBody.SetPosAndVel(seconds, newX, newY, newZ, eVX, eVY, eVZ); // Most of time these setings will stick
+                simBody.SetPosAndVel(savePrevious, seconds, newX, newY, newZ, eVX, eVY, eVZ); // Most of time these setings will stick
             }
 
             // Calculate barycenter
@@ -173,7 +155,7 @@ namespace OrbitalSimOpenGL
 
             // Calc FVs for next pass
             CalcForceVectors();
-            SumForceVectors();
+            SumForceVectors(savePrevious);
         }
 
         /// <summary>
@@ -194,12 +176,7 @@ namespace OrbitalSimOpenGL
                     continue; // No need if body has been excluded
 
                 // Restore position and velocity vectors
-                simBody.SetPosAndVel(0D, SavedBodyLocation[bodyNum].X,
-                                        SavedBodyLocation[bodyNum].Y,
-                                        SavedBodyLocation[bodyNum].Z,
-                                        SavedBodyVelVec[bodyNum].X,
-                                        SavedBodyVelVec[bodyNum].Y,
-                                        SavedBodyVelVec[bodyNum].Z);
+                simBody.RestoreToPrev();
             }
         }
 
@@ -267,7 +244,7 @@ namespace OrbitalSimOpenGL
                 if (simBody.ExcludeFromSim)
                     continue;
 
-                if (VectorsAreOpposed(simBody.CurrIntervalFV, simBody.PrevIntervalFV))
+                if (VectorsAreOpposed(simBody.CurrFV, simBody.PrevFV))
                 {
                     // Here it is known the FV for simBody has encountered an ~180 flip
                     // (two bodies have passed through one another (collision detection is off))
@@ -279,12 +256,22 @@ namespace OrbitalSimOpenGL
                     CrossTimesList.Add(new(simBody, Barycenter));
                 }
 #if true
+                SimBody simBody0 = SimBodyList.BodyList[0];
+                SimBody simBody1 = SimBodyList.BodyList[1];
+                Vector3d sv0, sv1;
+                Double len;
+                sv0.X = simBody0.X; sv0.Y = simBody0.Y; sv0.Z = simBody0.Z;
+                sv1.X = simBody1.X; sv1.Y = simBody1.Y; sv1.Z = simBody1.Z;
+                len = (sv0 - sv1).Length;
                 if (0 == bodyNum)
                     System.Diagnostics.Debug.WriteLine("NextPosition:DegenCase bodyNum 0"
-                        + " VelVec.X " + simBody.VX.ToString("0.000E00")
-                        + " SavedBodyVelVec.X " + SavedBodyVelVec[0].X.ToString("0.000E00")
-                        + " LastVectorSum " + simBody.CurrIntervalFV.X.ToString("0.000E00")
-                        + ", SavedVectorSum " + simBody.PrevIntervalFV.X.ToString("0.000E00")
+                        + " Dist " + len.ToString("0.000E00")
+                        + " X " + simBody.X.ToString("0.000E00")
+                        + " PrevX " + simBody.PrevLoc.X.ToString("0.000E00")
+                        + " VelVec " + simBody.VX.ToString("0.000E00")
+                        + " PrevVel " + simBody.PrevVel.X.ToString("0.000E00")
+                        + " CurrFV " + simBody.CurrFV.X.ToString("0.000E00")
+                        + " PrevFV " + simBody.PrevFV.X.ToString("0.000E00")
                      );
 #endif
             }
@@ -296,19 +283,46 @@ namespace OrbitalSimOpenGL
                 foreach (CrossTime crossTime in CrossTimesList)
                     seconds = Math.Min(seconds, crossTime.Seconds);
                 // Double it to get to place on other side of flip where FVs
-                // should be about what they were on entering the interval.
+                // should be about what they were upon entering the interval.
                 seconds *= 2D;
 
                 ResetInterval();            // Back to beginning of interval
+
+#if true
+                SimBody simBody0 = SimBodyList.BodyList[0];
+                SimBody simBody1 = SimBodyList.BodyList[1];
+                Vector3d sv0, sv1;
+                Double len;
+                sv0.X = simBody0.X; sv0.Y = simBody0.Y; sv0.Z = simBody0.Z;
+                sv1.X = simBody1.X; sv1.Y = simBody1.Y; sv1.Z = simBody1.Z;
+                len = (sv0 - sv1).Length;
+                System.Diagnostics.Debug.WriteLine("NextPosition:DegenCase bodyNum 0 after ResetInterval"
+                    + " Dist " + len.ToString("0.000E00")
+                    + " seconds " + seconds.ToString("0.000E00")
+                    + " X " + simBody0.X.ToString("0.000E00")
+                    + " PrevX " + simBody0.PrevLoc.X.ToString("0.000E00")
+                    + " VelVec " + simBody0.VX.ToString("0.000E00")
+                    + " PrevVel " + simBody0.PrevVel.X.ToString("0.000E00")
+                    + " CurrFV " + simBody0.CurrFV.X.ToString("0.000E00")
+                    + " PrevFV " + simBody0.PrevFV.X.ToString("0.000E00")
+                    );
+#endif
+
                 ProcessInterval(seconds);   // Process it over again wiht the new value for seconds
 
 #if true
-                SimBody simBody = SimBodyList.BodyList[0];
+                sv0.X = simBody0.X; sv0.Y = simBody0.Y; sv0.Z = simBody0.Z;
+                sv1.X = simBody1.X; sv1.Y = simBody1.Y; sv1.Z = simBody1.Z;
+                len = (sv0 - sv1).Length;
                 System.Diagnostics.Debug.WriteLine("NextPosition:DegenCase bodyNum 0 after reprocess interval"
-                    + " VelVec.X " + simBody.VX.ToString("0.000E00")
-                    + " SavedBodyVelVec.X " + SavedBodyVelVec[0].X.ToString("0.000E00")
-                    + " LastVectorSum " + simBody.CurrIntervalFV.X.ToString("0.000E00")
-                    + ", SavedVectorSum " + simBody.PrevIntervalFV.X.ToString("0.000E00")
+                    + " Dist " + len.ToString("0.000E00")
+                    + " seconds " + seconds.ToString("0.000E00")
+                    + " X " + simBody0.X.ToString("0.000E00")
+                    + " PrevX " + simBody0.PrevLoc.X.ToString("0.000E00")
+                    + " VelVec " + simBody0.VX.ToString("0.000E00")
+                    + " PrevVel " + simBody0.PrevVel.X.ToString("0.000E00")
+                    + " CurrFV " + simBody0.CurrFV.X.ToString("0.000E00")
+                    + " PrevFV " + simBody0.PrevFV.X.ToString("0.000E00")
                     );
 #endif
             }
@@ -325,7 +339,7 @@ namespace OrbitalSimOpenGL
         /// FVs represent Newtons of force in each dimension.
         /// bodyNum should not refer to an excluded body.
         /// </remarks>
-        private void SumForceVectors()
+        private void SumForceVectors(bool savePrevious)
         {
             for (int bodyNum = 0; bodyNum < NumBodies; bodyNum++)
             {
@@ -334,7 +348,10 @@ namespace OrbitalSimOpenGL
                 if (simBody.ExcludeFromSim)
                     continue;
 
-                simBody.CurrIntervalFV -= simBody.CurrIntervalFV; // To 0
+                if (savePrevious)
+                    simBody.PrevFV = simBody.CurrFV;
+
+                simBody.CurrFV -= simBody.CurrFV; // To 0
 
                 //forceVector -= forceVector; // To 0
 
@@ -351,9 +368,9 @@ namespace OrbitalSimOpenGL
                         // body with higher index, attraction of lower to higher (bL ---> bH)
                         int index = SparseArray.ValuesIndex(bodyNum, otherBodyNum);
                         if (bodyNum < otherBodyNum)
-                            simBody.CurrIntervalFV += ForceVectors[index];
+                            simBody.CurrFV += ForceVectors[index];
                         else
-                            simBody.CurrIntervalFV -= ForceVectors[index];
+                            simBody.CurrFV -= ForceVectors[index];
                     }
                 }
             }
