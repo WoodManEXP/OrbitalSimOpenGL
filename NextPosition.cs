@@ -163,7 +163,6 @@ namespace OrbitalSimOpenGL
         /// </summary>
         private void ResetInterval()
         {
-
             // Reset the interval
             SimBody simBody;
             int bodyNum;
@@ -180,47 +179,44 @@ namespace OrbitalSimOpenGL
             }
         }
 
-        struct CrossTime
+        /// <summary>
+        /// Calculate seconds to vector flip within an iteration
+        /// </summary>
+        /// <param name="simBody"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// It is known that vectors flip in this interval for simBody, this calculates seconds into the interval where
+        /// the flip occurs (basically a time to incercept problem). Flip is calculated to occur when in interval simBody
+        /// intercepts the Barycenter formed by all the other bodies in the system.
+        /// </remarks>
+        private Double IntervalSeconds(SimBody simBody)
         {
-            #region Properties
-            public Double Seconds { get; set; } //Seconds into the interval to the FV flip
-            #endregion
+            Double seconds;
 
-            /// <summary>
-            /// One of these is instantiated each time a FV flip is detected.
-            /// </summary>
-            /// <param name="simBody">Body for which FV vector flip was detected</param>
-            /// <remarks>
-            /// With the FV 180 degree flip this knows the body centers were on a direct collision course...
-            /// </remarks>
-            public CrossTime(SimBody simBody, Barycenter barycenter)
-            {
+            // Known: Beginning and end of interval position and velocity vectors of all bodies in the system
+            // Flip seconds into the interval are calculated using beginning of interval values
+            // (those are the ones used to advance bodies through the interval)
+            // Cross time is calculated on
+            // - simBody's beginning of interval position and velocity vector through the interval
+            // - Barycenter location and velocity as defined by all the other bodies in the system (excluding simBody)
+            // https://orbital-mechanics.space/the-n-body-problem/motion-of-the-barycenter.html
 
-                // Calculate the seconds into the interval of the FV flip
-                Seconds = 0D;
+            // Location and velocity of simBody
+            // (Supposedly allocation of a struct via "new" in this context is stack rather than heap space. So this is
+            // as efficiant as it can be).
+            Vector3d simBodyLoc = new(simBody.X, simBody.Y, simBody.Z);
+            Double simBodyVel = new Vector3d(simBody.VX, simBody.VY, simBody.VZ).Length;
 
-                // Known: Beginning and end of interval position and velocity vectors of all bodies in the system
-                // Flip seconds into the interval are calculated using beginning of interval values
-                // (those are the ones used to advance bodies through the interval)
-                // Cross time is calculated on
-                // - simBody's beginning of interval position and velocity vector through the interval
-                // - Barycenter location and velocity as defined by all the other bodies in the system (excluding simBody)
-                // https://orbital-mechanics.space/the-n-body-problem/motion-of-the-barycenter.html
+            // Location and velocity of simBody'less barycenter
+            Vector3d barycenterLoc = (Barycenter.Numerator - (simBody.Mass * simBodyLoc)) / (Barycenter.SystemMass - simBody.Mass);
+            Double barycenterVel = Barycenter.VelocityLess(simBody);
 
-                // Location and velocity of simBody
-                // (Supposedly allocation of a struct via "new" in this context is stack rather than heap space. So this is
-                // as efficiant as it can be).
-                Vector3d simBodyLoc = new(simBody.X, simBody.Y, simBody.Z);
-                Double simBodyVel = new Vector3d(simBody.VX, simBody.VY, simBody.VZ).Length;
+            seconds = (simBodyLoc - barycenterLoc).Length / (simBodyVel + barycenterVel);
 
-                // Location and velocity of simBody'less barycenter
-                Vector3d barycenterLoc = (barycenter.Numerator - (simBody.Mass * simBodyLoc)) / (barycenter.SystemMass - simBody.Mass);
-                Double barycenterVel = barycenter.VelocityLess(simBody);
-
-                Seconds = (simBodyLoc - barycenterLoc).Length / (simBodyVel + barycenterVel);
-            }
+            return seconds;
         }
-        private List<CrossTime> CrossTimesList = new();
+
+        private List<SimBody> VectorsFlippedList = new();
 
         /// <summary>
         /// Handle degenerate case of bodies passing through one another
@@ -233,7 +229,7 @@ namespace OrbitalSimOpenGL
             if (CollisionDetector.DetectCollisions)
                 return seconds;
 
-            CrossTimesList.Clear();
+            VectorsFlippedList.Clear();
 
             // Did any of the force vectors flip?
             // Collect in the list refs to each of the bodies for which FVs flipped.
@@ -245,7 +241,6 @@ namespace OrbitalSimOpenGL
                     continue;
 
                 if (VectorsAreOpposed(simBody.CurrFV, simBody.PrevFV))
-                {
                     // Here it is known the FV for simBody has encountered an ~180 flip
                     // (two bodies have passed through one another (collision detection is off))
                     // Although unlikely, this could happen for multiple bodies during an iteration.
@@ -253,40 +248,24 @@ namespace OrbitalSimOpenGL
                     // Not totally fool-proof, but given bodies tend to be widely spaced and intervals short
                     // most cases will be processed correctly. If there were many bodies really close to one another
                     // in a tight group this will likely generate poor results.
-                    CrossTimesList.Add(new(simBody, Barycenter));
-                }
-#if true
-                SimBody simBody0 = SimBodyList.BodyList[0];
-                SimBody simBody1 = SimBodyList.BodyList[1];
-                Vector3d sv0, sv1;
-                Double len;
-                sv0.X = simBody0.X; sv0.Y = simBody0.Y; sv0.Z = simBody0.Z;
-                sv1.X = simBody1.X; sv1.Y = simBody1.Y; sv1.Z = simBody1.Z;
-                len = (sv0 - sv1).Length;
-                if (0 == bodyNum)
-                    System.Diagnostics.Debug.WriteLine("NextPosition:DegenCase bodyNum 0"
-                        + " Dist " + len.ToString("0.000E00")
-                        + " X " + simBody.X.ToString("0.000E00")
-                        + " PrevX " + simBody.PrevLoc.X.ToString("0.000E00")
-                        + " VelVec " + simBody.VX.ToString("0.000E00")
-                        + " PrevVel " + simBody.PrevVel.X.ToString("0.000E00")
-                        + " CurrFV " + simBody.CurrFV.X.ToString("0.000E00")
-                        + " PrevFV " + simBody.PrevFV.X.ToString("0.000E00")
-                     );
-#endif
+                    VectorsFlippedList.Add(simBody);
             }
 
             // Pull out min crosstimes seconds as return value
-            if (CrossTimesList.Count > 0)
+            if (VectorsFlippedList.Count > 0)
             {
                 seconds = Double.MaxValue;
-                foreach (CrossTime crossTime in CrossTimesList)
-                    seconds = Math.Min(seconds, crossTime.Seconds);
-                // Double it to get to place on other side of flip where FVs
-                // should be about what they were upon entering the interval.
-                seconds *= 2D;
 
-                ResetInterval();            // Back to beginning of interval
+                ResetInterval(); // Back to beginning of interval
+
+                Barycenter?.Calc(); // Recalc barycenter
+
+                foreach (SimBody simBody in VectorsFlippedList)
+                    seconds = Math.Min(seconds, IntervalSeconds(simBody));
+
+                // Double it to get to place on other side of flip where FVs
+                // should have about same, but opposite, magnitude as upon entering the interval.
+                seconds *= 2D;     
 
 #if true
                 SimBody simBody0 = SimBodyList.BodyList[0];
@@ -308,7 +287,7 @@ namespace OrbitalSimOpenGL
                     );
 #endif
 
-                ProcessInterval(seconds);   // Process it over again wiht the new value for seconds
+                ProcessInterval(seconds);   // Process it over again with the new value for seconds
 
 #if true
                 sv0.X = simBody0.X; sv0.Y = simBody0.Y; sv0.Z = simBody0.Z;
