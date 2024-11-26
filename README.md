@@ -39,7 +39,7 @@ These are videos, hosted on YouTube, running various models showing the sims's c
 
 ## Implementation
 
-The sim is implemented for MS Windows 10+ in C\# using Microsoft’s Visual Studio 2022 IDE. The 3D graphics is implemented via OpenGL/OpenTK via an OpenGL WPF control available at [https://github.com/opentk/GLWpfControl](https://github.com/opentk/GLWpfControl) .The installed OpenGL control comes from [https://www.nuget.org/packages/OpenTK.GLWpfControl](https://www.nuget.org/packages/OpenTK.GLWpfControl).  The non 3D controls and visualizations are implemented via MS WPF facilities.
+The sim is implemented for MS Windows 10+ in C\# using Microsoft’s Visual Studio 2022 IDE. The 3D graphics is implemented via OpenGL/OpenTK via an OpenGL WPF control available at [https://github.com/opentk/GLWpfControl](https://github.com/opentk/GLWpfControl). The installed OpenGL control comes from [https://www.nuget.org/packages/OpenTK.GLWpfControl](https://www.nuget.org/packages/OpenTK.GLWpfControl).  The non 3D controls and visualizations are implemented via MS WPF facilities.
 
 OpenTK.Mathematics supplies definitions for datatypes such as Vector3d and Color4. These are used throughout the sim rather than WPF versions such as Vector3D or Color.
 
