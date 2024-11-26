@@ -27,6 +27,16 @@ The sim is iterative and works well iterating at 1 minute intervals. It calculat
 
 Over long periods of time the sim unavoidably devolves into chaos. Small errors are accumulating in the double precision math. If this was being used for navigation on a real spaceship, new observations would be taken along the way to correct the errors accumulating in the sim’s math. The sim is also unaware of the miniscule gravitational effects of far away bodies elsewhere in the galaxy and universe. No worries though, they can be safely ignored for the scales on which this operates.
 
+## Videos
+
+These are videos, hosted on YouTube, running various models showing the sims's capabilities.
+
+- One PBH approaching orbital plane, shallow angle  https://youtu.be/Ce85Par18Kw
+- Asteroid 99942 Apophis' encounter with Earth  https://youtu.be/nBchlIUUG1U
+- Change the gravitational constant  https://youtu.be/LqO-uI6X6h4
+- BH approaching, high angle  https://youtu.be/-5p1qsAGkE4
+- Stable solar system, but what if Sol disappears  https://youtu.be/qN0Kaa3Ua0s
+
 ## Implementation
 
 The sim is implemented for MS Windows 10+ in C\# using Microsoft’s Visual Studio 2022 IDE. The 3D graphics is implemented via OpenGL/OpenTK via an OpenGL WPF control available at [https://github.com/opentk/GLWpfControl](https://github.com/opentk/GLWpfControl) .The installed OpenGL control comes from [https://www.nuget.org/packages/OpenTK.GLWpfControl](https://www.nuget.org/packages/OpenTK.GLWpfControl).  The non 3D controls and visualizations are implemented via MS WPF facilities.
